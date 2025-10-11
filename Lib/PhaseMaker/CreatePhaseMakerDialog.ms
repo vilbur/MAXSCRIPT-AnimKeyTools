@@ -9,19 +9,24 @@ function createPhaseMakerDialog =
 	
 	
 	/* LOAD CONTENT FROM FOLDERS */
-	ContentLoader	= ContentLoader_v path:(current_dir+"/content") ini:( getSourceFileName()) --DEBUG:DEBUG
+	ContentLoader	= ContentLoader_v path:(current_dir+"/content") title:"PhaseMaker" width:168 ini:( getSourceFileName()) --DEBUG:DEBUG
+	--ContentLoader	= ContentLoader_v path:(current_dir+"/content-animaker") ini:( getSourceFileName()) --DEBUG:DEBUG
 	--ContentLoader	= ContentLoader_v path:(current_dir+"/Groupbox-Test")
 	
-	ContentLoader.Dialog.title = "PhaseMaker"
+	--ContentLoader.Dialog.title = "PhaseMaker"
 	
 	/* CREATE UI */
 	--ContentLoader.create() --width:512
-	ContentLoader.create width:168 --lockHeight:true
+	--Dialog = ContentLoader.create width:168 --lockHeight:true
+	--Dialog = ContentLoader.create width:168 lockWidth:true
+	Dialog = ContentLoader.create() --lockWidth:true
 	
+	
+	Dialog.register()
 	
 	/* LOAD RIGS */
-	--DIALOG_content_animmaker.DL_rig_select.items = #(" ") + (RigWrapper_v()).getNamesOfRigsInScene() -- first item empty + rig names
-	--DIALOG_content_animmaker.DL_rig_select.selection = 2 -- select first rig name
-	
+	DIALOG_phasemaker.DL_rig_select.items = #(" ") + (RigWrapper_v()).getNamesOfRigsInScene() -- first item empty + rig names
+	DIALOG_phasemaker.DL_rig_select.selection = 2 -- select first rig name
+	--format "DIALOG_phasemaker: %\n" DIALOG_phasemaker
 )
 

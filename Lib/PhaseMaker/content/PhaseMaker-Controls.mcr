@@ -10,20 +10,20 @@ tooltip:	"Colorpicker test"
 icon:	"control:timer|interval:500|active:true|height:0"
 (
 	--format "EventFired	= % \n" EventFired
-	--format "DIALOG_content_animmaker: %\n" DIALOG_content_animmaker	
+	--format "DIALOG_phasemaker: %\n" DIALOG_phasemaker	
 	/* ADJUST BUTTON TEXT - CREATE PHASE if first frame of range is active else COPY PHASE */
 	on execute do
-		if DIALOG_content_animmaker != undefined then
+		if DIALOG_phasemaker != undefined then
 		(
 			is_current_time_on_start_of_range = animationRange.start == currentTime
 			
-			BTN_create_phase = DIALOG_content_animmaker.BTN_create_phase
+			BTN_create_phase = DIALOG_phasemaker.BTN_create_phase
 			
-			BTN_mirror_phase = DIALOG_content_animmaker.BTN_mirror_phase
+			BTN_mirror_phase = DIALOG_phasemaker.BTN_mirror_phase
 			
 			BTN_mirror_phase.pos.x = 	BTN_create_phase.pos.x =  16
 			
-			
+			/* VISIBILITY OF BUTTONS  */ 
 			BTN_create_phase.visible = is_current_time_on_start_of_range
 			
 			BTN_mirror_phase.visible = not BTN_create_phase.visible
@@ -84,7 +84,7 @@ icon:	"control:#CHECKBOX|across:2"
 	
 	format "EventFired: %\n" EventFired
 	
-	DIALOG_content_animmaker.DL_phase_length.enabled = EventFired.val
+	DIALOG_phasemaker.DL_phase_length.enabled = EventFired.val
 
 )
 
@@ -116,7 +116,7 @@ icon:	"control:#CHECKBOX|across:2"
 	
 	format "EventFired: %\n" EventFired
 	
-	DIALOG_content_animmaker.DL_increment_value.enabled = EventFired.val
+	DIALOG_phasemaker.DL_increment_value.enabled = EventFired.val
 
 )
 
@@ -141,14 +141,14 @@ function getPhaseRange dir:#BACK  =
 	(
 		end = currentTime.frame as integer 
 		
-		start = end + DIALOG_content_animmaker.DL_phase_length.selected as integer + 1
+		start = end + DIALOG_phasemaker.DL_phase_length.selected as integer + 1
 		
 	)
 	else
 	(
 		start = currentTime.frame as integer
 		
-		end = start + DIALOG_content_animmaker.DL_phase_length.selected as integer - 1
+		end = start + DIALOG_phasemaker.DL_phase_length.selected as integer - 1
 	)
 
 	
@@ -174,6 +174,14 @@ function getCycleRange =
 	cycle --return
 )
 
+/*------------------------------------------------------------------------------
+
+	BUTTONS 
+
+--------------------------------------------------------------------------------*/
+
+
+
 /**  
  */
 macroscript	template_phase_create
@@ -181,14 +189,14 @@ category:	"_AnimKeyTools"
 --buttontext:	"Frame - > Phase"
 buttontext:	"C R E A T E phase"
 toolTip:	"Generate phase from single frame.E.G.: Generate 1st step from first frame"
-icon:	"across:2|id:#BTN_create_phase|width:128|height:32|border:false"
+icon:	"across:2|id:#BTN_create_phase|visible:false|width:128|height:32|border:false"
 (
 
 	undo "Mirror Phase" on
 	(
-		increment = DIALOG_content_animmaker.DL_increment_value.selected as integer
+		increment = DIALOG_phasemaker.DL_increment_value.selected as integer
 		
-		rig_name = DIALOG_content_animmaker.DL_rig_select.selected
+		rig_name = DIALOG_phasemaker.DL_rig_select.selected
 		
 		phase = getPhaseRange dir:#FORWARD
 		
@@ -209,16 +217,16 @@ category:	"_AnimKeyTools"
 --buttontext:	"Frame - > Phase"
 buttontext:	"M I R R O R phase"
 toolTip:	"Generate phase from single frame.E.G.: Generate 1st step from first frame"
-icon:	"across:2|id:#BTN_mirror_phase|width:128|height:32|border:false|align:#CENTER"
+icon:	"across:2|id:#BTN_mirror_phase|visible:false|width:128|height:32|border:false|align:#CENTER"
 (
 	
 	PhaseCreator = PhaseCreator_v()
 	
 	undo "Mirror Phase" on
 	(
-		increment = DIALOG_content_animmaker.DL_increment_value.selected as integer
+		increment = DIALOG_phasemaker.DL_increment_value.selected as integer
 		
-		rig_name = DIALOG_content_animmaker.DL_rig_select.selected
+		rig_name = DIALOG_phasemaker.DL_rig_select.selected
 		
 		phase = getPhaseRange()
 		
@@ -275,7 +283,7 @@ icon:	"across:1|width:128|height:32|border:false"
 	--	--format "\n"; print ".getPhaseRange()"
 	--	start = currentTime.frame as integer
 	--	
-	--	end = start + DIALOG_content_animmaker.DL_phase_length.selected as integer - 1
+	--	end = start + DIALOG_phasemaker.DL_phase_length.selected as integer - 1
 	--	format "Interval: %\n" ([ start, end] )
 	--	[ start, end ] --return
 	--)
