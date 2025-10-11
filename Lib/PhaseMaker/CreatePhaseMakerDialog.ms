@@ -25,8 +25,13 @@ function createPhaseMakerDialog =
 	Dialog.register()
 	
 	/* LOAD RIGS */
-	DIALOG_phasemaker.DL_rig_select.items = #(" ") + (RigWrapper_v()).getNamesOfRigsInScene() -- first item empty + rig names
-	DIALOG_phasemaker.DL_rig_select.selection = 2 -- select first rig name
+	--if DIALOG_phasemaker != undefined then 
+	if DIALOG_phasemaker.DL_rig_select != undefined then -- if used only for DEVELOP 
+	(
+		DIALOG_phasemaker.DL_rig_select.items = #(" ") + (RigWrapper_v()).getNamesOfRigsInScene() -- first item empty + rig names
+		DIALOG_phasemaker.DL_rig_select.selection = 2 -- select first rig name
+		
+	)
 	--format "DIALOG_phasemaker: %\n" DIALOG_phasemaker
 )
 

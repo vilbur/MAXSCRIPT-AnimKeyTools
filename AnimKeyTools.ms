@@ -1,8 +1,9 @@
 clearListener(); print("Cleared in:\n"+getSourceFileName())
 
-global DIALOG_content_animmaker
+global DIALOG_phasemaker
 
-global PHASE_LENGTH
+if PHASE_LENGTH == undefined then 
+	global PHASE_LENGTH = 1
 
 
 /*------------------------------------------------------------------------------
@@ -14,7 +15,6 @@ filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-UI-framework/Lib/C
 
 /* GLOBAL COLOR NAMES */ 
 filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-COLOR_NAMES/COLOR_NAMES.ms" )	--"./../MAXSCRIPT-COLOR_NAMES/COLOR_NAMES.ms"
-
 
 
 /*------------------------------------------------------------------------------
@@ -29,29 +29,13 @@ filein( getFilenamePath(getSourceFileName()) + "/Lib/KeyFrameManager/KeyFrameMan
 
 
 
---/*------------------------------------------------------------------------------
---	TrackbarTools
----------------------------------------------------------------------------------*/
---
---
---filein( getFilenamePath(getSourceFileName()) + "/Lib/frameButtonRcMenu/frameButtonRcMenu.ms" )	--"./Lib/frameButtonRcMenu/frameButtonRcMenu.ms"
---
-----filein( getFilenamePath(getSourceFileName()) + "/Lib/walkCycleAnimator/walkCycleAnimator.ms" )	--"./Lib/walkCycleAnimator/walkCycleAnimator.ms"
---
---
---filein( getFilenamePath(getSourceFileName()) + "/Lib/TrackbarTools/trackbarToolsDialog.ms" )	--"./Lib/TrackbarTools/trackbarToolsDialog.ms"
---
---
---/*------------------------------------------------------------------------------
---	MACROS - imported in production
---	
---	DEVELOPMENT: this file is imported in *.mcr files bellow
---	
-----------------------------------------------------------------------------------*/
---
---filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/TrackbarTools.mcr" )	--"./TrackbarTools/TrackbarTools.mcr"
---
---
---filein( getFilenamePath(getSourceFileName()) + "/PhaseMaker/PhaseMaker.mcr" )	--"./PhaseMaker/PhaseMaker.mcr"
---
---
+/*------------------------------------------------------------------------------
+	MACROS - imported in production
+	
+	DEVELOPMENT: this file is imported in *.mcr files bellow
+	
+--------------------------------------------------------------------------------*/
+
+filein( getFilenamePath(getSourceFileName()) + "/Lib/TrackbarTools.mcr" )	--"./Lib/TrackbarTools.mcr"
+
+filein( getFilenamePath(getSourceFileName()) + "/Lib/PhaseMaker.mcr" )	--"./Lib/PhaseMaker.mcr"

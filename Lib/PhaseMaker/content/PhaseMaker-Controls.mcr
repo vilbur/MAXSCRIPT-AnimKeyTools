@@ -28,6 +28,14 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			
 			BTN_mirror_phase.visible = not BTN_create_phase.visible
 			
+			/* SYNC WITH GLOBAL VAROABLE */ 
+			if PHASE_LENGTH != DIALOG_phasemaker.DL_phase_length.selection then
+				DIALOG_phasemaker.DL_phase_length.selection = PHASE_LENGTH
+				
+				
+			--format "PHASE_LENGTH: %\n" PHASE_LENGTH
+			--format "DIALOG_phasemaker.DL_phase_length.selected: %\n" DIALOG_phasemaker.DL_phase_length.selected
+			--DIALOG_phasemaker.DL_phase_length.selected = EventFired.val as string
 		)
 )
 
@@ -70,7 +78,18 @@ toolTip:	"Count of frames in phase"
 icon:	"control:#DROPDOWN|across:2|width:64|items:#( '1', '2', '3', '4', '5', '6', '7', '8', '9')"
 (
 	
+	format "Phase Length: %\n" "(Phase Length)"
 	format "EventFired: %\n" EventFired
+	
+	--if EventFired == undefined then
+	--(
+	--	if PHASE_LENGTH == undefined then 
+	--		PHASE_LENGTH = DIALOG_phasemaker.DL_phase_length.selected as integer
+	--)
+	--else
+		--PHASE_LENGTH = DIALOG_phasemaker.DL_phase_length.selected = EventFired.val as string
+		PHASE_LENGTH = EventFired.val
+
 )
 
 /**  
@@ -295,47 +314,3 @@ icon:	"across:1|width:128|height:32|border:false"
 	
 	
 )
-
-
---/**  
--- */
---macroscript	template_mirror_phase
---category:	"content-Template"
---buttontext:	"Mirror phase"
---toolTip:	"MIRROR: If 1 side is selected.\n\nSWAP: If 2 side is selected.\n\nE.G.:\n\nA) Left foot selected > MIRROR to rigt foot.\n\nB) Both feet selected > SWAP left <-> right"
---icon:	"across:1|width:128|height:32|border:false"
---(
---	--RigWrapper = RigWrapper_v()
---	--PhaseCreator = PhaseCreator_v()
---	--
---	--
---	--RigWrapper.loadRig $boy_Setup_Ctrl_MasterControl_G
---	--
---	--undo "mirrorPhases" on
---	--
---	--RigWrapper.mirrorPhase ( Interval 1 3 )
---)
---
---/**  
--- */
---macroscript	template_make_cycle
---category:	"content-Template"
---buttontext:	"Cycle"
---toolTip:	""
---icon:	"across:1|width:128|height:32|border:false"
---(
---	--RigWrapper = RigWrapper_v()
---	--PhaseCreator = PhaseCreator_v()
---	--
---	--
---	--RigWrapper.loadRig $boy_Setup_Ctrl_MasterControl_G
---	--
---	--undo "mirrorPhases" on
---	--
---	--RigWrapper.mirrorPhase ( Interval 1 3 )
---)
-
-
-
-
-

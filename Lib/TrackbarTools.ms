@@ -56,7 +56,10 @@ struct TrackbarTools_v
 			#TMOnly 
 		else
 			#all
-		--format "_rollout: %\n" _rollout.status_bar
+
+		/* SYNC WITH GLOBAL VAROABLE */
+		if PHASE_LENGTH != _rollout.DL_phase.selected then
+			_rollout.DL_phase.selection = PHASE_LENGTH
 	),
 	
 	/* set frame */ 
