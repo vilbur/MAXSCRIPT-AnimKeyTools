@@ -171,20 +171,20 @@ struct KeyFrameManager_v
 	 */
 	function _processControllerKeys ControllerKeys callback =
 	(
-		format "\n"; print "KeyFrameManager_v._processControllerKeys()"
-		format "% CALLBACK: %\n" ControllerKeys.ctrl callback
+		--format "\n"; print "KeyFrameManager_v._processControllerKeys()"
+		--format "% CALLBACK: %\n" ControllerKeys.ctrl callback
 		--format "ControllerKeys.keys: %\n" ControllerKeys.keys
 		/** Copy key
 		 */
 		function _copyKey ctrl key_time =
 		(
-			format "\n"; print "KeyFrameManager_v._copyKey()"
+			--format "\n"; print "KeyFrameManager_v._copyKey()"
 			
 			phase_length = this._getPhaseLenght()
-			format "phase_length: %\n" phase_length
+			--format "phase_length: %\n" phase_length
 			new_time = ( key_time + phase_length ) as integer
 			
-			format "_copyKey % -> %\n" key_time new_time
+			--format "_copyKey % -> %\n" key_time new_time
 			
 			/* COPY KEY */ 
 			with animate on at time new_time

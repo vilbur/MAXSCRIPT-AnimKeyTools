@@ -19,7 +19,9 @@ struct TrackbarTools_v
 	/* properties */
 	
 	/* private */
-	green_color = COLOR_NAMES[#DARKGREEN], -- coor active frame button 
+	green_color = COLOR_NAMES[#GREEN_DARK], -- coor active frame button 
+	
+	anim_button_state,
 	
 	/** On timer tick
 	 */
@@ -36,6 +38,8 @@ struct TrackbarTools_v
 		/* SHOW \ HIDE RED STRIP ON TOP OF ROLLOUT IF AINMATION MODE IS ACTIVE */ 
 		_rollout.status_bar.visible = animButtonState
 
+		current_frame = currentTime.frame as integer
+		
 		
 		/* UPDATE CURRENT FRAME */ 
 		if not is_playing_now then
@@ -59,9 +63,27 @@ struct TrackbarTools_v
 		else
 			#all
 
+			
 		/* SYNC WITH GLOBAL VAROABLE */
 		if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
-			_rollout.DL_phase.selection = PHASE_LENGTH 
+			_rollout.DL_phase.selection = PHASE_LENGTH
+
+
+		/* IF STATE OF ANIMATION MODE IS CHANGED */ 
+		if anim_button_state != animButtonState then
+		(
+			anim_button_state = animButtonState
+			
+			/* UPDATE HIGHLIGH COLOR OF BUTTON */ 
+			if ( frame_button = this._getFrameButton current_frame ) != undefined then
+			(
+				frame_button.highlightColor = (this.getFrameButtonColor current_frame)
+	
+				frame_button.state = false
+				frame_button.state = true
+			)
+		)
+		
 	),
 	
 	/* set frame */ 
@@ -147,17 +169,20 @@ struct TrackbarTools_v
 	 */
 	function updateButtons frame =
 	(
-		--format "\n"; print "TrackbarTools_v.updateButtons()"
+		format "\n"; print "TrackbarTools_v.updateButtons()"
+		format "frame: %\n" frame
 		
-		/** Get frame button color
-		 */
-		function getFrameButtonColor frame =  if animButtonState then red else ( if frame > 0 then green_color else orange )
-		
+		--if frame == undefined then
+			--frame = currentTime.frame as integer
+
+		buttons = this._getFrameButtons()
 
 		phase_lenght = this._getPhaseLenght()
+		format "phase_lenght: %\n" phase_lenght
 		
-		buttons = this._getFrameButtons()
 		
+		phase_start = frame - phase_lenght
+		format "phase_start: %\n" phase_start
 		
 		/* DISBALE OTHER FRAME BUTTONS */ 
 		for key in sort buttons.keys do
@@ -166,12 +191,13 @@ struct TrackbarTools_v
 			
 			buttons[key].state = is_current_frame_button
 			
-			--buttons[key].highlightColor =  getFrameButtonColor frame
+			buttons[key].highlightColor = this.getFrameButtonColor frame
 		)
 		
 		/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
 		for key in sort buttons.keys do
-			buttons[key].text = if key > frame and key < frame + phase_lenght then  "[ "+ key as string +" ]" else key as string
+			--buttons[key].text = if key > frame and key < frame + phase_lenght then  "[ "+ key as string +" ]" else key as string
+			buttons[key].text = if key >= phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
 	),
 	
 	/* Go to frame
@@ -279,6 +305,23 @@ struct TrackbarTools_v
 		buttons --return
 	),
 	
+	/** Get frame button
+	 */
+	function _getFrameButton frame =
+	(
+		--format "\n"; print "TrackbarTools_v._getFrameButton()"
+		
+		execute ( _rollout.name + ".btn_frame_" + frame as string ) --return
+	),
+		
+	/** Get frame button color
+	 */
+	function getFrameButtonColor frame =
+	(
+		if animButtonState then red else ( if frame != 0 then green_color else orange )
+	),
+	
+	
 	/*------------------------------------------------------------------------------
 		GET\SET UI VALUES
 	--------------------------------------------------------------------------------*/
@@ -301,7 +344,7 @@ struct TrackbarTools_v
 	
 	on create do
 	(
-		--format "\n"; print "TrackbarTools_v.onCreate()"
+		format "\n"; print "TrackbarTools_v.onCreate()"
 		this.setAnimRange animationRange.start animationRange.end
 		
 		this.showHideButtonsInRange currentTime.frame
