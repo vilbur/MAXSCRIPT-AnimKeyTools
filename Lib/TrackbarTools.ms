@@ -1,6 +1,8 @@
 
 filein( getFilenamePath(getSourceFileName()) + "/../AnimKeyTools.ms" )	--"./../AnimKeyTools.ms"
 
+filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms" )	--"./TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms"
+
 filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/trackbarToolsDialog.ms" )	--"./TrackbarTools/trackbarToolsDialog.ms"
 
 
@@ -58,8 +60,8 @@ struct TrackbarTools_v
 			#all
 
 		/* SYNC WITH GLOBAL VAROABLE */
-		if PHASE_LENGTH != _rollout.DL_phase.selected then
-			_rollout.DL_phase.selection = PHASE_LENGTH
+		if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
+			_rollout.DL_phase.selection = PHASE_LENGTH 
 	),
 	
 	/* set frame */ 

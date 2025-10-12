@@ -29,7 +29,7 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			BTN_mirror_phase.visible = not BTN_create_phase.visible
 			
 			/* SYNC WITH GLOBAL VAROABLE */ 
-			if PHASE_LENGTH != DIALOG_phasemaker.DL_phase_length.selection then
+			if PHASE_LENGTH != DIALOG_phasemaker.DL_phase_length.selected as integer then
 				DIALOG_phasemaker.DL_phase_length.selection = PHASE_LENGTH
 				
 				
