@@ -144,40 +144,6 @@ icon:	"control:#CHECKBOX|across:2"
 --------------------------------------------------------------------------------*/
 
 
-/** Get phase - nuber of frames before current time
-	
-	[phase keys][currentTime]
-	
-	@return Point2 [ start time, end time ]
-  
- */
-function getPhaseRange dir:#BACK  =
-(
-	--format "\n"; print ".getPhaseRange()"
-	
-	
-	if dir == #BACK then
-	(
-		end = currentTime.frame as integer 
-		
-		start = end + DIALOG_phasemaker.DL_phase_length.selected as integer + 1
-		
-	)
-	else
-	(
-		start = currentTime.frame as integer
-		
-		end = start + DIALOG_phasemaker.DL_phase_length.selected as integer - 1
-	)
-
-	
-	
-	
-
-	[ start, end ] --return
-	
-	
-)
 
 /** Get cycle range
  */
@@ -191,6 +157,53 @@ function getCycleRange =
 	cycle.y += cycle.y - cycle.x + 1
 	
 	cycle --return
+)
+
+/** Create or mirro phase
+ */
+function createOrMirroPhase mode =
+(
+	--format "\n"; print ".createOrMirroPhase()"
+	
+	/** Get phase - nuber of frames before current time
+		
+		[phase keys][currentTime]
+		
+		@return Point2 [ start time, end time ]
+	  
+	 */
+	function getPhaseRange dir:#BACKWARD  =
+	(
+		--format "\n"; print ".getPhaseRange()"
+		
+		current_time = currentTime.frame as integer 
+		phase_length = DIALOG_phasemaker.DL_phase_length.selected as integer
+		
+		phase = [ current_time, current_time ] --return
+		
+		if dir == #BACKWARD then
+			phase.x = current_time - phase_length  + 1
+
+		else
+			phase.y = current_time + phase_length - 1
+	
+		phase --return
+	)
+	
+	increment = DIALOG_phasemaker.DL_increment_value.selected as integer
+	
+	rig_name = DIALOG_phasemaker.DL_rig_select.selected
+	
+	phase = getPhaseRange dir:( if mode == #CREATE then #FORWARD else #BACKWARD )
+	--format "PHASE: %\n" phase
+
+	if (trimLeft(rig_name)).count > 0 then
+		(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
+
+	--else
+		--(KeyFrameManager_v()).copyKeys time:phase transforms:true properties:false -- default increment is length ofrange + 1
+	
+	
 )
 
 /*------------------------------------------------------------------------------
@@ -210,22 +223,8 @@ buttontext:	"C R E A T E phase"
 toolTip:	"Generate phase from single frame.E.G.: Generate 1st step from first frame"
 icon:	"across:2|id:#BTN_create_phase|visible:false|width:128|height:32|border:false"
 (
-
-	undo "Mirror Phase" on
-	(
-		increment = DIALOG_phasemaker.DL_increment_value.selected as integer
-		
-		rig_name = DIALOG_phasemaker.DL_rig_select.selected
-		
-		phase = getPhaseRange dir:#FORWARD
-		
-		if (trimLeft(rig_name)).count > 0 then
-			(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
-	
-		--else
-			--(KeyFrameManager_v()).copyKeys time:phase transforms:true properties:false -- default increment is length ofrange + 1
-	
-	)
+	undo "Create Phase" on
+		createOrMirroPhase #CREATE
 )
 
 
@@ -239,21 +238,20 @@ toolTip:	"Generate phase from single frame.E.G.: Generate 1st step from first fr
 icon:	"across:2|id:#BTN_mirror_phase|visible:false|width:128|height:32|border:false|align:#CENTER"
 (
 	
-	PhaseCreator = PhaseCreator_v()
 	
 	undo "Mirror Phase" on
+		createOrMirroPhase #MIRROR
 	(
 		increment = DIALOG_phasemaker.DL_increment_value.selected as integer
-		
 		rig_name = DIALOG_phasemaker.DL_rig_select.selected
 		
 		phase = getPhaseRange()
+		format "PHASE: %\n" phase
+		--if (trimLeft(rig_name)).count > 0 then
+			--(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
 		
-		if (trimLeft(rig_name)).count > 0 then
-			(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
-
-		else
-			(KeyFrameManager_v()).copyKeys time:phase transforms:true properties:false -- default increment is length ofrange + 1
+		--else
+		--	(KeyFrameManager_v()).copyKeys time:phase transforms:true properties:false -- default increment is length ofrange + 1
 
 	)
 )

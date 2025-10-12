@@ -48,7 +48,7 @@ struct LeftRightControls_v
 	 */
 	function switchKeysOnTimes phase increment:undefined =
 	(
-		--format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
 		/** Is locked
 		 */
 		function isLocked flags = flags.count > 0
@@ -62,17 +62,11 @@ struct LeftRightControls_v
 		
 		keys_all = makeUniqueArray(keys_L + keys_R)
 		
+		/* GET TRANSFORM LOCKS */ 
 		this._setTransformLocks()
 			
 	
-		/* FLIP ORINATATION OF TRANSFROMS */
-		
-		/* SAVE FLIPPED TRANSFROMS TO SHIFTED KEYS ON OTHER SIDE OBJECT */ 
-		
-		--this._copyKeysOnTimes left.obj  right.obj keys_L  phase #LEFT
-		
-		--this._copyKeysOnTimes right.obj left.obj  keys_R phase #RIGHT
-		
+		/* GET KEYS OF TRANSFORMS */ 
 		keys_pos_L  = left.getKeys #POSITION phase
 		keys_pos_R = right.getKeys #POSITION phase
 		
@@ -80,6 +74,7 @@ struct LeftRightControls_v
 		keys_rot_R = right.getKeys #ROTATION phase
 		
 
+		/* EXIT IF KEYS DOES NOT EXISTS */ 
 		if keys_all.count == 0 then
 			return false
 		
@@ -88,25 +83,27 @@ struct LeftRightControls_v
 		format "PHASE:     %\n" phase
 		format "INCREMENT: %\n" increment
 
-		--format "left.obj: %\n" left.obj
-		--format "right.obj: %\n" right.obj
 		
+		/* ITERaTE EACH TIME */ 
 		for source_time in keys_all do
 		(
 			--format "SOURCE_TIME: %\n" source_time
 			target_time = source_time + increment
 			
+			/* GET KEYS ON TIME */ 
 			rot_key_L = findItem keys_rot_L source_time
 			rot_key_R = findItem keys_rot_R source_time
 			
 			pos_key_L = findItem keys_pos_L source_time
 			pos_key_R = findItem keys_pos_R source_time
 			
+			/* TEST IF KEYS EXISTS */ 
 			position_keys_exists = pos_key_L or pos_key_R 
 			rotation_keys_exists = rot_key_L or rot_key_R 
 			--format "position_keys_exists: %\n" position_keys_exists
 			--format "rotation_keys_exists: %\n" rotation_keys_exists
 			
+			/* WHICH TYPE OF TRANSFORM IS PROCESSED */ 
 			mode = case of
 			(
 				( position_keys_exists and not rotation_keys_exists ): #POSITION
@@ -115,20 +112,23 @@ struct LeftRightControls_v
 				default: #BOTH
 			)
 			
+			/* GET DIRECTIONS OF COPY */ 
 			left_to_right = rot_key_L or pos_key_L
 			right_to_left = rot_key_R or pos_key_R
 			
+			/* IS LOCKED ? - POSITION */ 
 			is_pos_locked_L = isLocked lock_position_L
 			is_pos_locked_R = isLocked lock_position_R
 
+			/* IS LOCKED ? - ROTATION */ 
 			is_rot_locked_L = isLocked lock_rotation_L
 			is_rot_locked_R = isLocked lock_rotation_R
 			
-
+			/* MIRROR ONLY ROTATION */ 
 			if ( is_pos_locked_L and is_pos_locked_R ) then
 				this.swapLocalRotation source_time target_time mode left_to_right right_to_left
 			
-			else
+			else /* MIRROR TRANSFORMS */ 
 				this.flipIKControllers left.obj right.obj source_time target_time mode left_to_right right_to_left
 		)
 	),

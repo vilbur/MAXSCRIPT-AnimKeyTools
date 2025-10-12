@@ -169,20 +169,15 @@ struct TrackbarTools_v
 	 */
 	function updateButtons frame =
 	(
-		format "\n"; print "TrackbarTools_v.updateButtons()"
-		format "frame: %\n" frame
-		
-		--if frame == undefined then
-			--frame = currentTime.frame as integer
+		--format "\n"; print "TrackbarTools_v.updateButtons()"
 
 		buttons = this._getFrameButtons()
 
 		phase_lenght = this._getPhaseLenght()
-		format "phase_lenght: %\n" phase_lenght
-		
+		--format "phase_lenght: %\n" phase_lenght
 		
 		phase_start = frame - phase_lenght
-		format "phase_start: %\n" phase_start
+		--format "phase_start: %\n" phase_start
 		
 		/* DISBALE OTHER FRAME BUTTONS */ 
 		for key in sort buttons.keys do
@@ -197,7 +192,7 @@ struct TrackbarTools_v
 		/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
 		for key in sort buttons.keys do
 			--buttons[key].text = if key > frame and key < frame + phase_lenght then  "[ "+ key as string +" ]" else key as string
-			buttons[key].text = if key >= phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
+			buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
 	),
 	
 	/* Go to frame
