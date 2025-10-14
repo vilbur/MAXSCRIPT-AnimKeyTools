@@ -7,7 +7,10 @@ struct RigWrapper_v
 	/* construct */
 	rig_name, --string rig_name E.G.: "Boy" | $Boy_Setup_Ctrl_MasterControl_G
 
+	
 	/* properties */
+	master_control,
+	
 	rig_controls,
 	
 	key_times, -- #( int ) -- times to flip
@@ -17,6 +20,9 @@ struct RigWrapper_v
 	TransformFlipper = TransformFlipper_v(),
 
 	control_name_pattern = "(.*_Setup_Ctrl_([^_]+_)).*",
+	
+	/* private */ 
+	--walk_anim_layer,
 	
 	/** Load rig
 	 */
@@ -83,19 +89,21 @@ struct RigWrapper_v
 	(
 		format "\n"; print "PhaseCreator_v.mirrorPhases()"
 		--format "PHASE: %\n" phase
+		all_ctrls = #()
+		
+		KeyFrameManager = KeyFrameManager_v time:phase
 		
 		if increment == undefined or increment as Number == undefined then
 			increment = phase[2] - phase[1] + 1
 		
 		--format "INCREMENT: %\n" increment
 		
-		KeyFrameManager = KeyFrameManager_v time:phase
-
-		all_ctrls = #()
+		this.toggleWalkAnimLayer(false)
 		
 		for control_name in rig_controls.keys do
 			rig_controls[control_name].switchKeysOnTimes phase increment:increment
 		
+		this.toggleWalkAnimLayer(true)
 		
 		/* SET TIME TO FIRST AFTER PHASE */ 
 		sliderTime += increment
@@ -164,6 +172,34 @@ struct RigWrapper_v
 		rig_names --return
 	),
 	
+	/** Disable walk anim layer
+	  * Steps are animated on same position
+	 */
+	function toggleWalkAnimLayer state =
+	(
+		--format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
+		master_walk = execute ("$'"+rig_name+"_Setup_Ctrl_MasterWalk_G'") --return
+		
+		format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
+		if ( walk_anim_layer = (AnimLayerManager.getNodesLayers obj)[1] ) != undefined then
+		(
+			anim_layer_name = AnimLayerManager.getLayerName walk_anim_layer
+			format "anim_layer_name: %\n" anim_layer_name
+			
+			/* MUTE anim layer */ 
+			AnimLayerManager.setLayerMute walk_anim_layer (not state)
+		)
+		/* ADD ANIM LAYER */ 
+		else
+		(
+			AnimLayerManager.enableLayers #( master_walk ) pos:true rot:true
+			
+			/* DISABLE JSUT CREATED LAYER */ 
+			if state == false then
+				this.toggleWalkAnimLayer false
+		)
+	),
+
 
 	private
 	

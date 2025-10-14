@@ -52,17 +52,35 @@ icon:	"control:timer|interval:500|active:true|height:0"
 --)
 
 
-/**  
+/**  SELECT RIG IN SCENE
  */
-macroscript AnimKeyTools_rig
+macroscript AnimKeyTools_rig_select
 category:	"_AnimKeyTools"
 buttontext:	"[Rig select]"
 toolTip:	""
-icon:	"control:#DROPDOWN|across:1|width:128"
+icon:	"control:#DROPDOWN|across:2|align:#LEFT|width:96"
 (
 	
 	format "EventFired: %\n" EventFired
 )
+
+/**  TOOGLE WALK ANIM LAYER
+ */
+macroscript AnimKeyTools_rig_lock_walk_anim_layer
+category:	"_AnimKeyTools"
+buttontext:	"L"
+toolTip:	"LOCK\UNLOCK rotation and rotation of master walk handle"
+icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|across:2|align:#RIGHT|width:32|height:32|offset:[0, -8 ]"
+(
+	
+	format "EventFired: %\n" EventFired
+	rig_name = DIALOG_phasemaker.DL_rig_select.selected
+	
+	if (trimLeft(rig_name)).count > 0 then
+		(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
+)
+
+
 
 /*------------------------------------------------------------------------------
 	PHASE
@@ -75,7 +93,7 @@ macroscript AnimKeyTools_phase_length
 category:	"_AnimKeyTools"
 buttontext:	"[Phase Length]"
 toolTip:	"Count of frames in phase"
-icon:	"control:#DROPDOWN|across:2|width:64|items:#( '1', '2', '3', '4', '5', '6', '7', '8', '9')"
+icon:	"control:#DROPDOWN|across:2|width:64|items:#( '1', '2', '3', '4', '5', '6', '7', '8', '9')|offset:[0, 4 ]"
 (
 	
 	format "Phase Length: %\n" "(Phase Length)"
@@ -98,7 +116,7 @@ macroscript AnimKeyTools_phase_toggle
 category:	"_AnimKeyTools"
 buttontext:	"Phase"
 toolTip:	"Enable \ Diasable Phase"
-icon:	"control:#CHECKBOX|across:2"
+icon:	"control:#CHECKBOX|across:2|offset:[0, 4 ]"
 (
 	
 	format "EventFired: %\n" EventFired
@@ -118,7 +136,7 @@ category:	"_AnimKeyTools"
 buttontext:	"[Increment value]"
 toolTip:	"Offset from current frame where new keys are kreated.\n\nOPTION 'Phase': Increment by phase length"
 --icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '1', '2', '3', '4', '5', '6', '7', '8', '9')"
-icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9')"
+icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9')|offset:[0, 0 ]"
 (
 	format "EventFired: %\n" EventFired
 	
@@ -130,7 +148,7 @@ macroscript AnimKeyTools_increment_toggle
 category:	"_AnimKeyTools"
 buttontext:	"Increment"
 toolTip:	"Enable \ Diasable Increment"
-icon:	"control:#CHECKBOX|across:2"
+icon:	"control:#CHECKBOX|across:2|offset:[0, 0 ]"
 (
 	
 	format "EventFired: %\n" EventFired
@@ -306,16 +324,16 @@ icon:	"across:1|width:128|height:32|border:false"
 
 
 
-/** SYSTEM PATH MAX ROOT
-  *
-  *
-  */
-macroscript macrotest_parse_icon_params_system_path
-category:	"_macrotest"
-buttontext:	"System dir icon path"
-
-icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
+--/** SYSTEM PATH MAX ROOT
+--  *
+--  *
+--  */
+--macroscript macrotest_parse_icon_params_system_path
+--category:	"_macrotest"
+--buttontext:	"System dir icon path"
+--
 --icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
-(
-)
+----icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
+--(
+--)
 
