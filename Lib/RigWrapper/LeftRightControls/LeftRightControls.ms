@@ -48,13 +48,13 @@ struct LeftRightControls_v
 	 */
 	function switchKeysOnTimes phase increment:undefined =
 	(
-		format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		--format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
 		/** Is locked
 		 */
 		function isLocked flags = flags.count > 0
 		
 		if increment == undefined then 
-			increment = ( phase.end - phase.start ) + 1
+			increment = ( phase.end - phase.start ) + 1 as integer
 
 		/* GET ONLY KEYS IN PHASE */ 
 		keys_L =  left.getKeys #TRANSFORMS phase
@@ -78,16 +78,19 @@ struct LeftRightControls_v
 		if keys_all.count == 0 then
 			return false
 		
-		format "\n=====================================================\n"
+		format "\n====================================================================================================================\n"
 		format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		format "% <-> %\n" left.obj.name right.obj.name
 		format "PHASE:     %\n" phase
 		format "INCREMENT: %\n" increment
 
+		format "keys L: %\n" keys_pos_L
+		format "keys R: %\n" keys_pos_R
 		
 		/* ITERaTE EACH TIME */ 
 		for source_time in keys_all do
 		(
-			--format "SOURCE_TIME: %\n" source_time
+			format "SOURCE_TIME: %\n" source_time
 			target_time = source_time + increment
 			
 			/* GET KEYS ON TIME */ 
@@ -116,15 +119,15 @@ struct LeftRightControls_v
 			left_to_right = rot_key_L or pos_key_L
 			right_to_left = rot_key_R or pos_key_R
 			
-			/* IS LOCKED ? - POSITION */ 
+			/* IS POSITION LOCKED ? */ 
 			is_pos_locked_L = isLocked lock_position_L
 			is_pos_locked_R = isLocked lock_position_R
 
-			/* IS LOCKED ? - ROTATION */ 
+			/* IS ROTATION LOCKED ? */ 
 			is_rot_locked_L = isLocked lock_rotation_L
 			is_rot_locked_R = isLocked lock_rotation_R
 			
-			/* MIRROR ONLY ROTATION */ 
+			--/* MIRROR ONLY ROTATION */ 
 			if ( is_pos_locked_L and is_pos_locked_R ) then
 				this.swapLocalRotation source_time target_time mode left_to_right right_to_left
 			
@@ -227,12 +230,15 @@ struct LeftRightControls_v
 	*/
 	function flipIKControllers obj_L obj_R time_from time_to mode left_to_right right_to_left =
 	(
-		format "\n---------------------------------------"
-		format "\n"; print "TransformFlipper_v.flipIKControllers()"
+		format "\n---------------------------------------\n"
+		--format "\n"; print "TransformFlipper_v.flipIKControllers()"
 		time_from = time_from as time
 		time_to   = time_to   as time		
-		format "time_from: %\n" time_from
-		format "time_to: %\n" time_to
+		format "Frame: % →  %\n" time_from time_to
+		format "left_to_right: %\n" left_to_right
+		format "right_to_left: %\n" right_to_left
+		--format "time_from: %\n" time_from
+		--format "time_to: %\n" time_to
 		
 		at time time_from
 		(
@@ -248,23 +254,29 @@ struct LeftRightControls_v
 		
 		with animate on at time time_to
 		(
-			/* IF ROTATION OR BOTH */ 
+			/* copy ROTATION orfd BOTH */ 
 			if mode != #POSITION  then
 			(
-				obj_L.rotation = rot_R
-				obj_R.rotation = rot_L
+				if left_to_right then
+					obj_R.rotation = rot_L
+				
+				if right_to_left then
+					obj_L.rotation = rot_R
 			)
 			
 			
-			/* IF POSITION OR BOTH */ 
+			/* copy POSITION orfd BOTH */ 
 			if mode != #ROTATION  then
 			(
-				obj_L.pos = pos_flipped_L
-				obj_R.pos = pos_flipped_R
+				if left_to_right then
+					obj_R.pos = pos_flipped_R
+
+				if right_to_left then
+					obj_L.pos = pos_flipped_L
 			)
 		)
 		
-		/* remove keys of unanimated transform -- little dirty, but it works */
+		/* REMOVE KEYS OF UNANIMATED TRANSFORM -- little dirty, but it works */
 		if mode != #BOTH then
 		(
 			mode_to_delete = if mode == #POSITION  then #ROTATION else #POSITION

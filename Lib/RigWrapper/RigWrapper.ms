@@ -25,11 +25,11 @@ struct RigWrapper_v
 		format "\n"; print "RigWrapper_v.loadRig()"
 		
 		master_control = this.loadRigFromScene(rig_name)
-		format "master_control: %\n" master_control
+		--format "master_control: %\n" master_control
 		processed_objects = #()
 
 		this.rig_controls	= Dictionary #STRING -- KEY: VALUE:
-		format "this.rig_controls: %\n" this.rig_controls
+		--format "this.rig_controls: %\n" this.rig_controls
 		
 		rig_name = (filterString master_control.name "_")[1]	
 		
@@ -82,23 +82,20 @@ struct RigWrapper_v
 	function mirrorPhase phase increment:undefined =
 	(
 		format "\n"; print "PhaseCreator_v.mirrorPhases()"
-		format "PHASE: %\n" phase
+		--format "PHASE: %\n" phase
 		
 		if increment == undefined or increment as Number == undefined then
 			increment = phase[2] - phase[1] + 1
 		
-		format "INCREMENT: %\n" increment
+		--format "INCREMENT: %\n" increment
 		
 		KeyFrameManager = KeyFrameManager_v time:phase
 
 		all_ctrls = #()
 		
-		for control_name in rig_controls.keys do 
-		(
-			LeftRightControls = rig_controls[control_name]
-			
-			LeftRightControls.switchKeysOnTimes phase increment:increment
-		)
+		for control_name in rig_controls.keys do
+			rig_controls[control_name].switchKeysOnTimes phase increment:increment
+		
 		
 		/* SET TIME TO FIRST AFTER PHASE */ 
 		sliderTime += increment
@@ -110,9 +107,9 @@ struct RigWrapper_v
 	 */
 	function loadRigFromScene rig_name =
 	(
-		format "\n"; print "RigWrapper_v.loadRigFromScene()"
-		format "rig_name: %\n" rig_name
-		format "TEST: %\n" (execute ("$'"+rig_name+"_Setup_Ctrl_MasterControl_G'"))
+		--format "\n"; print "RigWrapper_v.loadRigFromScene()"
+		--format "rig_name: %\n" rig_name
+		--format "TEST: %\n" (execute ("$'"+rig_name+"_Setup_Ctrl_MasterControl_G'"))
 
 		--(execute ("$'"+rig_name+"_Setup_Ctrl_MasterControl_G'") as Array )[1] --return
 		execute ("$'"+rig_name+"_Setup_Ctrl_MasterControl_G'") --return

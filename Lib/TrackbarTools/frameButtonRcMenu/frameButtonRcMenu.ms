@@ -11,12 +11,12 @@ function frameButtonRcMenu frame =
 	function getString num = (num as integer )  as string
 
 	transform_tracks = #( "POSITION", "ROTATION", "SCALE" ) 
-	format "\n"; print ".frameButtonRcMenu()"
+	--format "\n"; print ".frameButtonRcMenu()"
 	--format "DIALOG_time_slider_tools.DL_phase.selection: %\n" DIALOG_time_slider_tools.DL_phase.selection
 	phase_length = DIALOG_time_slider_tools.DL_phase.items[DIALOG_time_slider_tools.DL_phase.selection] as integer
 	
 	phase = [ currentTime, currentTime + phase_length - 1 ] 
-	format "PAHSE_RANGE: %\n" phase
+	--format "PAHSE_RANGE: %\n" phase
 	time_delete = if keyboard.controlPressed then "#RIGHT" else "#CURRENT"
 	KeyFrameManager_side   = "(KeyFrameManager_v( if keyboard.controlPressed then #LEFT else #RIGHT ))"
 

@@ -10,7 +10,10 @@ struct PhaseCreator_v
 	(
 		format "\n"; print "PhaseCreator_v.repeatPhase()"
 		
+		key_next = undefined
+		
 		current_time = currentTime.frame as integer
+		
 		
 		for obj in objs do
 		(
@@ -49,6 +52,9 @@ struct PhaseCreator_v
 			else
 				messageBox ( obj.name + " has not transform key on TIME: " +current_time as string ) title:"ANIM KEY NOT FOURND"  beep:false
 		)
+		
+		if key_next != undefined then 
+			sliderTime = key_next
 	),
 	
 	

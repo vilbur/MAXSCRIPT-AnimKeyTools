@@ -179,11 +179,14 @@ function createOrMirroPhase mode =
 		current_time = currentTime.frame as integer 
 		phase_length = DIALOG_phasemaker.DL_phase_length.selected as integer
 		
-		phase = [ current_time, current_time ] --return
+		phase = [ current_time as integer , current_time as integer ] --return
 		
 		if dir == #BACKWARD then
-			phase.x = current_time - phase_length  + 1
-
+		(
+			phase.x = current_time - phase_length + 1
+			
+			--phase.y -= 1
+		)
 		else
 			phase.y = current_time + phase_length - 1
 	
@@ -195,7 +198,7 @@ function createOrMirroPhase mode =
 	rig_name = DIALOG_phasemaker.DL_rig_select.selected
 	
 	phase = getPhaseRange dir:( if mode == #CREATE then #FORWARD else #BACKWARD )
-	--format "PHASE: %\n" phase
+	format "PHASE: %\n" phase
 
 	if (trimLeft(rig_name)).count > 0 then
 		(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
@@ -241,19 +244,7 @@ icon:	"across:2|id:#BTN_mirror_phase|visible:false|width:128|height:32|border:fa
 	
 	undo "Mirror Phase" on
 		createOrMirroPhase #MIRROR
-	(
-		increment = DIALOG_phasemaker.DL_increment_value.selected as integer
-		rig_name = DIALOG_phasemaker.DL_rig_select.selected
-		
-		phase = getPhaseRange()
-		format "PHASE: %\n" phase
-		--if (trimLeft(rig_name)).count > 0 then
-			--(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
-		
-		--else
-		--	(KeyFrameManager_v()).copyKeys time:phase transforms:true properties:false -- default increment is length ofrange + 1
 
-	)
 )
 
 /**  
@@ -312,3 +303,19 @@ icon:	"across:1|width:128|height:32|border:false"
 	
 	
 )
+
+
+
+/** SYSTEM PATH MAX ROOT
+  *
+  *
+  */
+macroscript macrotest_parse_icon_params_system_path
+category:	"_macrotest"
+buttontext:	"System dir icon path"
+
+icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
+--icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
+(
+)
+
