@@ -8,7 +8,7 @@ struct PhaseCreator_v
 	 */
 	function repeatPhaseTransform objs =
 	(
-		format "\n"; print "PhaseCreator_v.repeatPhase()"
+		--format "\n"; print "PhaseCreator_v.repeatPhase()"
 		
 		key_next = undefined
 		
@@ -28,8 +28,8 @@ struct PhaseCreator_v
 			(
 				key_prev     = keys_transforms[index - 1]
 				key_current  = keys_transforms[index]
-				format "key_prev:    %\n" key_prev
-				format "key_current: %\n" key_current
+				--format "key_prev:    %\n" key_prev
+				--format "key_current: %\n" key_current
 				phase_length = key_current - key_prev
 				key_next = key_current + phase_length
 					

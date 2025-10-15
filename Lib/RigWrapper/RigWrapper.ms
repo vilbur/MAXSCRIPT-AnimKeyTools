@@ -28,7 +28,7 @@ struct RigWrapper_v
 	 */
 	function loadRig =
 	(
-		format "\n"; print "RigWrapper_v.loadRig()"
+		--format "\n"; print "RigWrapper_v.loadRig()"
 		
 		master_control = this.loadRigFromScene(rig_name)
 		--format "master_control: %\n" master_control
@@ -87,7 +87,7 @@ struct RigWrapper_v
 	 */
 	function mirrorPhase phase increment:undefined =
 	(
-		format "\n"; print "PhaseCreator_v.mirrorPhases()"
+		--format "\n"; print "PhaseCreator_v.mirrorPhases()"
 		--format "PHASE: %\n" phase
 		all_ctrls = #()
 		
@@ -177,10 +177,11 @@ struct RigWrapper_v
 	 */
 	function toggleWalkAnimLayer state =
 	(
-		--format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
+		format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
+		format "state: %\n" state
+		
 		master_walk = execute ("$'"+rig_name+"_Setup_Ctrl_MasterWalk_G'") --return
 		
-		format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
 		if ( walk_anim_layer = (AnimLayerManager.getNodesLayers obj)[1] ) != undefined then
 		(
 			anim_layer_name = AnimLayerManager.getLayerName walk_anim_layer

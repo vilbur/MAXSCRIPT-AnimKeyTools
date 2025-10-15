@@ -78,19 +78,19 @@ struct LeftRightControls_v
 		if keys_all.count == 0 then
 			return false
 		
-		format "\n====================================================================================================================\n"
-		format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
-		format "% <-> %\n" left.obj.name right.obj.name
-		format "PHASE:     %\n" phase
-		format "INCREMENT: %\n" increment
+		--format "\n====================================================================================================================\n"
+		--format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		--format "% <-> %\n" left.obj.name right.obj.name
+		--format "PHASE:     %\n" phase
+		--format "INCREMENT: %\n" increment
 
-		format "keys L: %\n" keys_pos_L
-		format "keys R: %\n" keys_pos_R
+		--format "keys L: %\n" keys_pos_L
+		--format "keys R: %\n" keys_pos_R
 		
 		/* ITERaTE EACH TIME */ 
 		for source_time in keys_all do
 		(
-			format "SOURCE_TIME: %\n" source_time
+			--format "SOURCE_TIME: %\n" source_time
 			target_time = source_time + increment
 			
 			/* GET KEYS ON TIME */ 
@@ -230,13 +230,13 @@ struct LeftRightControls_v
 	*/
 	function flipIKControllers obj_L obj_R time_from time_to mode left_to_right right_to_left =
 	(
-		format "\n---------------------------------------\n"
+		--format "\n---------------------------------------\n"
 		--format "\n"; print "TransformFlipper_v.flipIKControllers()"
 		time_from = time_from as time
 		time_to   = time_to   as time		
-		format "Frame: % →  %\n" time_from time_to
-		format "left_to_right: %\n" left_to_right
-		format "right_to_left: %\n" right_to_left
+		--format "Frame: % →  %\n" time_from time_to
+		--format "left_to_right: %\n" left_to_right
+		--format "right_to_left: %\n" right_to_left
 		--format "time_from: %\n" time_from
 		--format "time_to: %\n" time_to
 		
