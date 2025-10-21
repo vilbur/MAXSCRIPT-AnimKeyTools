@@ -16,7 +16,7 @@ icon:	"control:timer|interval:500|active:true|height:0"
 		if DIALOG_phasemaker != undefined then
 		(
 			is_current_time_on_start_of_range = animationRange.start == currentTime
-			
+			--format "DIALOG_phasemaker: %\n" DIALOG_phasemaker
 			BTN_create_phase = DIALOG_phasemaker.BTN_create_phase
 			
 			BTN_mirror_phase = DIALOG_phasemaker.BTN_mirror_phase
@@ -29,13 +29,8 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			BTN_mirror_phase.visible = not BTN_create_phase.visible
 			
 			/* SYNC WITH GLOBAL VAROABLE */ 
-			if PHASE_LENGTH != DIALOG_phasemaker.DL_phase_length.selected as integer then
+			if ( selected_pahese_length = DIALOG_phasemaker.DL_phase_length.selected ) != undefined and PHASE_LENGTH != selected_pahese_length as integer then
 				DIALOG_phasemaker.DL_phase_length.selection = PHASE_LENGTH
-				
-				
-			--format "PHASE_LENGTH: %\n" PHASE_LENGTH
-			--format "DIALOG_phasemaker.DL_phase_length.selected: %\n" DIALOG_phasemaker.DL_phase_length.selected
-			--DIALOG_phasemaker.DL_phase_length.selected = EventFired.val as string
 		)
 )
 
@@ -70,17 +65,19 @@ macroscript AnimKeyTools_rig_lock_walk_anim_layer
 category:	"_AnimKeyTools"
 buttontext:	"L"
 toolTip:	"LOCK\UNLOCK rotation and rotation of master walk handle"
-icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|across:2|align:#RIGHT|width:32|height:32|offset:[0, -8 ]"
+icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/walk.bmp', '/icons/walka.bmp')|across:2|align:#RIGHT|width:32|height:32|offset:[0, -8 ]"
 (
 	
 	format "EventFired: %\n" EventFired
-	rig_name = DIALOG_phasemaker.DL_rig_select.selected
-	
+	rig_name = DIALOG_phasemaker.DL_rig_select.selected 
+	format "rig_name: %\n" rig_name
+	if rig_name != undefined then 
 	if (trimLeft(rig_name)).count > 0 then
 		(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
 )
 
 
+ 
 
 /*------------------------------------------------------------------------------
 	PHASE
@@ -323,17 +320,4 @@ icon:	"across:1|width:128|height:32|border:false"
 )
 
 
-
---/** SYSTEM PATH MAX ROOT
---  *
---  *
---  */
---macroscript macrotest_parse_icon_params_system_path
---category:	"_macrotest"
---buttontext:	"System dir icon path"
---
---icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
-----icon:	"images:#('$maxroot/UI_ln/Icons/UVWUnwrapView_24i.bmp', undefined, undefined, 15 )"
---(
---)
 

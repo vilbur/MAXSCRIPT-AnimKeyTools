@@ -19,19 +19,20 @@ function createPhaseMakerDialog =
 	--ContentLoader.create() --width:512
 	--Dialog = ContentLoader.create width:168 --lockHeight:true
 	--Dialog = ContentLoader.create width:168 lockWidth:true
-	Dialog = ContentLoader.create() --lockWidth:true
+	--Dialog = ContentLoader.create() --lockWidth:true
+	Dialog = ContentLoader.create height:undefined
 	
 	Dialog.register()
 	
 	Dialog.alignToDialog( DIALOG_time_slider_tools ) height:#BOTTOM
 	
-	
-	/* LOAD RIGS */
+	--
+	--/* LOAD RIGS */
+	if DIALOG_phasemaker != undefined then 
 	if DIALOG_phasemaker.DL_rig_select != undefined then -- if used only for DEVELOP 
 	(
 		DIALOG_phasemaker.DL_rig_select.items = #(" ") + (RigWrapper_v()).getNamesOfRigsInScene() -- first item empty + rig names
 		DIALOG_phasemaker.DL_rig_select.selection = 2 -- select first rig name
 	)
-		
 )
 
