@@ -13,7 +13,7 @@ function createPhaseMakerDialog =
 	--ContentLoader	= ContentLoader_v path:(current_dir+"/content-animaker") ini:( getSourceFileName()) --DEBUG:DEBUG
 	--ContentLoader	= ContentLoader_v path:(current_dir+"/Groupbox-Test")
 	
-	--ContentLoader.Dialog.title = "PhaseMaker"
+	ContentLoader.Dialog.addlocal "current_time" undefined -- trace chnge of frame in ticker
 	
 	/* CREATE UI */
 	--ContentLoader.create() --width:512
