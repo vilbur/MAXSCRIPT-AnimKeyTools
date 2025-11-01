@@ -41,26 +41,14 @@ Bulb will change image when toggled.
 --------------------- */
 --showBulbButtonRollout()
 --
-
-
-
-obj	= selection[1]
-
---AnimLayerManager.disableLayerNodes obj
-
-
-if ( obj_anim_layer = (AnimLayerManager.getNodesLayers obj)[1] ) != undefined then
+/*
+Rollout to test imageButton with alpha icon
+*/
+rollout TEST_imageButton "Alpha Icon Test" 
 (
-	
-	format "obj_anim_layer: %\n" obj_anim_layer
-	
-	anim_layer_name = AnimLayerManager.getLayerName obj_anim_layer
-	format "anim_layer_name: %\n" anim_layer_name
-	
-	--AnimLayerManager.setLayerName obj_anim_layer "RENAMED"
-	
-	AnimLayerManager.setLayerMute obj_anim_layer true
-	
+	button  btn_icon "Bulb Button" width:48 height:48  images:#("LightOn", "LightOff", "LightOn", "LightOff") 
+
+
 )
-else
-	AnimLayerManager.enableLayers #( obj ) pos:true rot:true
+
+createDialog TEST_imageButton

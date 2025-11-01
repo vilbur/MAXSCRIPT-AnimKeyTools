@@ -6,36 +6,45 @@ if PHASE_LENGTH == undefined then
 	global PHASE_LENGTH = 1
 
 
-/*------------------------------------------------------------------------------
-	DEPENDENCY
---------------------------------------------------------------------------------*/
-
-/* UI FRAMEWORK */ 
-filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-UI-framework/Lib/ContentLoader/ContentLoader.ms" )	--"./../MAXSCRIPT-UI-framework/Lib/ContentLoader/ContentLoader.ms"
-
-/* GLOBAL COLOR NAMES */ 
-filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-COLOR_NAMES/COLOR_NAMES.ms" )	--"./../MAXSCRIPT-COLOR_NAMES/COLOR_NAMES.ms"
-
-
-/*------------------------------------------------------------------------------
-	COMMON
---------------------------------------------------------------------------------*/
-
-filein( getFilenamePath(getSourceFileName()) + "/Lib/ObjectControllerKeys/ObjectControllerKeys.ms" )	--"./Lib/ObjectControllerKeys/ObjectControllerKeys.ms"
-
-filein( getFilenamePath(getSourceFileName()) + "/Lib/RigWrapper/RigWrapper.ms" )	--"./Lib/RigWrapper/RigWrapper.ms"
-
-filein( getFilenamePath(getSourceFileName()) + "/Lib/KeyFrameManager/KeyFrameManager.ms" )	--"./Lib/KeyFrameManager/KeyFrameManager.ms"
-
-
-
-/*------------------------------------------------------------------------------
-	MACROS - imported in production
+/** Import anim key tools
+ */
+function importAnimKeyTools =
+(
+	--format "\n"; print ".importAnimKeyTools()"
 	
-	DEVELOPMENT: this file is imported in *.mcr files bellow
+	/*------------------------------------------------------------------------------
+		DEPENDENCY
+	--------------------------------------------------------------------------------*/
 	
---------------------------------------------------------------------------------*/
+	/* UI FRAMEWORK */ 
+	filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-UI-framework/Lib/ContentLoader/ContentLoader.ms" )	--"./../MAXSCRIPT-UI-framework/Lib/ContentLoader/ContentLoader.ms"
+	
+	/* GLOBAL COLOR NAMES */ 
+	filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-COLOR_NAMES/COLOR_NAMES.ms" )	--"./../MAXSCRIPT-COLOR_NAMES/COLOR_NAMES.ms"
+	
+	
+	/*------------------------------------------------------------------------------
+		COMMON
+	--------------------------------------------------------------------------------*/
+	
+	filein( getFilenamePath(getSourceFileName()) + "/Lib/ObjectControllerKeys/ObjectControllerKeys.ms" )	--"./Lib/ObjectControllerKeys/ObjectControllerKeys.ms"
+	
+	filein( getFilenamePath(getSourceFileName()) + "/Lib/RigWrapper/RigWrapper.ms" )	--"./Lib/RigWrapper/RigWrapper.ms"
+	
+	filein( getFilenamePath(getSourceFileName()) + "/Lib/KeyFrameManager/KeyFrameManager.ms" )	--"./Lib/KeyFrameManager/KeyFrameManager.ms"
+	
+	
+	
+	/*------------------------------------------------------------------------------
+		MACROS - imported in production
+		
+		DEVELOPMENT: this file is imported in *.mcr files bellow
+		
+	--------------------------------------------------------------------------------*/
+	
+	filein( getFilenamePath(getSourceFileName()) + "/Lib/TrackbarTools.mcr" )	--"./Lib/TrackbarTools.mcr"
+	
+	filein( getFilenamePath(getSourceFileName()) + "/Lib/PhaseMaker.mcr" )	--"./Lib/PhaseMaker.mcr"
+)
 
-filein( getFilenamePath(getSourceFileName()) + "/Lib/TrackbarTools.mcr" )	--"./Lib/TrackbarTools.mcr"
-
-filein( getFilenamePath(getSourceFileName()) + "/Lib/PhaseMaker.mcr" )	--"./Lib/PhaseMaker.mcr"
+importAnimKeyTools()
