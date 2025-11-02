@@ -8,10 +8,9 @@ function moveObjCbyAB direction:1 =
 	/* Execute move */
 	if selection.count == 3 then
 	(
-	/*  Move node by active transform axis
-		Distance is measured between two reference nodes
-	*/
-	--function moveByDistanceFromTwoRefs
+		/*  Move node by active transform axis
+			Distance is measured between two reference nodes
+		*/
 		target_node = selection[3]
 		ref_a = selection[1]
 		ref_b = selection[2]

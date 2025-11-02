@@ -318,7 +318,7 @@ icon:	"across:1|width:128|height:32|border:false"
 macroscript	template_move_c_by_AB
 category:	"content-Template"
 buttontext:	"MOVE C by A B"
-toolTip:	"Move object by active axis about distance of two another objects.\n\nTARGET OBJECT IS 3rd IN SELECTION"
+toolTip:	"Move object on active axis about distance of two another objects.\n\nTARGET OBJECT IS 3rd IN SELECTION"
 icon:	"across:1|width:128|height:32|border:false"
 (
 	
