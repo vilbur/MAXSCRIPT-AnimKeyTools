@@ -28,9 +28,9 @@ struct RigWrapper_v
 	 */
 	function loadRig =
 	(
-		--format "\n"; print "RigWrapper_v.loadRig()"
+		format "\n"; print "RigWrapper_v.loadRig()"
 		
-		master_control = this.loadRigFromScene(rig_name)
+		master_control = this._getMasterControlOfRig(rig_name)
 		--format "master_control: %\n" master_control
 		processed_objects = #()
 
@@ -61,7 +61,9 @@ struct RigWrapper_v
 			/* ADD CONTROL PAIR TO DICTIONARY */ 
 			if same_name_objs.count == 2 and (side == "L" or side == "R") then
 				rig_controls[full_basename] = (LeftRightControls_v()).addObjects(same_name_objs)(full_basename)
-
+			
+			else
+				format "%: %\n" same_name_objs.count same_name_objs
 			
 			/* AVOID PROCESSING OF SAME OBJECTS AGAIN  */ 
 			processed_objects += same_name_objs
@@ -103,19 +105,45 @@ struct RigWrapper_v
 		for control_name in rig_controls.keys do
 			rig_controls[control_name].switchKeysOnTimes phase increment:increment
 		
+		this.moveHipWithFeet()
+		
 		this.toggleWalkAnimLayer(true)
 		
 		/* SET TIME TO FIRST AFTER PHASE */ 
 		sliderTime += increment
+	),
+		/** Move hip with feet
+	 */
+	function moveHipWithFeet =
+	(
+		format "\n"; print "RigWrapper_v.moveHipWithFeet()"
+		
+		for control_name in rig_controls.keys do format "control_name: %\n" control_name
+
+		format "\n"
+		feet = this.getRigControls "IKFoot_"
+		format "feet: %\n" feet
+		format "feet[1]: %\n" feet[1]
+		format "feet[2]: %\n" feet[2]
+		format "feet[1]: %\n" (classOf feet[1])
+		format "feet.count: %\n" feet.count
+		
+		master_upper_body = (this.getRigControls "MasterUpperBody")[1]
+		format "master_upper_body: %\n" master_upper_body
+		
+		hip_pos = this.getPosOfObjCbyDistanceOfAB feet[1] feet[2] master_upper_body axis:#Y direction:-1
+		
+		format "HIP_POS: %\n" hip_pos
+		--format "ikfoot: %\n" ikfoot
 	),
 	
 	/** Load rig from scene
 	  
 	  @params string rig_name E.G.: Boy > Boy_Setup_Ctrl_MasterControl_G
 	 */
-	function loadRigFromScene rig_name =
+	function _getMasterControlOfRig rig_name =
 	(
-		--format "\n"; print "RigWrapper_v.loadRigFromScene()"
+		--format "\n"; print "RigWrapper_v._getMasterControlOfRig()"
 		--format "rig_name: %\n" rig_name
 		--format "TEST: %\n" (execute ("$'"+rig_name+"_Setup_Ctrl_MasterControl_G'"))
 
@@ -123,6 +151,14 @@ struct RigWrapper_v
 		execute ("$'"+rig_name+"_Setup_Ctrl_MasterControl_G'") --return
 	),
 
+	/** Get rig control
+	 */
+	function getRigControls control_name =
+	(
+		--format "\n"; print "RigWrapper_v.getRigControls()"
+		if ( object_set = execute ("$'"+rig_name+"_Setup_Ctrl_"+ control_name +"*'") ) != undefined then
+			object_set as Array --return
+	),
 
 	/** Split name
 	 */
@@ -203,6 +239,52 @@ struct RigWrapper_v
 
 
 	private
+	/*  Get distance of two reference nodes
+		
+		distance of objects A and B in y axis direction vector of object c
+		
+	*/
+	function getPosOfObjCbyDistanceOfAB ref_a ref_b target_node axis:undefined direction:1 =
+	(
+		format "\n"; print "RigWrapper_v.getPosOfObjCbyDistanceOfAB()"
+
+		/* Returns axis row of node TM */
+		function getTMPropAxis _node axis =
+		(
+			case axis of
+			(
+				#x: _node.transform.row1
+				#y: _node.transform.row2
+				#z: _node.transform.row3
+			)
+			-- return
+		)
+	
+		/* vector from A to B */
+		local vec_ab = (ref_b.position - ref_a.position)
+	
+		/* target’s Y direction (local/world depending on coord sys) */
+		local dir_on_axis
+		
+		/* GET AXIS BY ACTIVE AXIS IN MAIN TOOL BAR */ 
+		if axis == undefined then
+			axis = toolmode.axisConstraints
+		--format "classOf target_node: %\n" ( classOf target_node )
+		--format "target_node.transform: %\n" target_node.transform
+		prop_axis = ( normalize (getTMPropAxis target_node axis) )
+		
+		dir_on_axis = if toolMode.coordsys == #local then
+		   in coordsys local prop_axis
+		else
+		   in coordsys world prop_axis
+		
+		/* project AB vector onto target’s Y axis */
+		local _distance = dot vec_ab dir_on_axis
+		
+		--move target_node (dir_on_axis * _distance * direction )
+		
+		(dir_on_axis * _distance * direction ) --return
+	),
 	
 	
 	/**
