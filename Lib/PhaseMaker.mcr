@@ -3,9 +3,8 @@ category:	"_AnimKeyTools"
 buttontext:	"PhaseMaker"
 toolTip:	"Open PhaseMaker"
 (
-	importAnimKeyTools()
 	/* IMPORT TOOLS */ 	
-	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\Lib\PhaseMaker.ms" 
+	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\Lib\PhaseMaker.ms" --"./PhaseMaker.ms"
 )
 
 

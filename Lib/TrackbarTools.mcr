@@ -3,7 +3,6 @@ category:	"_AnimKeyTools"
 buttontext:	"TrackbarTools"
 toolTip:	"Open TrackbarTools"
 (
-	importAnimKeyTools()
 	/* IMPORT TOOLS */ 	
-	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\Lib\TrackbarTools.ms" 
+	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\Lib\TrackbarTools.ms" --"./TrackbarTools.ms"
 )

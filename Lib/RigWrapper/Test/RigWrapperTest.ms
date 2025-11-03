@@ -14,3 +14,7 @@ RigWrapper.loadRig()
 
 --undo "mirrorPhases" on
 	--RigWrapper.mirrorPhase ( Interval 1 3 )
+
+
+
+RigWrapper.mirrorPhase [0,1] increment:1

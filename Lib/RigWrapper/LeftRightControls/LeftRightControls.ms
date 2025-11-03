@@ -26,23 +26,23 @@ struct LeftRightControls_v
 	/* dependency */
 	/* reference */
 	/* inhered */
-
-	/** Add objects
-	 */
-	function addObjects objs full_basename =
-	(
-		--format "\n"; print "LeftRightControls_v.addObjects()"
- 
-		for obj in objs do
-			for side in #( "L", "R" ) where matchPattern obj.name pattern:(full_basename + "_"+side+"_*") do 
-				case side of
-				(
-					"L": this.left  = ObjectControllerKeys_v(obj)
-					"R": this.right = ObjectControllerKeys_v(obj)
-				)
-
-		this --return
-	),
+	--
+	--/** Add objects
+	-- */
+	--function addObjects objs full_basename =
+	--(
+	--	--format "\n"; print "LeftRightControls_v.addObjects()"
+	--
+	--	for obj in objs do
+	--		for side in #( "L", "R" ) where matchPattern obj.name pattern:(full_basename + "_"+side+"_*") do 
+	--			case side of
+	--			(
+	--				"L": this.left  = ObjectControllerKeys_v(obj)
+	--				"R": this.right = ObjectControllerKeys_v(obj)
+	--			)
+	--
+	--	this --return
+	--),
 
 	/** Copy keys on times
 	 */
@@ -467,7 +467,10 @@ struct LeftRightControls_v
 	 */
 	on create do
 	(
-		--format "\n"; print "LeftRightControls.onCreate()"
+		format "\n"; print "LeftRightControls.onCreate()"
+		this.left  = ObjectControllerKeys_v(this.left)
+		this.right = ObjectControllerKeys_v(this.right)
+		
 	)
 
 )

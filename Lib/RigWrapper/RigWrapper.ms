@@ -1,5 +1,7 @@
 filein( getFilenamePath(getSourceFileName()) + "/../TransformFlipper/TransformFlipper.ms" )	--"./../TransformFlipper/TransformFlipper.ms"
 filein( getFilenamePath(getSourceFileName()) + "/LeftRightControls/LeftRightControls.ms" )	--"./LeftRightControls/LeftRightControls.ms"
+filein( getFilenamePath(getSourceFileName()) + "/RigControl.ms/RigControl.ms" )	--"./RigControl.ms/RigControl.ms"
+
 /**
  */
 struct RigWrapper_v
@@ -53,18 +55,19 @@ struct RigWrapper_v
 			/* GET OBJ NMAE PATTERN */ 
 			full_basename = rig_name +"_Setup_Ctrl_"+basename -- E.G.: "boy_Setup_Ctrl_IKFoot"
 
-			
 			/* GET OBJECTS WITH SAME PATTERN OF NAME  */ 
 			same_name_objs = execute ("$'"+ full_basename +"_*'") as Array
 			
+			rig_controls[full_basename] = RigControl_v(same_name_objs) --is_pair_control:(side == "L" or side == "R")
+			
 			
 			/* ADD CONTROL PAIR TO DICTIONARY */ 
-			if same_name_objs.count == 2 and (side == "L" or side == "R") then
-				rig_controls[full_basename] = (LeftRightControls_v()).addObjects(same_name_objs)(full_basename)
-			
-			else
-				format "%: %\n" same_name_objs.count same_name_objs
-			
+			--if same_name_objs.count == 2 and (side == "L" or side == "R") then
+			--	rig_controls[full_basename] = (LeftRightControls_v()).addObjects(same_name_objs)(full_basename)
+			--
+			--else
+			--	format "%: %\n" same_name_objs.count same_name_objs
+			--
 			/* AVOID PROCESSING OF SAME OBJECTS AGAIN  */ 
 			processed_objects += same_name_objs
 		)
@@ -83,19 +86,16 @@ struct RigWrapper_v
 		FLIP ORINATATION OF TRANSFROMS
 		SAVE FLIPPED TRANSFROMS TO SHIFTED KEYS ON OTHER SIDE OBJECT	  
 		
-		@param dictionary rig_controls list of controls E.G.: rig_controls["boy_Setup_Ctrl_IKFoot"]["L|R"] = #()
-		
-		
 	 */
 	function mirrorPhase phase increment:undefined =
 	(
-		--format "\n"; print "PhaseCreator_v.mirrorPhases()"
+		format "\n"; print "PhaseCreator_v.mirrorPhases()"
 		--format "PHASE: %\n" phase
 		all_ctrls = #()
 		
 		KeyFrameManager = KeyFrameManager_v time:phase
 		
-		if increment == undefined or increment as Number == undefined then
+		if superClassOf increment != Number and (increment == undefined or increment as Number == undefined) then
 			increment = phase[2] - phase[1] + 1
 		
 		--format "INCREMENT: %\n" increment
@@ -103,11 +103,18 @@ struct RigWrapper_v
 		this.toggleWalkAnimLayer(false)
 		
 		for control_name in rig_controls.keys do
-			rig_controls[control_name].switchKeysOnTimes phase increment:increment
+			format "%: %\n" control_name rig_controls[control_name]
 		
-		this.moveHipWithFeet()
+		for control_name in rig_controls.keys where rig_controls[control_name].LeftRightControls != undefined do
+			rig_controls[control_name].LeftRightControls.switchKeysOnTimes phase increment:increment
 		
-		this.toggleWalkAnimLayer(true)
+			 --(LeftRightControls_v()).addObjects(same_name_objs)(full_basename)
+		
+			--format "CONTROL_NAME: %\n" control_name
+		
+		--this.moveHipWithFeet()
+		
+		--this.toggleWalkAnimLayer(true)
 		
 		/* SET TIME TO FIRST AFTER PHASE */ 
 		sliderTime += increment

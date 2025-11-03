@@ -160,7 +160,7 @@ icon:	"control:#CHECKBOX|across:2|offset:[0, 4 ]"
 macroscript AnimKeyTools_increment
 category:	"_AnimKeyTools"
 buttontext:	"[Increment value]"
-toolTip:	"Offset from current frame where new keys are kreated.\n\nOPTION 'Phase': Increment by phase length"
+toolTip:	"Offset from current frame where new keys are created.\n\nOPTION 'Phase': Increment by phase length"
 --icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '1', '2', '3', '4', '5', '6', '7', '8', '9')"
 icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9')|offset:[0, 0 ]"
 (
