@@ -103,7 +103,7 @@ struct RigWrapper_v
 		
 		format "INCREMENT: %\n" increment
 		
-		--this.toggleWalkAnimLayer(false)
+		anim_layer_state = this.toggleWalkAnimLayer(false)
 		
 		--for control_name in rig_controls.keys do
 			--format "%: %\n" control_name rig_controls[control_name]
@@ -113,7 +113,8 @@ struct RigWrapper_v
 		
 		this.moveHipWithFeet current_time ( current_time + increment )
 		
-		--this.toggleWalkAnimLayer(true)
+		if anim_layer_state then
+			this.toggleWalkAnimLayer(true)
 		
 		/* SET TIME TO FIRST AFTER PHASE */ 
 		sliderTime += increment
@@ -234,12 +235,20 @@ struct RigWrapper_v
 		format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
 		format "state: %\n" state
 		
-		master_walk = execute ("$'"+rig_name+"_Setup_Ctrl_MasterWalk_G'") --return
+		current_state = true
 		
-		if ( walk_anim_layer = (AnimLayerManager.getNodesLayers obj)[1] ) != undefined then
+		--master_walk = execute ("$'"+rig_name+"_Setup_Ctrl_MasterWalk_G'") --return
+		
+		master_walk = (this.getRigControls "MasterWalk")[1]
+
+		if ( walk_anim_layer = (AnimLayerManager.getNodesLayers master_walk)[1] ) != undefined then
 		(
 			format "walk_anim_layer: %\n" walk_anim_layer
 			anim_layer_name = AnimLayerManager.getLayerName walk_anim_layer
+					master_walk = (this.getRigControls "MasterWalk")[1]
+
+			current_state = AnimLayerManager.getLayerMute  walk_anim_layer
+			
 			format "anim_layer_name: %\n" anim_layer_name
 			
 			/* MUTE anim layer */ 
@@ -254,8 +263,27 @@ struct RigWrapper_v
 			if state == false then
 				this.toggleWalkAnimLayer false
 		)
+		
+		current_state --return
+	),
+	
+	/** Get walk anim layer
+	 */
+	function getWalkAnimLayer obj =
+	(
+		--format "\n"; print "RigWrapper_v.getWalkAnimLayer()"
+		
+		
 	),
 
+	/** Get walk anim layer state
+	 */
+	function getWalkAnimLayerState obj =
+	(
+		--format "\n"; print "RigWrapper_v.getWalkAnimLayerState()"
+		
+		
+	),
 
 	private
 	/*  Get distance of two reference nodes

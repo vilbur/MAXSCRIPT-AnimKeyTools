@@ -22,6 +22,8 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			--format "DIALOG_phasemaker.current_time: %\n" DIALOG_phasemaker.current_time
 			DIALOG_phasemaker.current_time = currentTime
 			
+			rig_name = DIALOG_phasemaker.DL_rig_select.selected 
+
 			current_time = currentTime.frame as integer
 			--format "current_time: %\n" current_time
 			phase_length = DIALOG_phasemaker.DL_phase_length.selected as integer
@@ -30,21 +32,26 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			--format "phase_start_pre_current_time: %\n" phase_start_pre_current_time
 			is_phase_in_range = phase_start_pre_current_time >= animationRange.start.frame
 			--format "is_phase_in_range: %\n" is_phase_in_range
-			ttip_create = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
-			ttip_mirror = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
 			
-			frames_phase  = ( current_time - phase_length +1 ) as string + " - " + current_time as string 
-			frames_mirror = (current_time + 1) as string + " - " + ( current_time + phase_length ) as string
+			--is_current_time_on_start_of_range = animationRange.start == currentTime
 			
-			is_current_time_on_start_of_range = animationRange.start == currentTime
-			--format "DIALOG_phasemaker: %\n" DIALOG_phasemaker
+			
+			/*------------------------------------------------------------------------------
+				EDIT BUTTONS
+			--------------------------------------------------------------------------------*/
 			BTN_create_phase = DIALOG_phasemaker.BTN_create_phase
 			
 			BTN_mirror_phase = DIALOG_phasemaker.BTN_mirror_phase
 			
-			BTN_mirror_phase.pos.x = 	BTN_create_phase.pos.x =  16
+			--BTN_mirror_phase.pos.x = 	BTN_create_phase.pos.x =  16
 			
-			/* VISIBILITY OF BUTTONS  */ 
+			/* TOOLTIPS OF BUTTONS  */ 
+			ttip_create = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
+			ttip_mirror = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
+
+			frames_phase  = ( current_time - phase_length +1 ) as string + " - " + current_time as string 
+			frames_mirror = (current_time + 1) as string + " - " + ( current_time + phase_length ) as string
+			
 			BTN_create_phase.tooltip = "CREATE PHASE IN FRAMES: " + current_time as string +" > " + (current_time + phase_length - 1 ) as string + ttip_create
 			
 			BTN_mirror_phase.tooltip = if is_phase_in_range then
@@ -56,8 +63,13 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			
 			BTN_mirror_phase.enabled = is_phase_in_range
 			
+						(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
+
+			CBTN_toggle_walk_anim_layer
 			
-			/* SYNC WITH GLOBAL VAROABLE */ 
+			/*------------------------------------------------------------------------------
+				SYNC WITH GLOBAL VARIABLE
+			--------------------------------------------------------------------------------*/
 			if ( selected_pahese_length = DIALOG_phasemaker.DL_phase_length.selected ) != undefined and PHASE_LENGTH != selected_pahese_length as integer then
 				DIALOG_phasemaker.DL_phase_length.selection = PHASE_LENGTH
 		)
@@ -101,8 +113,8 @@ icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/wal
 	rig_name = DIALOG_phasemaker.DL_rig_select.selected 
 	--format "rig_name: %\n" rig_name
 	if rig_name != undefined then 
-	if (trimLeft(rig_name)).count > 0 then
-		(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
+		if (trimLeft(rig_name)).count > 0 then
+			(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
 )
 
 
