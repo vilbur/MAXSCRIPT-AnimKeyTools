@@ -90,6 +90,9 @@ struct RigWrapper_v
 	function mirrorPhase phase increment:undefined =
 	(
 		format "\n"; print "PhaseCreator_v.mirrorPhases()"
+		
+		current_time = currentTime
+		format "current_time: %\n" current_time
 		--format "PHASE: %\n" phase
 		all_ctrls = #()
 		
@@ -98,21 +101,17 @@ struct RigWrapper_v
 		if superClassOf increment != Number and (increment == undefined or increment as Number == undefined) then
 			increment = phase[2] - phase[1] + 1
 		
-		--format "INCREMENT: %\n" increment
+		format "INCREMENT: %\n" increment
 		
-		this.toggleWalkAnimLayer(false)
+		--this.toggleWalkAnimLayer(false)
 		
-		for control_name in rig_controls.keys do
-			format "%: %\n" control_name rig_controls[control_name]
+		--for control_name in rig_controls.keys do
+			--format "%: %\n" control_name rig_controls[control_name]
 		
 		for control_name in rig_controls.keys where rig_controls[control_name].LeftRightControls != undefined do
 			rig_controls[control_name].LeftRightControls.switchKeysOnTimes phase increment:increment
 		
-			 --(LeftRightControls_v()).addObjects(same_name_objs)(full_basename)
-		
-			--format "CONTROL_NAME: %\n" control_name
-		
-		--this.moveHipWithFeet()
+		this.moveHipWithFeet current_time ( current_time + increment )
 		
 		--this.toggleWalkAnimLayer(true)
 		
@@ -121,26 +120,38 @@ struct RigWrapper_v
 	),
 		/** Move hip with feet
 	 */
-	function moveHipWithFeet =
+	function moveHipWithFeet from_time to_time =
 	(
 		format "\n"; print "RigWrapper_v.moveHipWithFeet()"
-		
-		for control_name in rig_controls.keys do format "control_name: %\n" control_name
+		format "from_time: %\n" from_time
+		format "to_time:   %\n" to_time
+		--for control_name in rig_controls.keys do format "control_name: %\n" control_name
 
 		format "\n"
 		feet = this.getRigControls "IKFoot_"
-		format "feet: %\n" feet
-		format "feet[1]: %\n" feet[1]
-		format "feet[2]: %\n" feet[2]
-		format "feet[1]: %\n" (classOf feet[1])
-		format "feet.count: %\n" feet.count
+		--format "feet: %\n" feet
+		--format "feet[1]: %\n" feet[1]
+		--format "feet[2]: %\n" feet[2]
+		--format "feet[1]: %\n" (classOf feet[1])
+		--format "feet.count: %\n" feet.count
+		--
+		master_walk = (this.getRigControls "MasterWalk")[1]
+		--format "master_walk: %\n" master_walk
 		
-		master_upper_body = (this.getRigControls "MasterUpperBody")[1]
-		format "master_upper_body: %\n" master_upper_body
+		step_length_pos = this.getPosOfObjCbyDistanceOfAB feet[1] feet[2] master_walk axis:#Y direction:-1
 		
-		hip_pos = this.getPosOfObjCbyDistanceOfAB feet[1] feet[2] master_upper_body axis:#Y direction:-1
+
+		--master_pos = master_walk.pos * step_length_pos
+		master_pos = at time from_time master_walk.pos
+		new_pos = master_pos + step_length_pos
 		
-		format "HIP_POS: %\n" hip_pos
+		with animate on
+			at time to_time (master_walk.pos = new_pos)
+			
+		--format "MASTER POS: %\n" (at time to_time master_walk.pos)
+		format "master_pos: %\n" master_pos
+		format "STEP POS:   %\n" step_length_pos
+		format "new_pos:    %\n" new_pos
 		--format "ikfoot: %\n" ikfoot
 	),
 	
@@ -227,6 +238,7 @@ struct RigWrapper_v
 		
 		if ( walk_anim_layer = (AnimLayerManager.getNodesLayers obj)[1] ) != undefined then
 		(
+			format "walk_anim_layer: %\n" walk_anim_layer
 			anim_layer_name = AnimLayerManager.getLayerName walk_anim_layer
 			format "anim_layer_name: %\n" anim_layer_name
 			
@@ -256,7 +268,7 @@ struct RigWrapper_v
 		format "\n"; print "RigWrapper_v.getPosOfObjCbyDistanceOfAB()"
 
 		/* Returns axis row of node TM */
-		function getTMPropAxis _node axis =
+		function getTMPropAxis _node axis = 
 		(
 			case axis of
 			(
@@ -266,31 +278,44 @@ struct RigWrapper_v
 			)
 			-- return
 		)
+		/* Returns axis row of node TM */
+		function setTMPropAxis _node axis pos_on_axis =
+		(
+			node_pos = _node.pos
+			
+			setProperty node_pos axis pos_on_axis
+		
+			node_pos --return
+		)
+		/* target’s direction (local/world depending on coord sys) */
+		local dir_on_axis
 	
 		/* vector from A to B */
 		local vec_ab = (ref_b.position - ref_a.position)
+		format "vec_ab: %\n" vec_ab
 	
-		/* target’s Y direction (local/world depending on coord sys) */
-		local dir_on_axis
 		
 		/* GET AXIS BY ACTIVE AXIS IN MAIN TOOL BAR */ 
 		if axis == undefined then
 			axis = toolmode.axisConstraints
 		--format "classOf target_node: %\n" ( classOf target_node )
 		--format "target_node.transform: %\n" target_node.transform
-		prop_axis = ( normalize (getTMPropAxis target_node axis) )
+		--prop_axis = ( normalize (getTMPropAxis target_node axis) )
 		
-		dir_on_axis = if toolMode.coordsys == #local then
-		   in coordsys local prop_axis
-		else
-		   in coordsys world prop_axis
-		
+		--dir_on_axis = if toolMode.coordsys == #local then
+		--   in coordsys local  ( normalize (getTMPropAxis target_node axis) )
+		--else
+		--   in coordsys world  ( normalize (getTMPropAxis target_node axis) )
+		--
+		dir_on_axis = in coordsys world  ( normalize (getTMPropAxis target_node axis) )
+		format "dir_on_axis: %\n" dir_on_axis
 		/* project AB vector onto target’s Y axis */
 		local _distance = dot vec_ab dir_on_axis
-		
 		--move target_node (dir_on_axis * _distance * direction )
-		
-		(dir_on_axis * _distance * direction ) --return
+		_distance = abs _distance
+		format "_distance: %\n" _distance
+		(dir_on_axis * _distance * direction )
+		--setTMPropAxis target_node axis (dir_on_axis * _distance * direction ) --return
 	),
 	
 	

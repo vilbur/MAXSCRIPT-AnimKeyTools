@@ -1,6 +1,7 @@
 clearListener(); print("Cleared in:\n"+getSourceFileName())
 
 global DIALOG_phasemaker
+global DIALOG_time_slider_tools
 
 if PHASE_LENGTH == undefined then 
 	global PHASE_LENGTH = 1

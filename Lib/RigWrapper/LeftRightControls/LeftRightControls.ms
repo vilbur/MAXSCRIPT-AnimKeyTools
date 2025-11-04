@@ -467,7 +467,7 @@ struct LeftRightControls_v
 	 */
 	on create do
 	(
-		format "\n"; print "LeftRightControls.onCreate()"
+		--format "\n"; print "LeftRightControls.onCreate()"
 		this.left  = ObjectControllerKeys_v(this.left)
 		this.right = ObjectControllerKeys_v(this.right)
 		
