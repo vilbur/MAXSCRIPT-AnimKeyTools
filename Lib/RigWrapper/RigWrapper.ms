@@ -1,7 +1,7 @@
 filein( getFilenamePath(getSourceFileName()) + "/../TransformFlipper/TransformFlipper.ms" )	--"./../TransformFlipper/TransformFlipper.ms"
 filein( getFilenamePath(getSourceFileName()) + "/LeftRightControls/LeftRightControls.ms" )	--"./LeftRightControls/LeftRightControls.ms"
 filein( getFilenamePath(getSourceFileName()) + "/RigControl.ms/RigControl.ms" )	--"./RigControl.ms/RigControl.ms"
-
+filein( getFilenamePath(getSourceFileName()) + "/../PhaseMaker/Lib/AnimLayer/AnimLayer.ms" )	--"./../PhaseMaker/Lib/AnimLayer/AnimLayer.ms"
 /**
  */
 struct RigWrapper_v
@@ -24,8 +24,8 @@ struct RigWrapper_v
 	control_name_pattern = "(.*_Setup_Ctrl_([^_]+_)).*",
 	
 	/* private */ 
-	--walk_anim_layer,
-	
+	AnimLayer 	= AnimLayer_v(),
+
 	/** Load rig
 	 */
 	function loadRig =
@@ -58,7 +58,8 @@ struct RigWrapper_v
 			/* GET OBJECTS WITH SAME PATTERN OF NAME  */ 
 			same_name_objs = execute ("$'"+ full_basename +"_*'") as Array
 			
-			rig_controls[full_basename] = RigControl_v(same_name_objs) --is_pair_control:(side == "L" or side == "R")
+			--rig_controls[full_basename] = RigControl_v(same_name_objs) --is_pair_control:(side == "L" or side == "R")
+			rig_controls[basename] = RigControl_v(same_name_objs) --is_pair_control:(side == "L" or side == "R")
 			
 			
 			/* ADD CONTROL PAIR TO DICTIONARY */ 
@@ -95,31 +96,42 @@ struct RigWrapper_v
 		format "current_time: %\n" current_time
 		--format "PHASE: %\n" phase
 		all_ctrls = #()
+		copied_controls = #()
+		--copied_controls	= Dictionary #STRING -- KEY: VALUE:
 		
 		KeyFrameManager = KeyFrameManager_v time:phase
-		
+
 		if superClassOf increment != Number and (increment == undefined or increment as Number == undefined) then
 			increment = phase[2] - phase[1] + 1
 		
 		format "INCREMENT: %\n" increment
 		
-		anim_layer_state = this.toggleWalkAnimLayer(false)
+		this.AnimLayer.toggleLayer "MasterWalk" false
 		
-		--for control_name in rig_controls.keys do
-			--format "%: %\n" control_name rig_controls[control_name]
-		
+		/* MIRROR EACH  */ 
 		for control_name in rig_controls.keys where rig_controls[control_name].LeftRightControls != undefined do
-			rig_controls[control_name].LeftRightControls.switchKeysOnTimes phase increment:increment
+		(
+			
+			if rig_controls[control_name].LeftRightControls.switchKeysOnTimes phase increment:increment then
+				append copied_controls control_name
+				--copied_controls[control_name]
+			
+		)
+			
+		for i = 1 to copied_controls.count do format "%: %\n" i copied_controls[i]
 		
-		this.moveHipWithFeet current_time ( current_time + increment )
+		if findItem copied_controls "IKFoot" > 0 then
+			this.moveHipWithFeet current_time ( current_time + increment )
+			
 		
-		if anim_layer_state then
-			this.toggleWalkAnimLayer(true)
+		--if anim_layer_state then
+			--this.toggleWalkAnimLayer(true)
 		
 		/* SET TIME TO FIRST AFTER PHASE */ 
 		sliderTime += increment
 	),
-		/** Move hip with feet
+	
+	/** Move hip with feet
 	 */
 	function moveHipWithFeet from_time to_time =
 	(
@@ -129,26 +141,32 @@ struct RigWrapper_v
 		--for control_name in rig_controls.keys do format "control_name: %\n" control_name
 
 		format "\n"
+		
 		feet = this.getRigControls "IKFoot_"
-		--format "feet: %\n" feet
-		--format "feet[1]: %\n" feet[1]
-		--format "feet[2]: %\n" feet[2]
-		--format "feet[1]: %\n" (classOf feet[1])
-		--format "feet.count: %\n" feet.count
-		--
+
 		master_walk = (this.getRigControls "MasterWalk")[1]
-		--format "master_walk: %\n" master_walk
 		
 		step_length_pos = this.getPosOfObjCbyDistanceOfAB feet[1] feet[2] master_walk axis:#Y direction:-1
+				
+		active_layer = AnimLayer.getActiveLayer master_walk
+		format "ACTIVE_LAYER: %\n" active_layer
+		--AnimLayer.wtf()
+		/* ADD or ACTIVATE ANIMATION LAYER */ 
+		if AnimLayer.hasLayer master_walk "MasterWalk" then
+			AnimLayer.setLayerActive "MasterWalk"
+		else
+			AnimLayer.addLayer master_walk "MasterWalk"
 		
-
-		--master_pos = master_walk.pos * step_length_pos
+		/* GET POSITIONS */ 
 		master_pos = at time from_time master_walk.pos
 		new_pos = master_pos + step_length_pos
 		
+		/* ANIMATE HIP POSITION  */ 
 		with animate on
 			at time to_time (master_walk.pos = new_pos)
 			
+		this.AnimLayer.setLayerActive active_layer
+
 		--format "MASTER POS: %\n" (at time to_time master_walk.pos)
 		format "master_pos: %\n" master_pos
 		format "STEP POS:   %\n" step_length_pos
@@ -267,25 +285,8 @@ struct RigWrapper_v
 		current_state --return
 	),
 	
-	/** Get walk anim layer
-	 */
-	function getWalkAnimLayer obj =
-	(
-		--format "\n"; print "RigWrapper_v.getWalkAnimLayer()"
-		
-		
-	),
-
-	/** Get walk anim layer state
-	 */
-	function getWalkAnimLayerState obj =
-	(
-		--format "\n"; print "RigWrapper_v.getWalkAnimLayerState()"
-		
-		
-	),
-
 	private
+
 	/*  Get distance of two reference nodes
 		
 		distance of objects A and B in y axis direction vector of object c

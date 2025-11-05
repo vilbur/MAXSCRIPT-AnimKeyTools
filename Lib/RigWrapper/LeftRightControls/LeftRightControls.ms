@@ -78,9 +78,9 @@ struct LeftRightControls_v
 		if keys_all.count == 0 then
 			return false
 		
-		--format "\n====================================================================================================================\n"
-		--format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
-		--format "% <-> %\n" left.obj.name right.obj.name
+		format "\n====================================================================================================================\n"
+		format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		format "% <-> %\n" left.obj.name right.obj.name
 		--format "PHASE:     %\n" phase
 		--format "INCREMENT: %\n" increment
 
@@ -134,6 +134,8 @@ struct LeftRightControls_v
 			else /* MIRROR TRANSFORMS */ 
 				this.flipIKControllers left.obj right.obj source_time target_time mode left_to_right right_to_left
 		)
+		
+		true --return true if any kdkey has been processed
 	),
 	
 	

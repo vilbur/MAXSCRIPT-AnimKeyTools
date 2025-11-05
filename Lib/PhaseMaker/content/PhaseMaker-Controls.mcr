@@ -63,7 +63,7 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			
 			BTN_mirror_phase.enabled = is_phase_in_range
 			
-						(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
+			--(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
 
 			CBTN_toggle_walk_anim_layer
 			
