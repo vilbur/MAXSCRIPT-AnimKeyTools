@@ -1,7 +1,8 @@
 filein( getFilenamePath(getSourceFileName()) + "/../TransformFlipper/TransformFlipper.ms" )	--"./../TransformFlipper/TransformFlipper.ms"
 filein( getFilenamePath(getSourceFileName()) + "/LeftRightControls/LeftRightControls.ms" )	--"./LeftRightControls/LeftRightControls.ms"
 filein( getFilenamePath(getSourceFileName()) + "/RigControl.ms/RigControl.ms" )	--"./RigControl.ms/RigControl.ms"
-filein( getFilenamePath(getSourceFileName()) + "/../PhaseMaker/Lib/AnimLayer/AnimLayer.ms" )	--"./../PhaseMaker/Lib/AnimLayer/AnimLayer.ms"
+filein( getFilenamePath(getSourceFileName()) + "/../AnimLayer/AnimLayer.ms" )	--"./../AnimLayer/AnimLayer.ms"
+
 /**
  */
 struct RigWrapper_v

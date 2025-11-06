@@ -4,7 +4,7 @@ buttontext:	"PhaseMaker"
 toolTip:	"Open PhaseMaker"
 (
 	/* IMPORT TOOLS */ 	
-	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\Lib\PhaseMaker.ms" --"./PhaseMaker.ms"
+	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\PhaseMaker.ms" --"./PhaseMaker.ms"
 )
 
 

@@ -4,5 +4,5 @@ buttontext:	"TrackbarTools"
 toolTip:	"Open TrackbarTools"
 (
 	/* IMPORT TOOLS */ 	
-	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\Lib\TrackbarTools.ms" --"./TrackbarTools.ms"
+	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\TrackbarTools.ms" --"./TrackbarTools.ms"
 )

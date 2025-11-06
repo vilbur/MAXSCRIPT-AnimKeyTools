@@ -38,6 +38,6 @@ filein( getFilenamePath(getSourceFileName()) + "/Lib/KeyFrameManager/KeyFrameMan
 	
 --------------------------------------------------------------------------------*/
 
-filein( getFilenamePath(getSourceFileName()) + "/Lib/TrackbarTools.mcr" )	--"./Lib/TrackbarTools.mcr"
+filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools.mcr" )	--"./TrackbarTools.mcr"
 
-filein( getFilenamePath(getSourceFileName()) + "/Lib/PhaseMaker.mcr" )	--"./Lib/PhaseMaker.mcr"
+filein( getFilenamePath(getSourceFileName()) + "/PhaseMaker.mcr" )	--"./PhaseMaker.mcr"

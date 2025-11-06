@@ -1,5 +1,5 @@
 
-filein( getFilenamePath(getSourceFileName()) + "/../AnimKeyTools.ms" )	--"./../AnimKeyTools.ms"
+filein( getFilenamePath(getSourceFileName()) + "/AnimKeyTools.ms" )	--"./AnimKeyTools.ms"
 
 filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms" )	--"./TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms"
 
