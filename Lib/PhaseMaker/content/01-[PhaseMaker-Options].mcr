@@ -125,7 +125,7 @@ icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/wal
 --------------------------------------------------------------------------------*/
 
 
-/**  
+/**  DROPDOWN 
  */
 macroscript AnimKeyTools_phase_length
 category:	"_AnimKeyTools"
@@ -148,7 +148,7 @@ icon:	"control:#DROPDOWN|across:2|width:64|items:#( '1', '2', '3', '4', '5', '6'
 
 )
 
-/**  
+/**  CHECKBOX
  */
 macroscript AnimKeyTools_phase_toggle
 category:	"_AnimKeyTools"
@@ -167,7 +167,7 @@ icon:	"control:#CHECKBOX|across:2|offset:[0, 4 ]"
 	INCREMENT
 --------------------------------------------------------------------------------*/
 
-/**  
+/**  DROPDOWN 
  */
 macroscript AnimKeyTools_increment
 category:	"_AnimKeyTools"
@@ -180,7 +180,7 @@ icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '0', '1', '2', '3',
 	
 )
 
-/**  
+/** CHECKBOX 
  */
 macroscript AnimKeyTools_increment_toggle
 category:	"_AnimKeyTools"
@@ -190,187 +190,20 @@ icon:	"control:#CHECKBOX|across:2|offset:[0, 0 ]"
 (
 	
 	--format "EventFired: %\n" EventFired
-	
 	DIALOG_phasemaker.DL_increment_value.enabled = EventFired.val
-
 )
 
-
-/*==============================================================================
-
-		BUTTONS
-
-================================================================================*/
-
-/** Get cycle range
+/*------------------------------------------------------------------------------
+	OPTIONS
+--------------------------------------------------------------------------------*/
+/** CHECKBOX 
  */
-function getCycleRange =
-(
-	--format "\n"; print ".getCycleRange()"
-	phase = getPhaseRange()
-	
-	cycle = copy phase
-	
-	cycle.y += cycle.y - cycle.x + 1
-	
-	cycle --return
-)
-
-/** Create or mirro phase
- */
-function createOrMirroPhase mode =
-(
-	--format "\n"; print ".createOrMirroPhase()"
-	
-	/** Get phase - nuber of frames before current time
-		
-		[phase keys][currentTime]
-		
-		@return Point2 [ start time, end time ]
-	  
-	 */
-	function getPhaseRange dir:#BACKWARD  =
-	(
-		--format "\n"; print ".getPhaseRange()"
-		
-		current_time = currentTime.frame as integer 
-		phase_length = DIALOG_phasemaker.DL_phase_length.selected as integer
-		
-		phase = [ current_time as integer , current_time as integer ] --return
-		
-		if dir == #BACKWARD then
-		(
-			phase.x = current_time - phase_length + 1
-			
-			--phase.y -= 1
-		)
-		else
-			phase.y = current_time + phase_length - 1
-	
-		phase --return
-	)
-	
-	increment = DIALOG_phasemaker.DL_increment_value.selected as integer
-	
-	rig_name = DIALOG_phasemaker.DL_rig_select.selected
-	
-	phase = getPhaseRange dir:( if mode == #CREATE then #FORWARD else #BACKWARD )
-	--format "PHASE: %\n" phase
-
-	if (trimLeft(rig_name)).count > 0 then
-		(RigWrapper_v(rig_name)).mirrorPhase phase increment:increment
-
-	--else
-		--(KeyFrameManager_v()).copyKeys time:phase transforms:true properties:false -- default increment is length ofrange + 1
-	
-	
-)
-
-
-/**  
- */
-macroscript	template_phase_create
+macroscript AnimKeyTools_move_hip_with_feet
 category:	"_AnimKeyTools"
---buttontext:	"Frame - > Phase"
-buttontext:	"C R E A T E phase"
-toolTip:	""
-icon:	"across:1|id:#BTN_create_phase|width:128|height:32|border:false"
+buttontext:	"Move body on walk"
+toolTip:	"Move MasterWalk control about step length on each step of walk"
+icon:	"control:#CHECKBOX|across:1|offset:[0, 0 ]"
 (
-	undo "Create Phase" on
-		createOrMirroPhase #CREATE
+	format "EventFired: %\n" EventFired
 )
-
-
-/**  
- */
-macroscript	template_mirror_phase
-category:	"_AnimKeyTools"
---buttontext:	"Frame - > Phase"
-buttontext:	"M I R R O R phase"
-toolTip:	""
-icon:	"across:1|id:#BTN_mirror_phase|width:128|height:32|border:false|align:#CENTER"
-(
-	
-	
-	undo "Mirror Phase" on
-		createOrMirroPhase #MIRROR
-
-)
-
-/**  
- */
-macroscript	template_copy_phase
-category:	"_AnimKeyTools"
---buttontext:	"Frame - > Phase"
-buttontext:	"C O P Y phase \ cycle"
-toolTip:	"Copy phase"
-icon:	"across:1|width:128|height:32|border:false"
-(
-
-	undo "Copy phase" on
-		(KeyFrameManager_v( getPhaseRange() )).copyKeys objs:( selection as Array )
-)
-/**  
- */
-macroscript	template_copy_cycle
-category:	"_AnimKeyTools"
---buttontext:	"Frame - > Phase"
-buttontext:	"C O P Y phase \ cycle"
-toolTip:	"Copy cycle - 1 cycle == 2 phases"
-icon:	"across:1|width:128|height:32|border:false"
-(
-
-	undo "Copy cycle" on
-	--format "getCycleRange(): %\n" (getCycleRange())
-		(KeyFrameManager_v( getCycleRange() )).copyKeys objs:( selection as Array )
-)
-
-/**  
- */
-macroscript	template_move_c_by_AB
-category:	"content-Template"
-buttontext:	"MOVE C by A B"
-toolTip:	"Move object on active axis about distance of two another objects.\n\nTARGET OBJECT IS 3rd IN SELECTION"
-icon:	"across:1|width:128|height:32|border:false"
-(
-	
-	on execute do
-	(
-		undo "Move obj C by A B " on
-			moveObjCbyAB direction:-1
-		
-	)
-	
-)
-
-/**  
- */
-macroscript	template_repeat_phase
-category:	"content-Template"
-buttontext:	"R E P E A T transform"
-toolTip:	""
-icon:	"across:1|width:128|height:32|border:false"
-(
-	
-	--/** Get interval
-	-- */
-	--function getPhaseRange =
-	--(
-	--	--format "\n"; print ".getPhaseRange()"
-	--	start = currentTime.frame as integer
-	--	
-	--	end = start + DIALOG_phasemaker.DL_phase_length.selected as integer - 1
-	--	format "Interval: %\n" ([ start, end] )
-	--	[ start, end ] --return
-	--)
-	
-	--RigWrapper = RigWrapper_v()
-	PhaseCreator = PhaseCreator_v()
-	
-	PhaseCreator_v.repeatPhaseTransform( selection as Array )
-	
-	
-)
-
-
 
