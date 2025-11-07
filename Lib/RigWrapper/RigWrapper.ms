@@ -31,10 +31,10 @@ struct RigWrapper_v
 	 */
 	function loadRig =
 	(
-		format "\n"; print "RigWrapper_v.loadRig()"
+		--format "\n"; print "RigWrapper_v.loadRig()"
 		
 		master_control = this._getMasterControlOfRig(rig_name)
-		format "master_control: %\n" master_control
+		--format "master_control: %\n" master_control
 		processed_objects = #()
 
 		this.rig_controls	= Dictionary #STRING -- KEY: VALUE:
@@ -91,10 +91,10 @@ struct RigWrapper_v
 	 */
 	function mirrorPhase phase increment:undefined =
 	(
-		format "\n"; print "PhaseCreator_v.mirrorPhases()"
+		--format "\n"; print "PhaseCreator_v.mirrorPhases()"
 		
 		current_time = currentTime
-		format "current_time: %\n" current_time
+		--format "current_time: %\n" current_time
 		--format "PHASE: %\n" phase
 		all_ctrls = #()
 		copied_controls = #()
@@ -105,7 +105,7 @@ struct RigWrapper_v
 		if superClassOf increment != Number and (increment == undefined or increment as Number == undefined) then
 			increment = phase[2] - phase[1] + 1
 		
-		format "INCREMENT: %\n" increment
+		--format "INCREMENT: %\n" increment
 		
 		this.AnimLayer.toggleLayer "MasterWalk" false
 		
@@ -136,21 +136,21 @@ struct RigWrapper_v
 	 */
 	function moveHipWithFeet from_time to_time =
 	(
-		format "\n"; print "RigWrapper_v.moveHipWithFeet()"
-		format "from_time: %\n" from_time
-		format "to_time:   %\n" to_time
+		--format "\n"; print "RigWrapper_v.moveHipWithFeet()"
+		--format "from_time: %\n" from_time
+		--format "to_time:   %\n" to_time
 		--for control_name in rig_controls.keys do format "control_name: %\n" control_name
 
-		format "\n"
+		--format "\n"
 		
 		feet = this.getRigControls "IKFoot_"
 
-		master_walk = (this.getRigControls "MasterWalk")[1]
+		master_walk = this._getMasterWalkControl()
 		
 		step_length_pos = this.getPosOfObjCbyDistanceOfAB feet[1] feet[2] master_walk axis:#Y direction:-1
 				
 		active_layer = AnimLayer.getActiveLayer master_walk
-		format "ACTIVE_LAYER: %\n" active_layer
+		--format "ACTIVE_LAYER: %\n" active_layer
 		--AnimLayer.wtf()
 		/* ADD or ACTIVATE ANIMATION LAYER */ 
 		if AnimLayer.hasLayer master_walk "MasterWalk" then
@@ -169,9 +169,9 @@ struct RigWrapper_v
 		this.AnimLayer.setLayerActive active_layer
 
 		--format "MASTER POS: %\n" (at time to_time master_walk.pos)
-		format "master_pos: %\n" master_pos
-		format "STEP POS:   %\n" step_length_pos
-		format "new_pos:    %\n" new_pos
+		--format "master_pos: %\n" master_pos
+		--format "STEP POS:   %\n" step_length_pos
+		--format "new_pos:    %\n" new_pos
 		--format "ikfoot: %\n" ikfoot
 	),
 	
@@ -251,13 +251,13 @@ struct RigWrapper_v
 	 */
 	function toggleWalkAnimLayer state =
 	(
-		format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
-		format "state: %\n" state
+		--format "\n"; print "RigWrapper_v.toggleWalkAnimLayer()"
+		--format "state: %\n" state
 		
 		current_state = true
 		
-		master_walk = (this.getRigControls "MasterWalk")[1]
-		format "master_walk: %\n" master_walk
+		master_walk = this._getMasterWalkControl()
+		--format "master_walk: %\n" master_walk
 
 		if master_walk != undefined then
 		(
@@ -272,7 +272,27 @@ struct RigWrapper_v
 		current_state --return
 	),
 	
+	/** Is anim layer enabled
+	 */
+	function isAnimLayerEnabled =
+	(
+		--format "\n"; print "RigWrapper_v.isAnimLayerEnabled()"
+		if (master_walk = this._getMasterWalkControl()) != undefined and ( layer_index = AnimLayer.getLayer master_walk "MasterWalk" ) != undefined then
+			AnimLayerManager.getLayerMute layer_index
+		else
+			false --return
+		
+	),
+	
 	private
+	
+	/** Get master walk control
+	 */
+	function _getMasterWalkControl =
+	(
+		--format "\n"; print "RigWrapper_v._getMasterWalkControl()"
+		(this.getRigControls "MasterWalk")[1] --return
+	),
 
 	/*  Get distance of two reference nodes
 		
@@ -281,7 +301,7 @@ struct RigWrapper_v
 	*/
 	function getPosOfObjCbyDistanceOfAB ref_a ref_b target_node axis:undefined direction:1 =
 	(
-		format "\n"; print "RigWrapper_v.getPosOfObjCbyDistanceOfAB()"
+		--format "\n"; print "RigWrapper_v.getPosOfObjCbyDistanceOfAB()"
 
 		/* Returns axis row of node TM */
 		function getTMPropAxis _node axis = 
@@ -308,7 +328,7 @@ struct RigWrapper_v
 	
 		/* vector from A to B */
 		local vec_ab = (ref_b.position - ref_a.position)
-		format "vec_ab: %\n" vec_ab
+		--format "vec_ab: %\n" vec_ab
 	
 		
 		/* GET AXIS BY ACTIVE AXIS IN MAIN TOOL BAR */ 
@@ -324,12 +344,12 @@ struct RigWrapper_v
 		--   in coordsys world  ( normalize (getTMPropAxis target_node axis) )
 		--
 		dir_on_axis = in coordsys world  ( normalize (getTMPropAxis target_node axis) )
-		format "dir_on_axis: %\n" dir_on_axis
+		--format "dir_on_axis: %\n" dir_on_axis
 		/* project AB vector onto target’s Y axis */
 		local _distance = dot vec_ab dir_on_axis
 		--move target_node (dir_on_axis * _distance * direction )
 		_distance = abs _distance
-		format "_distance: %\n" _distance
+		--format "_distance: %\n" _distance
 		(dir_on_axis * _distance * direction )
 		--setTMPropAxis target_node axis (dir_on_axis * _distance * direction ) --return
 	),

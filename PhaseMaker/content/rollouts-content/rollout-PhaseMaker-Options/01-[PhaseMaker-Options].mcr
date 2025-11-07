@@ -3,7 +3,7 @@
 /*------------------------------------------------------------------------------
 	TICKER - TIMER
 ------------------------------------------------------------------------------*/
-/*
+/* UPDATE UI
 */
 macroscript	AnimKeyTools_timer
 category:	"_AnimKeyTools"
@@ -15,35 +15,31 @@ icon:	"control:timer|interval:500|active:true|height:0"
 	--format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options	
 	/* ADJUST BUTTON TEXT - CREATE PHASE if first frame of range is active else COPY PHASE */
 	on execute do
-	--format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options
-		if DIALOG_phasemaker != undefined and DIALOG_phasemaker.current_time != currentTime then
+	(
+		/* DEFINE SHORTCUTS */ 
+		ROLLOUT_options  = ROLLOUT_phasemaker_options
+		BTN_create_phase = ROLLOUT_phasemaker_controls.BTN_create_phase
+		BTN_mirror_phase = ROLLOUT_phasemaker_controls.BTN_mirror_phase
+		
+		/* HELPERS */ 
+		rig_name = ROLLOUT_options.DL_rig_select.selected 
+		
+		current_time = currentTime.frame as integer
+
+		phase_length = ROLLOUT_options.DL_phase_length.selected as integer
+
+		phase_first_frame = current_time - phase_length + 1 
+
+		is_phase_in_range = phase_first_frame >= animationRange.start.frame
+			
+		/* UPDATE IF CURRENT TIME IS CHANGED */ 
+		if DIALOG_phasemaker.current_time != currentTime then
 		(
-			--format "\n"
-			--format "ROLLOUT_phasemaker_options.current_time: %\n" ROLLOUT_phasemaker_options.current_time
 			DIALOG_phasemaker.current_time = currentTime
 			
-			rig_name = ROLLOUT_phasemaker_options.DL_rig_select.selected 
-		
-			current_time = currentTime.frame as integer
-			--format "current_time: %\n" current_time
-			phase_length = ROLLOUT_phasemaker_options.DL_phase_length.selected as integer
-			--format "phase_length: %\n" phase_length
-			phase_start_pre_current_time = current_time - phase_length + 1 
-			--format "phase_start_pre_current_time: %\n" phase_start_pre_current_time
-			is_phase_in_range = phase_start_pre_current_time >= animationRange.start.frame
-			--format "is_phase_in_range: %\n" is_phase_in_range
-			
-			--is_current_time_on_start_of_range = animationRange.start == currentTime
-			
-			
 			/*------------------------------------------------------------------------------
-				EDIT BUTTONS
+				UPDATE BUTTONS
 			--------------------------------------------------------------------------------*/
-			BTN_create_phase = ROLLOUT_phasemaker_controls.BTN_create_phase
-			
-			BTN_mirror_phase = ROLLOUT_phasemaker_controls.BTN_mirror_phase
-			
-			--BTN_mirror_phase.pos.x = 	BTN_create_phase.pos.x =  16
 			
 			/* TOOLTIPS OF BUTTONS  */ 
 			ttip_create = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
@@ -52,41 +48,34 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			frames_phase  = ( current_time - phase_length +1 ) as string + " - " + current_time as string 
 			frames_mirror = (current_time + 1) as string + " - " + ( current_time + phase_length ) as string
 			
+			/* EDIT TOOLTIPS */ 
 			BTN_create_phase.tooltip = "CREATE PHASE IN FRAMES: " + current_time as string +" > " + (current_time + phase_length - 1 ) as string + ttip_create
 			
 			BTN_mirror_phase.tooltip = if is_phase_in_range then
 											"MIRROR FRAMES OF PHASE: " + frames_phase +" > " + frames_mirror + ttip_create
 										else
-											"PHASE START BEFORE ANIMATION RANGE: " + phase_start_pre_current_time as string +"\n\nMOVE CURRENT TIME TO FRAME: " + (current_time + ( abs phase_start_pre_current_time )) as string
-			
-			
-			/* DISABLE BUTTON MIRRO PHASE BUTTON - if current time is less then phase ( phase is extending time range start ) */ 
-			BTN_mirror_phase.enabled = is_phase_in_range
-			
-			--(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
-		
-			--CBTN_toggle_walk_anim_layer
-			
-			/*------------------------------------------------------------------------------
-				SYNC WITH GLOBAL VARIABLE
-			--------------------------------------------------------------------------------*/
-			if ( selected_pahese_length = ROLLOUT_phasemaker_options.DL_phase_length.selected ) != undefined and PHASE_LENGTH != selected_pahese_length as integer then
-				ROLLOUT_phasemaker_options.DL_phase_length.selection = PHASE_LENGTH
+											"PHASE START BEFORE ANIMATION RANGE: " + phase_first_frame as string +"\n\nMOVE CURRENT TIME TO FRAME: " + (current_time + ( abs phase_first_frame )) as string
 		)
+		
+		/* DISABLE BUTTON MIRRO PHASE BUTTON - if current time is less then phase ( phase is extending time range start ) */ 
+		BTN_mirror_phase.enabled = is_phase_in_range
+		
+		/* UPDATE ANIM LAYER LOCK */ 
+		ROLLOUT_options.CBTN_toggle_walk_anim_layer.state = (RigWrapper_v(rig_name)).isAnimLayerEnabled()
+		
+		/*------------------------------------------------------------------------------
+			SYNC WITH GLOBAL VARIABLE
+		--------------------------------------------------------------------------------*/
+		if ( selected_pahese_length = ROLLOUT_options.DL_phase_length.selected ) != undefined and PHASE_LENGTH != selected_pahese_length as integer then
+			ROLLOUT_options.DL_phase_length.selection = PHASE_LENGTH
+	)
 )
 
---/**  
--- */
---macroscript AnimKeyTools_rig_choose
---category:	"_AnimKeyTools"
---buttontext:	"RIG"
---toolTip:	"Select rig to work with"
---icon:	"control:#label|across:2|width:64|items:#( 'Phase', '1', '2', '3', '4', '5', '6', '7', '8', '9')|height:10"
---(
---	format "EventFired: %\n" EventFired
---	
---)
+/*------------------------------------------------------------------------------
 
+	CONTROLS
+
+--------------------------------------------------------------------------------*/
 
 /**  SELECT RIG IN SCENE
  */

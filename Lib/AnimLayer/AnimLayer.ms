@@ -53,7 +53,7 @@ struct AnimLayer_v
 	 */
 	function getLayer obj layer_name =
 	(
-		format "\n"; print "AnimLayer_v.getLayer()"
+		--format "\n"; print "AnimLayer_v.getLayer()"
 		if this.hasLayer obj layer_name then
 		(
 			index = this._getLayerIndex layer_name
