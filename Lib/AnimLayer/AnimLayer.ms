@@ -39,15 +39,19 @@ struct AnimLayer_v
 		this._setAnimLayers()
 	),
 	
+	/** Has layer
+	 */
+	function hasLayer objs index_or_name =
+	(
+		--format "\n"; print "AnimLayer_v.hasLayer()"
+		( index = this._getLayerIndex index_or_name ) != undefined and findItem ( this.getLayers objs ) index > 0
+	),
+	
 	/** Set layer active
 	 */
 	function setLayerActive index_or_name =
 	(
 		--format "\n"; print "AnimLayer_v.setLayerActive()"
-		--format "index_or_name: %\n" index_or_name
-		--format "anim_layers: %\n" anim_layers
-		index = if classOf index_or_name == string then anim_layers[index_or_name] else index_or_name
-		--format "index: %\n" index
 		
 		if ( index = this._getLayerIndex index_or_name ) != undefined then 
 			AnimLayerManager.setLayerActive index

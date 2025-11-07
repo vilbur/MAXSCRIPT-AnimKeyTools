@@ -34,7 +34,7 @@ function createPhaseMakerDialog =
 	(
 		rig_select = ROLLOUT_phasemaker_options.DL_rig_select
 		
-		rig_select.items = (RigWrapper_v()).getNamesOfRigsInScene() + #("Undefined") -- first item empty + rig names
+		rig_select.items = (RigWrapper_v()).getNamesOfRigsInScene() + #("Dont use rig") -- first item empty + rig names
 		
 		rig_select.selection = 1 -- select first rig name
 	)

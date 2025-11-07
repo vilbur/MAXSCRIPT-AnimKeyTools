@@ -81,9 +81,9 @@ buttontext:	"C R E A T E phase"
 toolTip:	""
 icon:	"across:1|id:#BTN_create_phase|width:128|height:32|border:false"
 (
-	format "EventFired: %\n" EventFired
-	--undo "Create Phase" on
-		--createOrMirroPhase #CREATE
+	--format "EventFired: %\n" EventFired
+	undo "Create Phase" on
+		createOrMirroPhase #CREATE
 )
 
 
