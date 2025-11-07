@@ -256,31 +256,17 @@ struct RigWrapper_v
 		
 		current_state = true
 		
-		--master_walk = execute ("$'"+rig_name+"_Setup_Ctrl_MasterWalk_G'") --return
-		
 		master_walk = (this.getRigControls "MasterWalk")[1]
+		format "master_walk: %\n" master_walk
 
-		if ( walk_anim_layer = (AnimLayerManager.getNodesLayers master_walk)[1] ) != undefined then
+		if master_walk != undefined then
 		(
-			format "walk_anim_layer: %\n" walk_anim_layer
-			anim_layer_name = AnimLayerManager.getLayerName walk_anim_layer
-					master_walk = (this.getRigControls "MasterWalk")[1]
-
-			current_state = AnimLayerManager.getLayerMute  walk_anim_layer
-			
-			format "anim_layer_name: %\n" anim_layer_name
-			
-			/* MUTE anim layer */ 
-			AnimLayerManager.setLayerMute walk_anim_layer (not state)
-		)
-		/* ADD ANIM LAYER */ 
-		else
-		(
-			AnimLayerManager.enableLayers #( master_walk ) pos:true rot:true
-			
-			/* DISABLE JSUT CREATED LAYER */ 
-			if state == false then
-				this.toggleWalkAnimLayer false
+			if ( layer_index = AnimLayer.getLayer master_walk "MasterWalk" ) != undefined then
+				/* MUTE \ UNMUTE anim layer */ 
+				AnimLayerManager.setLayerMute layer_index (not state)
+			else
+				/* ADD ANIM LAYER */ 
+				AnimLayer.addLayer master_walk "MasterWalk"
 		)
 		
 		current_state --return

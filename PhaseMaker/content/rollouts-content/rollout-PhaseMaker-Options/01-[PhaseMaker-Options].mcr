@@ -106,15 +106,18 @@ macroscript AnimKeyTools_rig_lock_walk_anim_layer
 category:	"_AnimKeyTools"
 buttontext:	"Lock MasterWalk anim layer"
 toolTip:	"LOCK\UNLOCK position and rotation of master walk control"
-icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/walk.bmp', '/icons/walka.bmp')|across:2|align:#RIGHT|width:32|height:32|offset:[ 8, -8 ]"
+icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/walk.bmp', '/icons/walka.bmp')|across:2|align:#RIGHT|width:32|height:32|offset:[ 8, -8 ]|ini:false"
 (
-	
-	--format "EventFired: %\n" EventFired
-	rig_name = ROLLOUT_phasemaker_options.DL_rig_select.selected 
-	--format "rig_name: %\n" rig_name
-	if rig_name != undefined then 
-		if (trimLeft(rig_name)).count > 0 then
-			(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
+	on execute do
+	(
+		format "EventFired: %\n" EventFired
+		rig_name = ROLLOUT_phasemaker_options.DL_rig_select.selected 
+		format "rig_name: %\n" rig_name
+		if rig_name != undefined then 
+			if (trimLeft(rig_name)).count > 0 then
+				(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
+		
+	)
 )
 
 

@@ -57,10 +57,17 @@ with animate on at time 2 _sphere.pos.x = 100
 --------------------------------------------------------------------------------*/
 
 active_layer = AnimLayer.getActiveLayer _sphere
-format "active_layer: %\n" active_layer
+format "active_layer: %\n\n" active_layer
 
 AnimLayer.activateBaseLayer()
 
 
 active_layers = AnimLayer.getActiveLayers #(_box, _sphere)
-format "active_layers: %\n" active_layers
+format "active_layers: %\n\n" active_layers
+
+has_layer = AnimLayer.hasLayer _sphere sphere_layer
+format "has_layer '%': %\n\n" sphere_layer has_layer
+
+
+layer_index = AnimLayer.getLayer _sphere sphere_layer
+format "layer_index: %\n\n" layer_index

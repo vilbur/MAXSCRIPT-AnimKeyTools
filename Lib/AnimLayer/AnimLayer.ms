@@ -47,6 +47,24 @@ struct AnimLayer_v
 		( index = this._getLayerIndex index_or_name ) != undefined and findItem ( this.getLayers objs ) index > 0
 	),
 	
+	/** Get layer
+	  
+	  @return integer layer index
+	 */
+	function getLayer obj layer_name =
+	(
+		format "\n"; print "AnimLayer_v.getLayer()"
+		if this.hasLayer obj layer_name then
+		(
+			index = this._getLayerIndex layer_name
+
+			obj_layers = this.getLayers obj
+			
+			if findItem obj_layers index > 0 then
+				index --return
+		)
+	),
+	
 	/** Set layer active
 	 */
 	function setLayerActive index_or_name =
