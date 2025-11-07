@@ -34,7 +34,7 @@ struct RigWrapper_v
 		format "\n"; print "RigWrapper_v.loadRig()"
 		
 		master_control = this._getMasterControlOfRig(rig_name)
-		--format "master_control: %\n" master_control
+		format "master_control: %\n" master_control
 		processed_objects = #()
 
 		this.rig_controls	= Dictionary #STRING -- KEY: VALUE:

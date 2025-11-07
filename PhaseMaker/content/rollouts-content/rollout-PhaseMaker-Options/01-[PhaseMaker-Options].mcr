@@ -1,9 +1,8 @@
-
-filein( getFilenamePath(getSourceFileName()) + "/../Lib/moveObjCbyAB.ms" )	--"./../Lib/moveObjCbyAB.ms"
+--filein( getFilenamePath(getSourceFileName()) + "/../../../Lib/moveObjCbyAB.ms" )	--"./../../../Lib/moveObjCbyAB.ms"
 
 /*------------------------------------------------------------------------------
 	TICKER - TIMER
---------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 /*
 */
 macroscript	AnimKeyTools_timer
@@ -13,20 +12,21 @@ tooltip:	"Colorpicker test"
 icon:	"control:timer|interval:500|active:true|height:0"
 (
 	--format "EventFired	= % \n" EventFired
-	--format "DIALOG_phasemaker: %\n" DIALOG_phasemaker	
+	--format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options	
 	/* ADJUST BUTTON TEXT - CREATE PHASE if first frame of range is active else COPY PHASE */
 	on execute do
+	--format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options
 		if DIALOG_phasemaker != undefined and DIALOG_phasemaker.current_time != currentTime then
 		(
 			--format "\n"
-			--format "DIALOG_phasemaker.current_time: %\n" DIALOG_phasemaker.current_time
+			--format "ROLLOUT_phasemaker_options.current_time: %\n" ROLLOUT_phasemaker_options.current_time
 			DIALOG_phasemaker.current_time = currentTime
 			
-			rig_name = DIALOG_phasemaker.DL_rig_select.selected 
-
+			rig_name = ROLLOUT_phasemaker_options.DL_rig_select.selected 
+		
 			current_time = currentTime.frame as integer
 			--format "current_time: %\n" current_time
-			phase_length = DIALOG_phasemaker.DL_phase_length.selected as integer
+			phase_length = ROLLOUT_phasemaker_options.DL_phase_length.selected as integer
 			--format "phase_length: %\n" phase_length
 			phase_start_pre_current_time = current_time - phase_length + 1 
 			--format "phase_start_pre_current_time: %\n" phase_start_pre_current_time
@@ -39,16 +39,16 @@ icon:	"control:timer|interval:500|active:true|height:0"
 			/*------------------------------------------------------------------------------
 				EDIT BUTTONS
 			--------------------------------------------------------------------------------*/
-			BTN_create_phase = DIALOG_phasemaker.BTN_create_phase
+			BTN_create_phase = ROLLOUT_phasemaker_controls.BTN_create_phase
 			
-			BTN_mirror_phase = DIALOG_phasemaker.BTN_mirror_phase
+			BTN_mirror_phase = ROLLOUT_phasemaker_controls.BTN_mirror_phase
 			
 			--BTN_mirror_phase.pos.x = 	BTN_create_phase.pos.x =  16
 			
 			/* TOOLTIPS OF BUTTONS  */ 
 			ttip_create = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
 			ttip_mirror = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
-
+		
 			frames_phase  = ( current_time - phase_length +1 ) as string + " - " + current_time as string 
 			frames_mirror = (current_time + 1) as string + " - " + ( current_time + phase_length ) as string
 			
@@ -60,18 +60,18 @@ icon:	"control:timer|interval:500|active:true|height:0"
 											"PHASE START BEFORE ANIMATION RANGE: " + phase_start_pre_current_time as string +"\n\nMOVE CURRENT TIME TO FRAME: " + (current_time + ( abs phase_start_pre_current_time )) as string
 			
 			
-			
+			/* DISABLE BUTTON MIRRO PHASE BUTTON - if current time is less then phase ( phase is extending time range start ) */ 
 			BTN_mirror_phase.enabled = is_phase_in_range
 			
 			--(RigWrapper_v(rig_name)).toggleWalkAnimLayer (not EventFired.val)
-
-			CBTN_toggle_walk_anim_layer
+		
+			--CBTN_toggle_walk_anim_layer
 			
 			/*------------------------------------------------------------------------------
 				SYNC WITH GLOBAL VARIABLE
 			--------------------------------------------------------------------------------*/
-			if ( selected_pahese_length = DIALOG_phasemaker.DL_phase_length.selected ) != undefined and PHASE_LENGTH != selected_pahese_length as integer then
-				DIALOG_phasemaker.DL_phase_length.selection = PHASE_LENGTH
+			if ( selected_pahese_length = ROLLOUT_phasemaker_options.DL_phase_length.selected ) != undefined and PHASE_LENGTH != selected_pahese_length as integer then
+				ROLLOUT_phasemaker_options.DL_phase_length.selection = PHASE_LENGTH
 		)
 )
 
@@ -80,8 +80,8 @@ icon:	"control:timer|interval:500|active:true|height:0"
 --macroscript AnimKeyTools_rig_choose
 --category:	"_AnimKeyTools"
 --buttontext:	"RIG"
---toolTip:	"Open AnimKeyTools"
---icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '1', '2', '3', '4', '5', '6', '7', '8', '9')|height:10"
+--toolTip:	"Select rig to work with"
+--icon:	"control:#label|across:2|width:64|items:#( 'Phase', '1', '2', '3', '4', '5', '6', '7', '8', '9')|height:10"
 --(
 --	format "EventFired: %\n" EventFired
 --	
@@ -93,24 +93,24 @@ icon:	"control:timer|interval:500|active:true|height:0"
 macroscript AnimKeyTools_rig_select
 category:	"_AnimKeyTools"
 buttontext:	"[Rig select]"
-toolTip:	""
-icon:	"control:#DROPDOWN|across:2|align:#LEFT|width:96"
+toolTip:	"Select rig in scene to work with"
+icon:	"control:#DROPDOWN|across:2|align:#LEFT|width:96|offset:[ -8, 0 ]"
 (
 	
-	--format "EventFired: %\n" EventFired
+	format "EventFired: %\n" EventFired
 )
 
 /**  TOOGLE WALK ANIM LAYER
  */
 macroscript AnimKeyTools_rig_lock_walk_anim_layer
 category:	"_AnimKeyTools"
-buttontext:	"L"
-toolTip:	"LOCK\UNLOCK rotation and rotation of master walk handle"
-icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/walk.bmp', '/icons/walka.bmp')|across:2|align:#RIGHT|width:32|height:32|offset:[0, -8 ]"
+buttontext:	"Lock MasterWalk anim layer"
+toolTip:	"LOCK\UNLOCK position and rotation of master walk control"
+icon:	"control:#CHECKBUTTON|id:#CBTN_toggle_walk_anim_layer|images:#('/icons/walk.bmp', '/icons/walka.bmp')|across:2|align:#RIGHT|width:32|height:32|offset:[ 8, -8 ]"
 (
 	
 	--format "EventFired: %\n" EventFired
-	rig_name = DIALOG_phasemaker.DL_rig_select.selected 
+	rig_name = ROLLOUT_phasemaker_options.DL_rig_select.selected 
 	--format "rig_name: %\n" rig_name
 	if rig_name != undefined then 
 		if (trimLeft(rig_name)).count > 0 then
@@ -140,10 +140,10 @@ icon:	"control:#DROPDOWN|across:2|width:64|items:#( '1', '2', '3', '4', '5', '6'
 	--if EventFired == undefined then
 	--(
 	--	if PHASE_LENGTH == undefined then 
-	--		PHASE_LENGTH = DIALOG_phasemaker.DL_phase_length.selected as integer
+	--		PHASE_LENGTH = ROLLOUT_phasemaker_options.DL_phase_length.selected as integer
 	--)
 	--else
-		--PHASE_LENGTH = DIALOG_phasemaker.DL_phase_length.selected = EventFired.val as string
+		--PHASE_LENGTH = ROLLOUT_phasemaker_options.DL_phase_length.selected = EventFired.val as string
 		PHASE_LENGTH = EventFired.val
 
 )
@@ -159,7 +159,7 @@ icon:	"control:#CHECKBOX|across:2|offset:[0, 4 ]"
 	
 	--format "EventFired: %\n" EventFired
 	
-	DIALOG_phasemaker.DL_phase_length.enabled = EventFired.val
+	ROLLOUT_phasemaker_options.DL_phase_length.enabled = EventFired.val
 
 )
 
@@ -189,13 +189,10 @@ toolTip:	"PLACEHODER CONTROL - DOES NOTNG YET\n\n Enable \ Diasable Increment"
 icon:	"control:#CHECKBOX|across:2|offset:[0, 0 ]"
 (
 	
-	--format "EventFired: %\n" EventFired
-	DIALOG_phasemaker.DL_increment_value.enabled = EventFired.val
+	format "EventFired: %\n" EventFired
+	--ROLLOUT_phasemaker_options.DL_increment_value.enabled = EventFired.val
 )
 
-/*------------------------------------------------------------------------------
-	OPTIONS
---------------------------------------------------------------------------------*/
 /** CHECKBOX 
  */
 macroscript AnimKeyTools_move_hip_with_feet

@@ -26,13 +26,17 @@ function createPhaseMakerDialog =
 	
 	Dialog.alignToDialog( DIALOG_time_slider_tools ) height:#BOTTOM
 	
+	format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options
+	--format "ROLLOUT_phasemaker_options.DL_rig_select: %\n" ROLLOUT_phasemaker_options.DL_rig_select
 	--
-	--/* LOAD RIGS */
-	if DIALOG_phasemaker != undefined then 
-	if DIALOG_phasemaker.DL_rig_select != undefined then -- if used only for DEVELOP 
+	/* LOAD RIGS */
+	if ROLLOUT_phasemaker_options != undefined then 
 	(
-		DIALOG_phasemaker.DL_rig_select.items = #(" ") + (RigWrapper_v()).getNamesOfRigsInScene() -- first item empty + rig names
-		DIALOG_phasemaker.DL_rig_select.selection = 2 -- select first rig name
+		rig_select = ROLLOUT_phasemaker_options.DL_rig_select
+		
+		rig_select.items = (RigWrapper_v()).getNamesOfRigsInScene() + #("Undefined") -- first item empty + rig names
+		
+		rig_select.selection = 1 -- select first rig name
 	)
 )
 

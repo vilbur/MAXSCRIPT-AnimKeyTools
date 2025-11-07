@@ -39,7 +39,7 @@ function createOrMirroPhase mode =
 		--format "\n"; print ".getPhaseRange()"
 		
 		current_time = currentTime.frame as integer 
-		phase_length = DIALOG_phasemaker.DL_phase_length.selected as integer
+		phase_length = ROLLOUT_phasemaker_options.DL_phase_length.selected as integer
 		
 		phase = [ current_time as integer , current_time as integer ] --return
 		
@@ -55,9 +55,9 @@ function createOrMirroPhase mode =
 		phase --return
 	)
 	
-	increment = DIALOG_phasemaker.DL_increment_value.selected as integer
+	increment = ROLLOUT_phasemaker_options.DL_increment_value.selected as integer
 	
-	rig_name = DIALOG_phasemaker.DL_rig_select.selected
+	rig_name = ROLLOUT_phasemaker_options.DL_rig_select.selected
 	
 	phase = getPhaseRange dir:( if mode == #CREATE then #FORWARD else #BACKWARD )
 	--format "PHASE: %\n" phase
@@ -81,8 +81,9 @@ buttontext:	"C R E A T E phase"
 toolTip:	""
 icon:	"across:1|id:#BTN_create_phase|width:128|height:32|border:false"
 (
-	undo "Create Phase" on
-		createOrMirroPhase #CREATE
+	format "EventFired: %\n" EventFired
+	--undo "Create Phase" on
+		--createOrMirroPhase #CREATE
 )
 
 
@@ -95,11 +96,8 @@ buttontext:	"M I R R O R phase"
 toolTip:	""
 icon:	"across:1|id:#BTN_mirror_phase|width:128|height:32|border:false|align:#CENTER"
 (
-	
-	
 	undo "Mirror Phase" on
 		createOrMirroPhase #MIRROR
-
 )
 
 /**  
@@ -111,7 +109,6 @@ buttontext:	"C O P Y phase \ cycle"
 toolTip:	"Copy phase"
 icon:	"across:1|width:128|height:32|border:false"
 (
-
 	undo "Copy phase" on
 		(KeyFrameManager_v( getPhaseRange() )).copyKeys objs:( selection as Array )
 )
@@ -124,9 +121,7 @@ buttontext:	"C O P Y phase \ cycle"
 toolTip:	"Copy cycle - 1 cycle == 2 phases"
 icon:	"across:1|width:128|height:32|border:false"
 (
-
 	undo "Copy cycle" on
-	--format "getCycleRange(): %\n" (getCycleRange())
 		(KeyFrameManager_v( getCycleRange() )).copyKeys objs:( selection as Array )
 )
 
@@ -138,14 +133,11 @@ buttontext:	"MOVE C by A B"
 toolTip:	"Move object on active axis about distance of two another objects.\n\nTARGET OBJECT IS 3rd IN SELECTION"
 icon:	"across:1|width:128|height:32|border:false"
 (
-	
 	on execute do
 	(
 		undo "Move obj C by A B " on
 			moveObjCbyAB direction:-1
-		
 	)
-	
 )
 
 /**  
@@ -164,7 +156,7 @@ icon:	"across:1|width:128|height:32|border:false"
 	--	--format "\n"; print ".getPhaseRange()"
 	--	start = currentTime.frame as integer
 	--	
-	--	end = start + DIALOG_phasemaker.DL_phase_length.selected as integer - 1
+	--	end = start + ROLLOUT_phasemaker_options.DL_phase_length.selected as integer - 1
 	--	format "Interval: %\n" ([ start, end] )
 	--	[ start, end ] --return
 	--)

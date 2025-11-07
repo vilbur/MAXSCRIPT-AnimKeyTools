@@ -1,7 +1,12 @@
 clearListener(); print("Cleared in:\n"+getSourceFileName())
 
+format "\nDEFINE GLOBALS"
+
 global DIALOG_phasemaker
 global DIALOG_time_slider_tools
+
+global ROLLOUT_phasemaker_options
+global ROLLOUT_phasemaker_controls
 
 if PHASE_LENGTH == undefined then 
 	global PHASE_LENGTH = 1
