@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="1113d1d2-74de-42d8-913a-3406d6b9a29d" kpf_version="5" name="MS-AnimKeyTools.komodoproject">
-<livefolder id="679b6e23-10eb-4068-9345-de8c05b4db75" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="PhaseMaker" url="Lib/PhaseMaker/">
+<livefolder id="4ec5ae84-ca77-4483-8d12-9fc28546e2a9" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="PhaseMaker" url="PhaseMaker/">
 </livefolder>
 <livefolder id="7d2bb24a-7d93-47d2-abdb-9b6bffb8f4d5" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="TrackbarTools" url="Lib/TrackbarTools/">
 </livefolder>

@@ -9,13 +9,14 @@ macroscript	AnimKeyTools_timer
 category:	"_AnimKeyTools"
 buttonText:	"Ticker"
 tooltip:	"Colorpicker test"
-icon:	"control:timer|interval:500|active:true|height:0"
+--icon:	"control:timer|interval:500|active:true|height:0"
+icon:	"control:timer|interval:2000|active:true|height:0"
 (
-	--format "EventFired	= % \n" EventFired
 	--format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options	
 	/* ADJUST BUTTON TEXT - CREATE PHASE if first frame of range is active else COPY PHASE */
 	on execute do
 	(
+		--format "EventFired	= % \n" EventFired
 		/* DEFINE SHORTCUTS */ 
 		ROLLOUT_options  = ROLLOUT_phasemaker_options
 		BTN_create_phase = ROLLOUT_phasemaker_controls.BTN_create_phase
@@ -41,18 +42,25 @@ icon:	"control:timer|interval:500|active:true|height:0"
 				UPDATE BUTTONS
 			--------------------------------------------------------------------------------*/
 			
-			/* TOOLTIPS OF BUTTONS  */ 
+			/* CREATE PHASE */ 
 			ttip_create = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
-			ttip_mirror = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
 		
-			frames_phase  = ( current_time - phase_length +1 ) as string + " - " + current_time as string 
-			frames_mirror = (current_time + 1) as string + " - " + ( current_time + phase_length ) as string
 			
-			/* EDIT TOOLTIPS */ 
-			BTN_create_phase.tooltip = "CREATE PHASE IN FRAMES: " + current_time as string +" > " + (current_time + phase_length - 1 ) as string + ttip_create
+			BTN_create_phase.tooltip = "CREATE PHASE IN FRAMES: " + current_time as string +" - " + (current_time + phase_length ) as string + ttip_create
+			
+			
+			/* MIRROR PHASE */ 
+			--ttip_mirror = "\n\nGenerate phase from single frame.\n\nE.G.: Generate 1st step from first frame"
+			ttip_mirror = ""
+			
+			frame_source = current_time as string
+			frame_target = ( current_time + phase_length ) as string
+			
+			frames_source =  if phase_length > 1 then (current_time - phase_length +1 ) as string + " - " + frame_source	else frame_source
+			frames_target =  if phase_length > 1 then (current_time + 1) as string + " - " + frame_target	else frame_target
 			
 			BTN_mirror_phase.tooltip = if is_phase_in_range then
-											"MIRROR FRAMES OF PHASE: " + frames_phase +" > " + frames_mirror + ttip_create
+											"MIRROR FRAMES OF PHASE\n\nSOURCE FRAMES: " + frames_source +"\nTARGET FRAMES: " + frames_target + ttip_mirror
 										else
 											"PHASE START BEFORE ANIMATION RANGE: " + phase_first_frame as string +"\n\nMOVE CURRENT TIME TO FRAME: " + (current_time + ( abs phase_first_frame )) as string
 		)
@@ -60,9 +68,17 @@ icon:	"control:timer|interval:500|active:true|height:0"
 		/* DISABLE BUTTON MIRRO PHASE BUTTON - if current time is less then phase ( phase is extending time range start ) */ 
 		BTN_mirror_phase.enabled = is_phase_in_range
 		
-		/* UPDATE ANIM LAYER LOCK */ 
-		ROLLOUT_options.CBTN_toggle_walk_anim_layer.state = (RigWrapper_v(rig_name)).isAnimLayerEnabled()
+		/* UPDATE ANIM LAYER LOCK */
 		
+		if DIALOG_phasemaker.RigWrapper == undefined then
+		--if ( RigWrapper = DIALOG_phasemaker.RigWrapper ) == undefined then 
+		(
+			--DIALOG_phasemaker.RigWrapper = if rig_name != "DO NOT USE RIG" then rig_name else undefined
+			DIALOG_phasemaker.RigWrapper = if rig_name != "DO NOT USE RIG" then RigWrapper_v(rig_name) else undefined
+		
+			if DIALOG_phasemaker.RigWrapper != undefined then
+				ROLLOUT_options.CBTN_toggle_walk_anim_layer.state = DIALOG_phasemaker.RigWrapper.isAnimLayerEnabled()
+		)
 		/*------------------------------------------------------------------------------
 			SYNC WITH GLOBAL VARIABLE
 		--------------------------------------------------------------------------------*/
@@ -83,10 +99,14 @@ macroscript AnimKeyTools_rig_select
 category:	"_AnimKeyTools"
 buttontext:	"[Rig select]"
 toolTip:	"Select rig in scene to work with"
-icon:	"control:#DROPDOWN|across:2|align:#LEFT|width:96|offset:[ -8, 0 ]"
+icon:	"control:#DROPDOWN|across:2|align:#LEFT|width:116|offset:[ -16, 0 ]"
 (
 	
-	format "EventFired: %\n" EventFired
+	--format "EventFired: %\n" EventFired
+		selected_rig = EventFired.control.items[EventFired.val]
+		
+	--format "selected_rig: %\n" selected_rig
+		DIALOG_phasemaker.RigWrapper = if selected_rig != "DO NOT USE RIG" then selected_rig else undefined
 )
 
 /**  TOOGLE WALK ANIM LAYER
@@ -136,8 +156,10 @@ icon:	"control:#DROPDOWN|across:2|width:64|items:#( '1', '2', '3', '4', '5', '6'
 	--)
 	--else
 		--PHASE_LENGTH = ROLLOUT_phasemaker_options.DL_phase_length.selected = EventFired.val as string
-		PHASE_LENGTH = EventFired.val
+	PHASE_LENGTH = EventFired.val
 
+	/* FORCE UPDATE UI */ 
+	DIALOG_phasemaker.current_time = undefined
 )
 
 /**  CHECKBOX
@@ -168,8 +190,8 @@ toolTip:	"Offset from current frame where new keys are created.\n\nOPTION 'Phase
 --icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '1', '2', '3', '4', '5', '6', '7', '8', '9')"
 icon:	"control:#DROPDOWN|across:2|width:64|items:#( 'Phase', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9')|offset:[0, 0 ]"
 (
-	--format "EventFired: %\n" EventFired
-	
+	/* FORCE UPDATE UI */
+	DIALOG_phasemaker.current_time = undefined
 )
 
 /** CHECKBOX 

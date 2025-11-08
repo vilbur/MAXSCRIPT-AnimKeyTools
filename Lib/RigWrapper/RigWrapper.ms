@@ -93,52 +93,50 @@ struct RigWrapper_v
 	(
 		--format "\n"; print "PhaseCreator_v.mirrorPhases()"
 		
-		current_time = currentTime
-		--format "current_time: %\n" current_time
-		--format "PHASE: %\n" phase
-		all_ctrls = #()
-		copied_controls = #()
-		--copied_controls	= Dictionary #STRING -- KEY: VALUE:
-		
-		KeyFrameManager = KeyFrameManager_v time:phase
+		--all_ctrls	= #()
+		--current_time	= currentTime
+		--copied_controls	= #()
+		--
+		--KeyFrameManager = KeyFrameManager_v time:phase
+		--
+		--if superClassOf increment != Number and (increment == undefined or increment as Number == undefined) then
+		--
+		--increment = phase[2] - phase[1] + 1
 
-		if superClassOf increment != Number and (increment == undefined or increment as Number == undefined) then
-			increment = phase[2] - phase[1] + 1
 		
-		--format "INCREMENT: %\n" increment
 		
-		this.AnimLayer.toggleLayer "MasterWalk" false
-		
-		/* MIRROR EACH  */ 
-		for control_name in rig_controls.keys where rig_controls[control_name].LeftRightControls != undefined do
-		(
+		--/* DISABLE ANIM LAYER - foot steps are animated on single place - without moving in space */
+		--is_layer_muted = AnimLayer.getMuteState "MasterWalk" 
+		--
+		--if is_layer_muted == false then 
+		--	AnimLayer.muteLayer "MasterWalk"
+		--
+		--/* MIRROR EACH  */ 
+		--for control_name in rig_controls.keys where rig_controls[control_name].LeftRightControls != undefined do
+		--	if rig_controls[control_name].LeftRightControls.switchKeysOnTimes phase increment:increment then
+		--		append copied_controls control_name
+		--
+		--	
+		--for i = 1 to copied_controls.count do format "%: %\n" i copied_controls[i]
+		--
+		--if findItem copied_controls "IKFoot" > 0 then
+		--	this.moveHipWithFeet current_time ( current_time + increment )
+
+		--/* REENABLE ANIM LAYER */ 	
+		--if is_layer_muted == false then 
+		--	AnimLayer.unmuteLayer "MasterWalk"
 			
-			if rig_controls[control_name].LeftRightControls.switchKeysOnTimes phase increment:increment then
-				append copied_controls control_name
-				--copied_controls[control_name]
-			
-		)
-			
-		for i = 1 to copied_controls.count do format "%: %\n" i copied_controls[i]
-		
-		if findItem copied_controls "IKFoot" > 0 then
-			this.moveHipWithFeet current_time ( current_time + increment )
-			
-		
-		--if anim_layer_state then
-			--this.toggleWalkAnimLayer(true)
-		
 		/* SET TIME TO FIRST AFTER PHASE */ 
-		sliderTime += increment
+		--sliderTime += increment
 	),
 	
 	/** Move hip with feet
 	 */
 	function moveHipWithFeet from_time to_time =
 	(
-		--format "\n"; print "RigWrapper_v.moveHipWithFeet()"
-		--format "from_time: %\n" from_time
-		--format "to_time:   %\n" to_time
+		format "\n"; print "RigWrapper_v.moveHipWithFeet()"
+		format "from_time: %\n" from_time
+		format "to_time:   %\n" to_time
 		--for control_name in rig_controls.keys do format "control_name: %\n" control_name
 
 		--format "\n"
@@ -150,17 +148,22 @@ struct RigWrapper_v
 		step_length_pos = this.getPosOfObjCbyDistanceOfAB feet[1] feet[2] master_walk axis:#Y direction:-1
 				
 		active_layer = AnimLayer.getActiveLayer master_walk
-		--format "ACTIVE_LAYER: %\n" active_layer
-		--AnimLayer.wtf()
+
+
 		/* ADD or ACTIVATE ANIMATION LAYER */ 
 		if AnimLayer.hasLayer master_walk "MasterWalk" then
 			AnimLayer.setLayerActive "MasterWalk"
 		else
 			AnimLayer.addLayer master_walk "MasterWalk"
 		
+		AnimLayer.unmuteLayer "MasterWalk"
+
 		/* GET POSITIONS */ 
 		master_pos = at time from_time master_walk.pos
 		new_pos = master_pos + step_length_pos
+		
+		format "MASTER_POS: %\n" master_pos
+		format "NEW_POS: %\n" new_pos
 		
 		/* ANIMATE HIP POSITION  */ 
 		with animate on
@@ -359,7 +362,7 @@ struct RigWrapper_v
 	 */
 	on create do
 	(
-		--format "\n"; print "RigWrapper.onCreate()"
+		format "\n"; print "RigWrapper.onCreate()"
 		if rig_name != undefined then 
 			this.loadRig()
 	)

@@ -9,11 +9,12 @@ function createPhaseMakerDialog =
 	
 	
 	/* LOAD CONTENT FROM FOLDERS */
-	ContentLoader	= ContentLoader_v path:(current_dir+"/content") title:"PhaseMaker" width:168 ini:( getSourceFileName()) --DEBUG:DEBUG
+	ContentLoader	= ContentLoader_v path:(current_dir+"/content") title:"PhaseMaker" width:168 ini:( getSourceFileName() ) --DEBUG:DEBUG
 	--ContentLoader	= ContentLoader_v path:(current_dir+"/content-animaker") ini:( getSourceFileName()) --DEBUG:DEBUG
 	--ContentLoader	= ContentLoader_v path:(current_dir+"/Groupbox-Test")
-	
+	filename_path = getFilenamePath( "path" )
 	ContentLoader.Dialog.addlocal "current_time" undefined -- trace chnge of frame in ticker
+	ContentLoader.Dialog.addlocal "RigWrapper" undefined -- trace chnge of frame in ticker
 	
 	/* CREATE UI */
 	--ContentLoader.create() --width:512
@@ -34,7 +35,7 @@ function createPhaseMakerDialog =
 	(
 		rig_select = ROLLOUT_phasemaker_options.DL_rig_select
 		
-		rig_select.items = (RigWrapper_v()).getNamesOfRigsInScene() + #("Dont use rig") -- first item empty + rig names
+		rig_select.items = (RigWrapper_v()).getNamesOfRigsInScene() + #("DO NOT USE RIG") -- first item empty + rig names
 		
 		rig_select.selection = 1 -- select first rig name
 	)

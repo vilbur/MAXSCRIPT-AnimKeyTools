@@ -9,8 +9,8 @@ struct LeftRightControls_v
 	--obj_L,
 	--obj_R,
 	
-	left,
-	right,
+	left, --"./../../ObjectControllerKeys/ObjectControllerKeys.ms"
+	right,--"./../../ObjectControllerKeys/ObjectControllerKeys.ms"
 	
 	lock_position_L,
 	lock_rotation_L,
@@ -79,8 +79,10 @@ struct LeftRightControls_v
 			return false
 		
 		format "\n====================================================================================================================\n"
-		format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		--format "\n";
+		print "RigWrapper_v.switchKeysOnTimes()"
 		format "% <-> %\n" left.obj.name right.obj.name
+		format "left: %\n" left
 		--format "PHASE:     %\n" phase
 		--format "INCREMENT: %\n" increment
 
@@ -114,7 +116,7 @@ struct LeftRightControls_v
 				
 				default: #BOTH
 			)
-			
+			format "mode: %\n" mode
 			/* GET DIRECTIONS OF COPY */ 
 			left_to_right = rot_key_L or pos_key_L
 			right_to_left = rot_key_R or pos_key_R
@@ -122,12 +124,14 @@ struct LeftRightControls_v
 			/* IS POSITION LOCKED ? */ 
 			is_pos_locked_L = isLocked lock_position_L
 			is_pos_locked_R = isLocked lock_position_R
+			--format "is_pos_locked_L: %\n" is_pos_locked_L
+			--format "is_pos_locked_R: %\n" is_pos_locked_R
 
 			/* IS ROTATION LOCKED ? */ 
 			is_rot_locked_L = isLocked lock_rotation_L
 			is_rot_locked_R = isLocked lock_rotation_R
-			
-			--/* MIRROR ONLY ROTATION */ 
+
+			/* MIRROR ONLY ROTATION */ 
 			if ( is_pos_locked_L and is_pos_locked_R ) then
 				this.swapLocalRotation source_time target_time mode left_to_right right_to_left
 			
@@ -146,7 +150,7 @@ struct LeftRightControls_v
 	*/
 	function swapLocalRotation time_from time_to mode left_to_right right_to_left =
 	(
-		--format "\n"; print "TransformFlipper_v.swapLocalRotation()"
+		format "\n"; print "TransformFlipper_v.swapLocalRotation()"
 		/* 
 		Function to set only rotation key on object at given time
 		*/
@@ -233,7 +237,7 @@ struct LeftRightControls_v
 	function flipIKControllers obj_L obj_R time_from time_to mode left_to_right right_to_left =
 	(
 		--format "\n---------------------------------------\n"
-		--format "\n"; print "TransformFlipper_v.flipIKControllers()"
+		format "\n"; print "TransformFlipper_v.flipIKControllers()"
 		time_from = time_from as time
 		time_to   = time_to   as time		
 		--format "Frame: % →  %\n" time_from time_to

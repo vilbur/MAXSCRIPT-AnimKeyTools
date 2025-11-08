@@ -27,7 +27,7 @@ struct ObjectControllerKeys_v
 		--format "\n"; print "ObjectControllerKeys_v.serachForKeysInControllers()"
 		this._setTransformKeys()
 		
-		this.setKeytsOfModsProperties()
+		--this.setKeytsOfModsProperties()
 	),
 	
 	/** Fiter keys
@@ -88,35 +88,48 @@ struct ObjectControllerKeys_v
 	function removeKeys which keys =
 	(
 		--format "\n"; print "ObjectControllerKeys_v.removeKeys()"
-		--format "keys: %\n" keys
+
+		format "\n"; print ("ObjectControllerKeys_v.removeKeys() " + obj.name )
+		format "which: %\n" which
+		format "keys_transforms: %\n" keys_transforms
 		
 		if classOf keys != Array then
 			keys = #( keys )
 		
 		keys = for key in keys collect key as integer
 		
+		format "keys: %\n" keys
+		
 		if which != #PROPERTIES then
 		(
 			keys_flat = #()
 			
 			transform_tracks = if which == #TRANSFORMS then keys_transforms.keys else #( which )
-			--format "transform_tracks: %\n" transform_tracks
-			for transform_track in transform_tracks where keys_transforms[transform_track] != undefined do
-				for ControllerKeys in keys_transforms[transform_track] do
-				(
-					--format "ControllerKeys.keys: %\n" ControllerKeys.keys
-						--format "ControllerKeys.ctrl: %\n" ControllerKeys.ctrl
-					
-					for key in ControllerKeys.keys where findItem keys key > 0 do
-						deleteKey ControllerKeys.ctrl (getKeyIndex ControllerKeys.ctrl key)
-					--for key in ControllerKeys.keys do
-					--(
-					--	format "key: %\n" key
-					--	format "INDEX: %\n" (findItem keys key > 0)
-					----format "INDEX: %\n" (getKeyIndex ControllerKeys.ctrl key)
-					--)
-					
-				)
+			format "transform_tracks: %\n" transform_tracks
+			
+			--for transform_track in transform_tracks where keys_transforms[transform_track] != undefined do
+			for transform_track in transform_tracks do
+			(
+				format "keys_transforms[transform_track]: %\n" keys_transforms[transform_track]
+				
+				if keys_transforms[transform_track] != undefined  then
+					for ControllerKeys in keys_transforms[transform_track] do
+					(
+						format "ControllerKeys.ctrl: %\n" ControllerKeys.ctrl
+						format "ControllerKeys.keys: %\n" ControllerKeys.keys
+						
+						for key in ControllerKeys.keys where findItem keys key > 0 do
+							deleteKey ControllerKeys.ctrl (getKeyIndex ControllerKeys.ctrl key)
+						--for key in ControllerKeys.keys do
+						--(
+						--	format "key: %\n" key
+						--	format "INDEX: %\n" (findItem keys key > 0)
+						----format "INDEX: %\n" (getKeyIndex ControllerKeys.ctrl key)
+						--)
+						
+					)
+				
+			)
 
 		)
 		else
@@ -281,6 +294,8 @@ struct ObjectControllerKeys_v
 				append controllers_keys ( ControllerKeys_v ctrl keys  )
 		)
 		
+		if controllers_keys.count > 0 then		format "% keys: %\n" obj.name controllers_keys
+		
 		controllers_keys --return
 	),
 	
@@ -300,9 +315,6 @@ struct ObjectControllerKeys_v
 	on create do
 	(
 		--format "\n"; print "ObjectControllerKeys.onCreate()"
-		this.serachForKeysInControllers()
-		--for prop in #(  ) where getProperty this prop == undefined do -- CHECK CONSTRUCT PROPERTIES -- Array of this struct keys_mods necessary to run
-		--	throw ("\n\n\nUNDEFINED CONSTRUCT PROPERTY\n\n\nSTRUCT:\n\n"+ ((filterString( classof this as string )"(:")[2]) +"\n\n\nPROPERTY:\n\n"+ prop )
+		--this.serachForKeysInControllers()
 	)
-
 )

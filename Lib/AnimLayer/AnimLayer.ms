@@ -125,6 +125,34 @@ struct AnimLayer_v
 		this._setAnimLayers()
 	),
 	
+	/** Get mute state
+	 */
+	function getMuteState index_or_name =
+	(
+		--format "\n"; print "AnimLayer_v.getMuteState()"
+		if ( index = this._getLayerIndex index_or_name ) != undefined then
+			AnimLayerManager.getLayerMute index
+	),
+	
+	/** Mute layer
+	 */
+	function muteLayer index_or_name =
+	(
+		--format "\n"; print "AnimLayer_v.muteLayer()"
+		if ( index = this._getLayerIndex index_or_name ) != undefined then 
+			AnimLayerManager.setLayerMute index true
+	),
+
+	
+	/** Mute layer
+	 */
+	function unmuteLayer index_or_name =
+	(
+		--format "\n"; print "AnimLayer_v.muteLayer()"
+		if ( index = this._getLayerIndex index_or_name ) != undefined then 
+			AnimLayerManager.setLayerMute index false
+	),
+	
 	/** Toggle layer
 	 */
 	function toggleLayer index_or_name state =
