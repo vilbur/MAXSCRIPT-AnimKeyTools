@@ -48,7 +48,7 @@ struct LeftRightControls_v
 	 */
 	function switchKeysOnTimes phase increment:undefined =
 	(
-		--format "\n"; print "RigWrapper_v.switchKeysOnTimes()"
+		--format "\n"; print "LeftRightControls_v.switchKeysOnTimes()"
 		/** Is locked
 		 */
 		function isLocked flags = flags.count > 0
@@ -78,18 +78,29 @@ struct LeftRightControls_v
 		if keys_all.count == 0 then
 			return false
 		
-		format "\n====================================================================================================================\n"
+		--format "\n====================================================================================================================\n"
 		--format "\n";
-		print "RigWrapper_v.switchKeysOnTimes()"
+		print "LeftRightControls_v.switchKeysOnTimes()"
 		format "% <-> %\n" left.obj.name right.obj.name
-		format "left: %\n" left
+		--format "left: %\n" left
 		--format "PHASE:     %\n" phase
 		--format "INCREMENT: %\n" increment
 
 		--format "keys L: %\n" keys_pos_L
 		--format "keys R: %\n" keys_pos_R
-		
-		/* ITERaTE EACH TIME */ 
+		/* IS POSITION LOCKED ? */ 
+		is_pos_locked_L = isLocked lock_position_L
+		is_pos_locked_R = isLocked lock_position_R
+		--format "is_pos_locked_L: %\n" is_pos_locked_L
+		--format "is_pos_locked_R: %\n" is_pos_locked_R
+
+		/* IS ROTATION LOCKED ? */ 
+		is_rot_locked_L = isLocked lock_rotation_L
+		is_rot_locked_R = isLocked lock_rotation_R
+
+		swap_only_rotation = is_pos_locked_L and is_pos_locked_R
+			
+		/* ITERATE EACH TIME */ 
 		for source_time in keys_all do
 		(
 			--format "SOURCE_TIME: %\n" source_time
@@ -98,9 +109,11 @@ struct LeftRightControls_v
 			/* GET KEYS ON TIME */ 
 			rot_key_L = findItem keys_rot_L source_time
 			rot_key_R = findItem keys_rot_R source_time
+			--format "rot_key_L: %\n" rot_key_L
 			
 			pos_key_L = findItem keys_pos_L source_time
 			pos_key_R = findItem keys_pos_R source_time
+			--format "pos_key_L: %\n" pos_key_L
 			
 			/* TEST IF KEYS EXISTS */ 
 			position_keys_exists = pos_key_L or pos_key_R 
@@ -116,29 +129,41 @@ struct LeftRightControls_v
 				
 				default: #BOTH
 			)
-			format "mode: %\n" mode
+			
+			--format "mode: %\n" mode
 			/* GET DIRECTIONS OF COPY */ 
 			left_to_right = rot_key_L or pos_key_L
 			right_to_left = rot_key_R or pos_key_R
 			
-			/* IS POSITION LOCKED ? */ 
-			is_pos_locked_L = isLocked lock_position_L
-			is_pos_locked_R = isLocked lock_position_R
-			--format "is_pos_locked_L: %\n" is_pos_locked_L
-			--format "is_pos_locked_R: %\n" is_pos_locked_R
-
-			/* IS ROTATION LOCKED ? */ 
-			is_rot_locked_L = isLocked lock_rotation_L
-			is_rot_locked_R = isLocked lock_rotation_R
-
+			--/* IS POSITION LOCKED ? */ 
+			--is_pos_locked_L = isLocked lock_position_L
+			--is_pos_locked_R = isLocked lock_position_R
+			----format "is_pos_locked_L: %\n" is_pos_locked_L
+			----format "is_pos_locked_R: %\n" is_pos_locked_R
+			--
+			--/* IS ROTATION LOCKED ? */ 
+			--is_rot_locked_L = isLocked lock_rotation_L
+			--is_rot_locked_R = isLocked lock_rotation_R
+			--
+			--swap_only_rotation = is_pos_locked_L and is_pos_locked_R
+			--
 			/* MIRROR ONLY ROTATION */ 
-			if ( is_pos_locked_L and is_pos_locked_R ) then
+			if swap_only_rotation then
 				this.swapLocalRotation source_time target_time mode left_to_right right_to_left
 			
 			else /* MIRROR TRANSFORMS */ 
 				this.flipIKControllers left.obj right.obj source_time target_time mode left_to_right right_to_left
 		)
 		
+		this._updateControlerKeys()
+
+		/* remove position keys created on restore position */
+		if swap_only_rotation then
+		(
+			left.removeKeys  #POSITION --times
+			right.removeKeys #POSITION --times
+		)
+
 		true --return true if any kdkey has been processed
 	),
 	
@@ -150,7 +175,8 @@ struct LeftRightControls_v
 	*/
 	function swapLocalRotation time_from time_to mode left_to_right right_to_left =
 	(
-		format "\n"; print "TransformFlipper_v.swapLocalRotation()"
+		format "\n"; print "LeftRightControls_v.swapLocalRotation()"
+		
 		/* 
 		Function to set only rotation key on object at given time
 		*/
@@ -224,10 +250,6 @@ struct LeftRightControls_v
 			)
 		)
 		
-		/* remove position keys created on restore position */ 
-		left.removeKeys  #POSITION #( time_to.frame as integer )
-		right.removeKeys #POSITION #( time_to.frame as integer )
-		
 	),
 
 	/* 
@@ -237,7 +259,7 @@ struct LeftRightControls_v
 	function flipIKControllers obj_L obj_R time_from time_to mode left_to_right right_to_left =
 	(
 		--format "\n---------------------------------------\n"
-		format "\n"; print "TransformFlipper_v.flipIKControllers()"
+		format "\n"; print "LeftRightControls_v.flipIKControllers()"
 		time_from = time_from as time
 		time_to   = time_to   as time		
 		--format "Frame: % →  %\n" time_from time_to
@@ -283,14 +305,31 @@ struct LeftRightControls_v
 		)
 		
 		/* REMOVE KEYS OF UNANIMATED TRANSFORM -- little dirty, but it works */
-		if mode != #BOTH then
-		(
-			mode_to_delete = if mode == #POSITION  then #ROTATION else #POSITION
-	
-			left.removeKeys  mode_to_delete time_to.frame
-			
-			right.removeKeys mode_to_delete time_to.frame
-		)
+		--if mode != #BOTH then
+		--(
+		--	format "\n"; print "LeftRightControls_v.flipIKControllers() -> removeKeys()"
+		--
+		--	this._updateControlerKeys()
+		--
+		--	mode_to_delete = if mode == #POSITION  then #ROTATION else #POSITION
+		--	
+		--	format "left.keys_transforms[%]: %\n" mode_to_delete left.keys_transforms[mode_to_delete]
+		--	
+		--	times = for i = time_from.frame to time_to.frame collect i as integer
+		--	
+		--	left.removeKeys  mode_to_delete keys:times
+		--	
+		--	right.removeKeys mode_to_delete keys:times
+		--)
+	),
+
+	/** Update controler keys
+	 */
+	function _updateControlerKeys =
+	(
+		--format "\n"; print "LeftRightControls_v._updateControlerKeys()"
+		this.left.serachForKeysInControllers()
+		this.right.serachForKeysInControllers()
 	),
 
 
@@ -465,7 +504,7 @@ struct LeftRightControls_v
 	 */
 	function isTransformLocked obj type =
 	(
-		--format "\n"; print "TransformFlipper_v.isTransformLocked()"
+		--format "\n"; print "LeftRightControls_v.isTransformLocked()"
 		for i in ((getTransformLockFlags obj) * lock_flags[type] ) collect #( #X, #Y, #Z, #X, #Y, #Z, #X, #Y, #Z )[i]
 	),
 

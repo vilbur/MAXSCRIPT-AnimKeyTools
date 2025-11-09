@@ -22,21 +22,21 @@ struct TransformFlipper_v
 	*/
 	function mirrorTrasformsAtTimes obj_A times_A obj_B times_B =
 	(
-		format "\n"; print "TransformFlipper_v.mirrorTrasformsAtTimes()"
+		--format "\n"; print "TransformFlipper_v.mirrorTrasformsAtTimes()"
 
-		format "obj_A: %\n" obj_A
-		format "obj_B: %\n" obj_B
+		--format "obj_A: %\n" obj_A
+		--format "obj_B: %\n" obj_B
 		--format "times_A: %\n" times_A
 		--format "times_B: %\n" times_B
 
 		lock_position_A = this.isTransformLocked obj_A #POSITION
 		lock_rotation_A = this.isTransformLocked obj_A #ROTATION
-		format "lock_position_A: %\n" lock_position_A
-		format "lock_rotation_A: %\n" lock_rotation_A
+		--format "lock_position_A: %\n" lock_position_A
+		--format "lock_rotation_A: %\n" lock_rotation_A
 		lock_position_B = this.isTransformLocked obj_B #POSITION
 		lock_rotation_B = this.isTransformLocked obj_B #ROTATION
-		format "lock_position_B: %\n" lock_position_B
-		format "lock_rotation_B: %\n" lock_rotation_B
+		--format "lock_position_B: %\n" lock_position_B
+		--format "lock_rotation_B: %\n" lock_rotation_B
 		
 		all_times = sort(makeUniqueArray (times_A + times_B))
 		--format "all_times: %\n" all_times
@@ -44,9 +44,9 @@ struct TransformFlipper_v
 		
 		for _time in all_times do
 		(
-			format "\n\n===========================================\n"
+			--format "\n\n===========================================\n"
 
-			format "_time: %\n" _time
+			--format "_time: %\n" _time
 			--with animate on
 			--at time _time
 			(
@@ -55,20 +55,20 @@ struct TransformFlipper_v
 				for controller_type in controller_types do
 				--for controller_type in #( #POSITION ) do
 				(
-					format "CONTROLLER_TYPE: %\n" controller_type
+					--format "CONTROLLER_TYPE: %\n" controller_type
 					--format "\n===========================================\n"
-					format "sliderTime: %\n" sliderTime
+					--format "sliderTime: %\n" sliderTime
 					key_a = 0
 					key_b = 0
 					
 					ctrl_a = this._getController obj_A controller_type
-					format "ctrl_a: %\n" ctrl_a
+					--format "ctrl_a: %\n" ctrl_a
 					ctrl_b = this._getController obj_B controller_type
 					
 					key_a = this._getKeyIndex ctrl_a ( _time as time ) key_a
 					key_b = this._getKeyIndex ctrl_b ( _time as time ) key_b
-					format "key_a key index: %\n" key_a
-					format "key_b key index: %\n" key_b
+					--format "key_a key index: %\n" key_a
+					--format "key_b key index: %\n" key_b
 					
 					if lock_position_A.count == 0 then
 					(
@@ -141,8 +141,8 @@ struct TransformFlipper_v
 	*/
 	function flipIKControllers obj_A obj_B _time controller_type =
 	(
-		format "\n---------------------------------------"
-		format "\n"; print "TransformFlipper_v.flipIKControllers()"
+		--format "\n---------------------------------------"
+		--format "\n"; print "TransformFlipper_v.flipIKControllers()"
 		_time = _time as time
 		with animate on
 		at time _time
@@ -171,7 +171,7 @@ struct TransformFlipper_v
 	*/
 	function swapLocalRotation obj_A obj_B _time =
 	(
-		format "\n"; print "TransformFlipper_v.swapLocalRotation()"
+		--format "\n"; print "TransformFlipper_v.swapLocalRotation()"
 		_time = _time as time
 	
 		with animate on

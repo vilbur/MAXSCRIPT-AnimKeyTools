@@ -27,7 +27,7 @@ struct ObjectControllerKeys_v
 		--format "\n"; print "ObjectControllerKeys_v.serachForKeysInControllers()"
 		this._setTransformKeys()
 		
-		--this.setKeytsOfModsProperties()
+		this.setKeytsOfModsProperties()
 	),
 	
 	/** Fiter keys
@@ -85,41 +85,56 @@ struct ObjectControllerKeys_v
 	
 	/** Delete keys
 	 */
-	function removeKeys which keys =
+	function removeKeys which keys:undefined =
 	(
 		--format "\n"; print "ObjectControllerKeys_v.removeKeys()"
-
+		format "\n"
 		format "\n"; print ("ObjectControllerKeys_v.removeKeys() " + obj.name )
-		format "which: %\n" which
-		format "keys_transforms: %\n" keys_transforms
+		--format "which: %\n" which
+		--format "keys_transforms[%]: %\n" which keys_transforms[which]
+		if keys != undefined then
+		(
+			if classOf keys != Array then
+				keys = #( keys )
+			
+			keys = for key in keys collect key as integer
+		)
 		
-		if classOf keys != Array then
-			keys = #( keys )
-		
-		keys = for key in keys collect key as integer
-		
-		format "keys: %\n" keys
+		--format "keys: %\n" keys
 		
 		if which != #PROPERTIES then
 		(
 			keys_flat = #()
 			
 			transform_tracks = if which == #TRANSFORMS then keys_transforms.keys else #( which )
-			format "transform_tracks: %\n" transform_tracks
+			--format "transform_tracks: %\n" transform_tracks
 			
 			--for transform_track in transform_tracks where keys_transforms[transform_track] != undefined do
 			for transform_track in transform_tracks do
 			(
-				format "keys_transforms[transform_track]: %\n" keys_transforms[transform_track]
+				--format "\n"
+				--format "transform_track: %\n" transform_track
+				--format "keys_transforms[transform_track]: %\n" keys_transforms[transform_track]
 				
 				if keys_transforms[transform_track] != undefined  then
 					for ControllerKeys in keys_transforms[transform_track] do
 					(
-						format "ControllerKeys.ctrl: %\n" ControllerKeys.ctrl
-						format "ControllerKeys.keys: %\n" ControllerKeys.keys
+						--format "ControllerKeys.ctrl: %\n" ControllerKeys.ctrl
+						--format "ControllerKeys.keys: %\n" ControllerKeys.keys
 						
-						for key in ControllerKeys.keys where findItem keys key > 0 do
-							deleteKey ControllerKeys.ctrl (getKeyIndex ControllerKeys.ctrl key)
+						for _time in ControllerKeys.keys do
+						(
+							--format "_time: %\n" _time
+							
+							if keys == undefined or findItem keys _time > 0 then
+								if ( key_index = getKeyIndex ControllerKeys.ctrl _time ) > 0 then 
+									deleteKey ControllerKeys.ctrl key_index
+									
+								--deleteKey ControllerKeys.ctrl (getKeyIndex ControllerKeys.ctrl _time)
+							
+						)
+								
+								
 						--for key in ControllerKeys.keys do
 						--(
 						--	format "key: %\n" key
@@ -163,8 +178,6 @@ struct ObjectControllerKeys_v
 		for transform_track in #( #POSITION, #ROTATION, #SCALE ) do 
 		--for transform_track in #( #POSITION ) do -- DEV
 		(
-			--format "\n*********************************\n"
-			--format "transform_track: %\n" transform_track
 
 			ctrl = case transform_track of
 			(
@@ -175,7 +188,15 @@ struct ObjectControllerKeys_v
 
 			/* GET KEYS FOR EAH CONTROLLER */ 
 			if ( controllers_keys = this._searchForControllerKeys ctrl).count > 0 then
+			(
+				--format "\n*********************************\n"
+				--format "\n"; print "KeyFrameManager_v._setTransformKeys()"
+				--format "TRANSFORM_TRACK: %\n" transform_track
+				--format "obj.name: %\n" obj.name
+				--format "% keys: %\n" ctrl controllers_keys
+				
 				keys_transforms[transform_track] = controllers_keys
+			)
 
 		)
 	),
@@ -259,7 +280,9 @@ struct ObjectControllerKeys_v
 	 */
 	function _searchForControllerKeys ctrl controllers_keys:#() =
 	(
+		--format "\n"
 		--format "\n"; print "KeyFrameManager_v._searchForControllerKeys()"
+		--format "obj.name: %\n" obj.name
 		--format "ctrl: %\n" ctrl
 		
 		num_keys = numKeys ctrl
@@ -294,7 +317,14 @@ struct ObjectControllerKeys_v
 				append controllers_keys ( ControllerKeys_v ctrl keys  )
 		)
 		
-		if controllers_keys.count > 0 then		format "% keys: %\n" obj.name controllers_keys
+		if controllers_keys.count > 0 then
+		(
+			--format "\n"
+			--format "\n"; print "KeyFrameManager_v._searchForControllerKeys()"
+			--format "obj.name: %\n" obj.name
+		 
+			--format "% keys: %\n" ctrl controllers_keys
+		)
 		
 		controllers_keys --return
 	),
@@ -315,6 +345,6 @@ struct ObjectControllerKeys_v
 	on create do
 	(
 		--format "\n"; print "ObjectControllerKeys.onCreate()"
-		--this.serachForKeysInControllers()
+		this.serachForKeysInControllers()
 	)
 )
