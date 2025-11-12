@@ -29,10 +29,12 @@ icon:	"control:timer|interval:2000|active:true|height:0"
 
 		phase_length = ROLLOUT_options.DL_phase_length.selected as integer
 
-		phase_first_frame = current_time - phase_length + 1 
+		phase_first_frame = current_time - phase_length + 1
 
 		is_phase_in_range = phase_first_frame >= animationRange.start.frame
-			
+		
+		is_phase_in_range = phase_first_frame >= animationRange.start.frame
+		
 		/* UPDATE IF CURRENT TIME IS CHANGED */ 
 		if DIALOG_phasemaker.current_time != currentTime then
 		(
@@ -64,7 +66,7 @@ icon:	"control:timer|interval:2000|active:true|height:0"
 										else
 											"PHASE START BEFORE ANIMATION RANGE: " + phase_first_frame as string +"\n\nMOVE CURRENT TIME TO FRAME: " + (current_time + ( abs phase_first_frame )) as string
 		)
-		
+		--format "is_phase_in_range: %\n" is_phase_in_range
 		/* DISABLE BUTTON MIRRO PHASE BUTTON - if current time is less then phase ( phase is extending time range start ) */ 
 		BTN_mirror_phase.enabled = is_phase_in_range
 		

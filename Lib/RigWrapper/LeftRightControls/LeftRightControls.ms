@@ -305,22 +305,22 @@ struct LeftRightControls_v
 		)
 		
 		/* REMOVE KEYS OF UNANIMATED TRANSFORM -- little dirty, but it works */
-		--if mode != #BOTH then
-		--(
-		--	format "\n"; print "LeftRightControls_v.flipIKControllers() -> removeKeys()"
-		--
-		--	this._updateControlerKeys()
-		--
-		--	mode_to_delete = if mode == #POSITION  then #ROTATION else #POSITION
-		--	
-		--	format "left.keys_transforms[%]: %\n" mode_to_delete left.keys_transforms[mode_to_delete]
-		--	
-		--	times = for i = time_from.frame to time_to.frame collect i as integer
-		--	
-		--	left.removeKeys  mode_to_delete keys:times
-		--	
-		--	right.removeKeys mode_to_delete keys:times
-		--)
+		if mode != #BOTH then
+		(
+			format "\n"; print "LeftRightControls_v.flipIKControllers() -> removeKeys()"
+		
+			this._updateControlerKeys()
+		
+			mode_to_delete = if mode == #POSITION  then #ROTATION else #POSITION
+			
+			format "left.keys_transforms[%]: %\n" mode_to_delete left.keys_transforms[mode_to_delete]
+			
+			times = for i = time_from.frame to time_to.frame collect i as integer
+			
+			left.removeKeys  mode_to_delete keys:times
+			
+			right.removeKeys mode_to_delete keys:times
+		)
 	),
 
 	/** Update controler keys
