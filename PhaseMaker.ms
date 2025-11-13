@@ -2,7 +2,7 @@
 
 
 
-filein( getFilenamePath(getSourceFileName()) + "/AnimKeyTools.ms" )	--"./AnimKeyTools.ms"
+filein( getFilenamePath(getSourceFileName()) + "/includes.ms" )	--"./includes.ms"
 
 filein( getFilenamePath(getSourceFileName()) + "/Lib/PhaseCreator/PhaseCreator.ms" )	--"./Lib/PhaseCreator/PhaseCreator.ms"
 
