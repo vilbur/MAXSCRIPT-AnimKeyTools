@@ -18,3 +18,6 @@ function loadContentAndCreateDialog =
 	/* CREATE UI */
 	ContentLoader.create() --width:512
 )
+
+
+loadContentAndCreateDialog()
