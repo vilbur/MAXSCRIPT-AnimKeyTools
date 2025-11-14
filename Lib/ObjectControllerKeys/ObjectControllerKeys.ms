@@ -10,9 +10,9 @@ struct ObjectControllerKeys_v
 	/* required */
 	
 	/* keys_mods */
-	keys_transforms	= Dictionary #NAME, -- key: #POSITION|#ROTATION|#SCALE value: #( ControllerKeys_v )
+	keys_transforms	= Dictionary #NAME, -- key: #POSITION|#ROTATION|#SCALE value: #( "./ControllerKeys/ControllerKeys.ms" )
 	
-	keys_mods = Dictionary #INTEGER, -- key: index_of_modifier value: #( ControllerKeys_v )
+	keys_mods = Dictionary #INTEGER, -- KEY: index_of_modifier value: #( ControllerKeys_v )
 	
 	
 	/* private */
@@ -63,6 +63,7 @@ struct ObjectControllerKeys_v
 		sort( makeUniqueArray keys_flat ) --return
 	),
 	
+	
 	/** Key exists
 	 */
 	function keyExists transfrom_prop key_time =
@@ -81,6 +82,24 @@ struct ObjectControllerKeys_v
 				key_found = findItem sub_ctrl.keys key_time > 0
 		
 		key_found --return
+	),
+	
+	
+	/** Create keys
+	 */
+	function createKeys track times =
+	(
+		format "\n"; print "ObjectControllerKeys_v.createKeys()"
+		
+		
+		if classOf times != Array then
+			times = #( times )
+				
+		for _time in times do
+			for ControllerKeys in keys_transforms[track] do 
+				addNewKey ControllerKeys.ctrl _time
+		
+		
 	),
 	
 	/** Delete keys
