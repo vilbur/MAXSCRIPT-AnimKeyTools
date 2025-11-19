@@ -47,11 +47,12 @@ function createTestObject =
 	SETUP SCENE
 --------------------------------------------------------------------------------*/
 
---obj	= selection[1]
+obj	= selection[1]
 
---obj = createTestObject()
+obj = createTestObject()
 
---sliderTime = 10
+sliderTime = 10
+sliderTime = 5
 
 
 
@@ -73,6 +74,15 @@ KeyFrameManager 	= KeyFrameManager_v() --time:#RIGHT -- DELETE CURRENT TIME IF t
 --KeyFrameManager.time = #CURRENT
 
 /*------------------------------------------------------------------------------
+	CREATE KEYS
+--------------------------------------------------------------------------------*/
+--KeyFrameManager.createKeys()
+
+KeyFrameManager.insertKeys()
+
+
+
+/*------------------------------------------------------------------------------
 	DELETE KEYS
 --------------------------------------------------------------------------------*/
 
@@ -86,7 +96,7 @@ KeyFrameManager 	= KeyFrameManager_v() --time:#RIGHT -- DELETE CURRENT TIME IF t
 /* ALL KEYS FROM OBJECTS IN TIME RANGE */ 
 --KeyFrameManager.removeKeys objs: selection[1] time:[ 10, 50 ]
 
-	
+		
 /* TRANSFORMS all */
 --KeyFrameManager.removeKeys transforms:true time:undefined
 

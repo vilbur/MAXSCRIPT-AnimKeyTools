@@ -9,7 +9,17 @@ function frameButtonRcMenu frame =
 	/** Get int string
 	 */
 	function getString num = (num as integer )  as string
-
+	
+	which = case toolmode.commandmode of
+	(
+		#move:	#POSITION
+		#Rotate:	#ROTATION
+		#squash:	#SCALE
+		#nuscale:	#SCALE
+		#uscale:	#SCALE
+		default: #( #POSITION, #ROTATION, #SCALE )
+	)
+		
 	transform_tracks = #( "POSITION", "ROTATION", "SCALE" ) 
 	--format "\n"; print ".frameButtonRcMenu()"
 	--format "DIALOG_time_slider_tools.DL_phase.selection: %\n" DIALOG_time_slider_tools.DL_phase.selection
@@ -37,6 +47,7 @@ function frameButtonRcMenu frame =
 	--------------------------------------------------------------------------------*/
 	Menu = RcMenu_v name:"frameButtonMenu"
 	
+
 	if selection.count > 0 then
 	(
 		Menu.item	"Delete CURRENT KEY"	"(KeyFrameManager_v( #CURRENT )).removeKeys()"

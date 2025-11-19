@@ -1,5 +1,9 @@
 filein( getFilenamePath(getSourceFileName()) + "/ControllerKeys/ControllerKeys.ms" )	--"./ControllerKeys/ControllerKeys.ms"
 
+filein( getFilenamePath(getSourceFileName()) + "/Lib/getObjectsWithKeys.ms" )	--"./Lib/getObjectsWithKeys.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Lib/createKeys.ms" )	--"./Lib/createKeys.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Lib/insertKeys.ms" )	--"./Lib/insertKeys.ms"
+
 /** Object ctrl keys
  */
 struct ObjectControllerKeys_v
@@ -66,19 +70,19 @@ struct ObjectControllerKeys_v
 	
 	/** Key exists
 	 */
-	function keyExists transfrom_prop key_time =
+	function keyExists track key_time =
 	(
 		--format "\n"; print "ObjectControllerKeys_v.keyExists()"
 		
 		--format "key_time: %\n" key_time
-		--format "transfrom_prop: %\n" transfrom_prop
-		--format "keys_transforms[transfrom_prop]: %\n" keys_transforms[transfrom_prop]
-		--format "INDEX: %\n" ( findItem keys_transforms[transfrom_prop] key_time )
+		--format "track: %\n" track
+		--format "keys_transforms[track]: %\n" keys_transforms[track]
+		--format "INDEX: %\n" ( findItem keys_transforms[track] key_time )
 		--
 		key_found = false
 		
-		if keys_transforms[transfrom_prop] != undefined then 
-			for sub_ctrl in keys_transforms[transfrom_prop] while key_found == false do 
+		if keys_transforms[track] != undefined then 
+			for sub_ctrl in keys_transforms[track] while key_found == false do 
 				key_found = findItem sub_ctrl.keys key_time > 0
 		
 		key_found --return
@@ -90,16 +94,16 @@ struct ObjectControllerKeys_v
 	function createKeys track times =
 	(
 		format "\n"; print "ObjectControllerKeys_v.createKeys()"
+		format "track: %\n" track
+		format "keys_transforms[track]: %\n" keys_transforms[track]
+		format "keys_transforms.keys: %\n" keys_transforms.keys
 		
+		if classOf times != Array then times = #( times )
 		
-		if classOf times != Array then
-			times = #( times )
-				
+		--format "times: %\n" times
 		for _time in times do
-			for ControllerKeys in keys_transforms[track] do 
-				addNewKey ControllerKeys.ctrl _time
-		
-		
+			addNewKey (this._getTransfromController track) _time
+
 	),
 	
 	/** Delete keys
@@ -198,12 +202,7 @@ struct ObjectControllerKeys_v
 		--for transform_track in #( #POSITION ) do -- DEV
 		(
 
-			ctrl = case transform_track of
-			(
-				#POSITION: obj.position.controller 
-				#ROTATION: obj.rotation.controller 
-				#SCALE:    obj.scale.controller 
-			)
+			ctrl = this._getTransfromController transform_track
 
 			/* GET KEYS FOR EAH CONTROLLER */ 
 			if ( controllers_keys = this._searchForControllerKeys ctrl).count > 0 then
@@ -217,6 +216,19 @@ struct ObjectControllerKeys_v
 				keys_transforms[transform_track] = controllers_keys
 			)
 
+		)
+	),
+	
+	/** Get transfrom controller
+	 */
+	function _getTransfromController transform_track =
+	(
+		--format "\n"; print "ObjectControllerKeys_v._getTransfromController()"
+		case transform_track of
+		(
+			#POSITION: obj.position.controller 
+			#ROTATION: obj.rotation.controller 
+			#SCALE:    obj.scale.controller 
 		)
 	),
 	
@@ -297,19 +309,15 @@ struct ObjectControllerKeys_v
 	
 	/** Delete keys from ctrl
 	 */
-	function _searchForControllerKeys ctrl controllers_keys:#() =
+	function _searchForControllerKeys ctrl ControllersKeys:#() =
 	(
-		--format "\n"
 		--format "\n"; print "KeyFrameManager_v._searchForControllerKeys()"
-		--format "obj.name: %\n" obj.name
-		--format "ctrl: %\n" ctrl
 		
 		num_keys = numKeys ctrl
 		
 		/*------------------------------------------------------------------------------
 			SEARCH FOR KEYS IN SUBANIMS
 		--------------------------------------------------------------------------------*/
-		--if num_keys== -1 then
 		if ctrl.numSubs > 0 then
 		(
 			/* LOOP SUBANIMS */ 
@@ -320,32 +328,32 @@ struct ObjectControllerKeys_v
 					if (sub_ctrl = getPropertyController ctrl sub_anim_ctrl.name) != undefined then
 					(
 						/* DELETE KEYS OF SUBANIM */
-						controllers_keys = this._searchForControllerKeys sub_ctrl controllers_keys:controllers_keys
+						ControllersKeys = this._searchForControllerKeys sub_ctrl ControllersKeys:ControllersKeys
 						
 					)
 		)
+		
 		/*------------------------------------------------------------------------------
 			GET KEYS FROM CONTROLLER
 		--------------------------------------------------------------------------------*/
-		else
-		if num_keys > 0 then
+		else if num_keys > 0 then
 		(
 			keys = this._getKeysFromController ctrl num_keys
 			
 			if keys.count > 0 then
-				append controllers_keys ( ControllerKeys_v ctrl keys  )
+				append ControllersKeys ( ControllerKeys_v ctrl keys  )
 		)
 		
-		if controllers_keys.count > 0 then
-		(
-			--format "\n"
-			--format "\n"; print "KeyFrameManager_v._searchForControllerKeys()"
-			--format "obj.name: %\n" obj.name
-		 
-			--format "% keys: %\n" ctrl controllers_keys
-		)
-		
-		controllers_keys --return
+		--if ControllersKeys.count > 0 then
+		--(
+		--	--format "\n"
+		--	--format "\n"; print "KeyFrameManager_v._searchForControllerKeys()"
+		--	--format "obj.name: %\n" obj.name
+		-- 
+		--	--format "% keys: %\n" ctrl ControllersKeys
+		--)
+		--
+		ControllersKeys --return
 	),
 	
 	/** Get keys from ctrl

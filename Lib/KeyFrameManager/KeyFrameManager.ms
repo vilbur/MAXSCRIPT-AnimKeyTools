@@ -32,8 +32,58 @@ struct KeyFrameManager_v
 	
 	/* reference */
 	/* inhered */
+	/** Create keys
+	 */
+	function createKeys objs: transforms: properties: time:  =
+	(
+		--format "\n"; print "KeyFrameManager_v.createKeys()"
+		--if classOf which != Array then which = #( which )
+		this.setParameters objs:objs transforms:transforms properties:properties time:time
+
+		--if classOf tracks != Array then tracks = #( tracks )
 	
+		--current_time = currentTime.frame as integer
 	
+		--objs = if selection.count > 0 then selection as Array else objects
+		
+		--ObjectsControllerKeys = getObjectsWithKeys(objs)
+		for obj in this.objs do
+		(
+			ObjectControllerKeys = ObjectControllerKeys_v(obj)
+			
+			for transform_track in tracks do
+				ObjectControllerKeys.createKeys transform_track current_time
+		)
+		--for ObjectControllerKeys in ObjectsControllerKeys do
+	
+					
+	),
+	
+	/** inser keys
+	 */
+	function insertKeys objs: transforms: properties: time: =
+	(
+		format "\n"; print "KeyFrameManager_v.insertKeys()"
+		this.setParameters objs:objs transforms:transforms properties:properties time:time
+		format "transforms: %\n" transforms	
+		current_time = currentTime
+
+		ObjectsControllerKeys = this.getObjectsWithKeys(this.objs)
+		
+		for ObjectControllerKeys in ObjectsControllerKeys do
+		(
+		format "ObjectControllerKeys: %\n" ObjectControllerKeys
+		--format "this.transforms: %\n" this.transforms
+			 --for transform_track in this.transforms do
+			for transform_track in ObjectControllerKeys.keys_transforms.keys do
+			--format "current_time: %\n" current_time
+			--format "transform_track: %\n" transform_track
+					ObjectControllerKeys.createKeys transform_track (current_time.frame as integer)
+			
+		)
+					
+	),
+
 	/** Remove anim keys from selection
 	  * 
 	  * @param Array objs if undefined then use current selection
@@ -125,6 +175,37 @@ struct KeyFrameManager_v
 
 	private
 	
+	/** 
+	  
+	 */
+	function getObjectsWithKeys objs which:#( #POSITION, #ROTATION, #SCALE ) =
+	(
+		format "\n"; print ".getObjectsWithKeys()"
+			
+		
+		if classOf which != Array then which = #( which )
+		format "which: %\n" which
+		/* OBJECTS to process */ 
+		
+		ObjectsControllerKeys = #()
+		
+		for obj in objs where ( ObjectControllerKeys = ObjectControllerKeys_v(obj) ).keys_transforms.keys.count > 0 do
+		(
+			
+			tracks_of_keys = for track in ObjectControllerKeys.keys_transforms.keys where (findItem which track) != 0 collect track
+	
+			if tracks_of_keys.count > 0 then
+				append ObjectsControllerKeys ObjectControllerKeys
+			
+			--format "tracks_of_keys: %\n" tracks_of_keys
+			
+			format "ObjectControllerKeys.keys_transforms: %\n" ObjectControllerKeys.keys_transforms.keys
+		)
+			
+		ObjectsControllerKeys --return
+		
+	),
+
 	/** Process transforms
 	 */
 	function executeCallback callback =
@@ -310,6 +391,7 @@ struct KeyFrameManager_v
 		--format "\n"; print "KeyFrameManager.onCreate()"
 		--for prop in #(  ) where getProperty this prop == undefined do -- CHECK CONSTRUCT PROPERTIES -- Array of this struct properties necessary to run
 		--	throw ("\n\n\nUNDEFINED CONSTRUCT PROPERTY\n\n\nSTRUCT:\n\n"+ ((filterString( classof this as string )"(:")[2]) +"\n\n\nPROPERTY:\n\n"+ prop )
+		
 	)
 
 )

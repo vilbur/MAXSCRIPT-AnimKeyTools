@@ -1,72 +1,7 @@
 /* DEV IMPORT */ 
 filein( getFilenamePath(getSourceFileName()) + "/../../../../Lib/ObjectControllerKeys/ObjectControllerKeys.ms" )	--"./../../../../Lib/ObjectControllerKeys/ObjectControllerKeys.ms"
 
-/** 
-  
- */
-function getObjectsWithKeys objs which:#( #POSITION, #ROTATION, #SCALE ) =
-(
-	format "\n"; print ".getObjectsWithKeys()"
-		
-	
-	if classOf which != Array then which = #( which )
-	format "which: %\n" which
-	/* OBJECTS to process */ 
-	
-	ObjectsControllerKeys = #()
-	
-	for obj in objs where ( ObjectControllerKeys = ObjectControllerKeys_v(obj) ).keys_transforms.keys.count > 0 do
-	(
-		
-		tracks_of_keys = for track in ObjectControllerKeys.keys_transforms.keys where (findItem which track) != 0 collect track
 
-		if tracks_of_keys.count > 0 then
-			append ObjectsControllerKeys ObjectControllerKeys
-		
-		--format "tracks_of_keys: %\n" tracks_of_keys
-		
-		format "ObjectControllerKeys.keys_transforms: %\n" ObjectControllerKeys.keys_transforms.keys
-	)
-		
-	ObjectsControllerKeys --return
-	
-)
-
-
-/** Create keys
- */
-function insertKeys objs =
-(
-	--format "\n"; print ".insertKeys()"
-	current_time = currentTime.frame as integer
-	
-
-	ObjectsControllerKeys = getObjectsWithKeys(objs)
-			
-	for ObjectControllerKeys in ObjectsControllerKeys do
-	--format "ObjectControllerKeys: %\n" ObjectControllerKeys
-		 for transfrom_prop in ObjectControllerKeys.keys_transforms.keys do
-			--format "%: %\n" transfrom_prop ObjectControllerKeys.keys_transforms[transfrom_prop]
-				ObjectControllerKeys.insertKeys transfrom_prop current_time
-				
-			--for ControllerKeys in ObjectControllerKeys.keys_transforms[transfrom_prop] do
-			--format "ControllerKeys: %\n" ControllerKeys
-				--ControllerKeys.insertKeys #POSITION current_time
-			
-		
-	--for ObjectControllerKeys in ObjectsControllerKeys do
-	--(
-	--	
-	--	--keys_transforms = ObjectControllerKeys.keys_transforms
-	--	--ObjectControllerKeys.obj
-	--	format "ObjectControllerKeys.obj: %\n" ObjectControllerKeys.obj
-	--	format "\n"
-	--	 --for track in keys_transforms.keys do
-	--		--keys_transforms[track].insertKeys #POSITION current_time
-	--		--format "keys_transforms[%]: %\n" track keys_transforms[track]
-	--
-	--)
-)
 /**  
  */
 macroscript	AnimTools_select_obejcts_with_Keys
@@ -118,9 +53,9 @@ icon:	"across:2|width:96|height:32"
  */
 macroscript	AnimTools_createKeys
 category:	"_AnimTools"
-buttontext:	"Insert key"
+buttontext:	"createKeys"
 toolTip:	"INSERT KEY at current time.\n\nUse selection or all objects if nothing is selected."
-icon:	""
+icon:	"menu:Insert key"
 (
 	on execute do
 	(
@@ -135,10 +70,45 @@ icon:	""
 		--	default: #( #POSITION, #ROTATION, #SCALE )
 		--)
 		
-		objs = if selection.count > 0 then selection as Array else objects
+		format "\nInsert key"
+		--createKeys()
+		--createKeys tracks:#POSITION
+		createKeys tracks:#ROTATION
+	)
+)
+/**  
+ */
+macroscript	AnimTools_test
+category:	"_AnimTools"
+buttontext:	"TEST"
+(
+	on execute do
+	(
+		--filein @"C:\Users\vilbur\AppData\Local\Autodesk\3dsMax\2023 - 64bit\ENU\scripts\MAXSCRIPT-AnimKeyTools\AnimTools\content\rollouts-main\rollout-KEYS\[Manage keys].mcr"
+		--which = case toolmode.commandmode of
+		--(
+		--	#move:	#POSITION
+		--	#Rotate:	#ROTATION
+		--	#squash:	#SCALE
+		--	#nuscale:	#SCALE
+		--	#uscale:	#SCALE
+		--	default: #( #POSITION, #ROTATION, #SCALE )
+		--)
+		MenuRc = RcMenu_v name:menu_name
 
-		--insertKeys which:which
-		insertKeys (objs)
+MenuRc.loadMenu "_AnimTools"
+
+--MenuRc.loadMenu "menu_name"
+
+/** POP UP MENU ON MOUSE POS
+ *
+ */
+MenuRc.popUp()
+
+				
+		--
+		----insertKeys which:which
+		--insertKeys (objs)
 	)
 )
 
