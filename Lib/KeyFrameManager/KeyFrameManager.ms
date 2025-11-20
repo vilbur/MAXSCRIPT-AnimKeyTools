@@ -40,22 +40,13 @@ struct KeyFrameManager_v
 		--if classOf which != Array then which = #( which )
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
 
-		--if classOf tracks != Array then tracks = #( tracks )
-	
-		--current_time = currentTime.frame as integer
-	
-		--objs = if selection.count > 0 then selection as Array else objects
-		
-		--ObjectsControllerKeys = getObjectsWithKeys(objs)
 		for obj in this.objs do
 		(
 			ObjectControllerKeys = ObjectControllerKeys_v(obj)
 			
-			for transform_track in tracks do
+			for transform_track in this.transforms do
 				ObjectControllerKeys.createKeys transform_track current_time
 		)
-		--for ObjectControllerKeys in ObjectsControllerKeys do
-	
 					
 	),
 	
@@ -65,23 +56,26 @@ struct KeyFrameManager_v
 	(
 		format "\n"; print "KeyFrameManager_v.insertKeys()"
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
-		format "transforms: %\n" transforms	
-		current_time = currentTime
 
 		ObjectsControllerKeys = this.getObjectsWithKeys(this.objs)
 		
 		for ObjectControllerKeys in ObjectsControllerKeys do
-		(
-		format "ObjectControllerKeys: %\n" ObjectControllerKeys
-		--format "this.transforms: %\n" this.transforms
-			 --for transform_track in this.transforms do
 			for transform_track in ObjectControllerKeys.keys_transforms.keys do
-			--format "current_time: %\n" current_time
-			--format "transform_track: %\n" transform_track
-					ObjectControllerKeys.createKeys transform_track (current_time.frame as integer)
-			
-		)
-					
+			(
+				format "\n"
+				format "transform_track: %\n" transform_track
+				format "ObjectControllerKeys.keys_transforms[transform_track]: %\n" ObjectControllerKeys.keys_transforms[transform_track]
+				keys_of_track = ObjectControllerKeys.getKeys transform_track
+				format "keys_of_track: %: %\n" transform_track keys_of_track
+				format "amax(keys_of_track): %\n" (amax(keys_of_track))
+				format "current_time: %\n" current_time
+				format "TEST: %\n" ( current_time < amax(keys_of_track) )
+				
+				/* INSERT KEY ONLY BETWEEN OTHER KEYS - do not create key if it is last  */ 
+				if current_time < amax(keys_of_track) then
+					ObjectControllerKeys.createKeys transform_track current_time
+				
+			)
 	),
 
 	/** Remove anim keys from selection
@@ -125,7 +119,7 @@ struct KeyFrameManager_v
 		--format "\n"; print "KeyFrameManager_v.mirrorKeys()"
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
 		
-		current_time = currentTime
+		--current_time = currentTime
 		
 		key_times = if classOf this.time == Point2 then
 			for i = this.time[1] to this.time[2] collect i as integer
@@ -391,7 +385,8 @@ struct KeyFrameManager_v
 		--format "\n"; print "KeyFrameManager.onCreate()"
 		--for prop in #(  ) where getProperty this prop == undefined do -- CHECK CONSTRUCT PROPERTIES -- Array of this struct properties necessary to run
 		--	throw ("\n\n\nUNDEFINED CONSTRUCT PROPERTY\n\n\nSTRUCT:\n\n"+ ((filterString( classof this as string )"(:")[2]) +"\n\n\nPROPERTY:\n\n"+ prop )
-		
+		current_time = currentTime
+
 	)
 
 )

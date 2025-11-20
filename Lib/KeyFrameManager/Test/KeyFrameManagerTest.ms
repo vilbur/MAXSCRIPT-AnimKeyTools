@@ -21,9 +21,9 @@ function createTestObject =
         at time 30 obj.position = [ 300, 0, 0 ]
 		
 		
-		at time 90 Rotate obj ( AngleAxis -180 [0,0,1])
+		at time 40 Rotate obj ( AngleAxis -180 [0,0,1])
 
-		at time 100  obj.radius = 100
+		at time 50  obj.radius = 100
     )
 	
 

@@ -1,9 +1,5 @@
 filein( getFilenamePath(getSourceFileName()) + "/ControllerKeys/ControllerKeys.ms" )	--"./ControllerKeys/ControllerKeys.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/Lib/getObjectsWithKeys.ms" )	--"./Lib/getObjectsWithKeys.ms"
-filein( getFilenamePath(getSourceFileName()) + "/Lib/createKeys.ms" )	--"./Lib/createKeys.ms"
-filein( getFilenamePath(getSourceFileName()) + "/Lib/insertKeys.ms" )	--"./Lib/insertKeys.ms"
-
 /** Object ctrl keys
  */
 struct ObjectControllerKeys_v
@@ -34,9 +30,9 @@ struct ObjectControllerKeys_v
 		this.setKeytsOfModsProperties()
 	),
 	
-	/** Fiter keys
+	/** get keys of #POSITION|#ROTATION|#SCALE 
 	 */
-	function getKeys which time_interval =
+	function getKeys which time_interval:undefined =
 	(
 		--format "\n"; print "ObjectControllerKeys_v.getKeys()"
 		--format "which: %\n" which
@@ -51,10 +47,12 @@ struct ObjectControllerKeys_v
 			
 			transform_tracks = if which == #TRANSFORMS then keys_transforms.keys else #( which )
 
+			/* LOOP TRACKS #POSITION|#ROTATION|#SCALE  */ 
 			for transform_track in transform_tracks where keys_transforms[transform_track] != undefined do
+				
 				for ControllerKeys in keys_transforms[transform_track] do
+				
 					keys_flat +=  if time_interval != undefined then ControllerKeys.filterKeys (time_interval) else ControllerKeys.keys
-			
 		)
 		else
 		(
@@ -313,6 +311,10 @@ struct ObjectControllerKeys_v
 	(
 		--format "\n"; print "KeyFrameManager_v._searchForControllerKeys()"
 		
+		/** Get keys from ctrl
+		 */
+		function _getKeysFromController ctrl num_keys = for k = 1 to num_keys collect (getKeyTime ctrl k).frame as integer
+		
 		num_keys = numKeys ctrl
 		
 		/*------------------------------------------------------------------------------
@@ -338,7 +340,7 @@ struct ObjectControllerKeys_v
 		--------------------------------------------------------------------------------*/
 		else if num_keys > 0 then
 		(
-			keys = this._getKeysFromController ctrl num_keys
+			keys = _getKeysFromController ctrl num_keys
 			
 			if keys.count > 0 then
 				append ControllersKeys ( ControllerKeys_v ctrl keys  )
@@ -355,17 +357,7 @@ struct ObjectControllerKeys_v
 		--
 		ControllersKeys --return
 	),
-	
-	/** Get keys from ctrl
-	 */
-	function _getKeysFromController ctrl num_keys =
-	(
-		--format "\n"; print "ObjectControllerKeys_v._getKeysFromController()"
-		for k = 1 to num_keys collect (getKeyTime ctrl k).frame as integer
-		--keys =  for k = 1 to num_keys collect (getKeyTime ctrl k).frame as integer
-		--format "KEYS: %\n" keys
-		--ControllerKeys_v ctrl keys --return
-	),
+
 
 	/**
 	 */

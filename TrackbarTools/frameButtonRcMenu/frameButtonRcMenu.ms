@@ -10,15 +10,15 @@ function frameButtonRcMenu frame =
 	 */
 	function getString num = (num as integer )  as string
 	
-	which = case toolmode.commandmode of
-	(
-		#move:	#POSITION
-		#Rotate:	#ROTATION
-		#squash:	#SCALE
-		#nuscale:	#SCALE
-		#uscale:	#SCALE
-		default: #( #POSITION, #ROTATION, #SCALE )
-	)
+	--which = case toolmode.commandmode of
+	--(
+	--	#move:	#POSITION
+	--	#Rotate:	#ROTATION
+	--	#squash:	#SCALE
+	--	#nuscale:	#SCALE
+	--	#uscale:	#SCALE
+	--	default: #( #POSITION, #ROTATION, #SCALE )
+	--)
 		
 	transform_tracks = #( "POSITION", "ROTATION", "SCALE" ) 
 	--format "\n"; print ".frameButtonRcMenu()"
@@ -51,6 +51,7 @@ function frameButtonRcMenu frame =
 	if selection.count > 0 then
 	(
 		Menu.item	"Delete CURRENT KEY"	"(KeyFrameManager_v( #CURRENT )).removeKeys()"
+		Menu.item	"INSRERT KEY"	"(KeyFrameManager_v( #CURRENT )).insertKeys()"
 		
 		/*------------------------------------------------------------------------------
 			TRIM
