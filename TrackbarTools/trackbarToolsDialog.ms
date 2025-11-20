@@ -38,7 +38,7 @@ function trackbarToolsDialog =
 	Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 ) ini:(getSourceFileName())
 	--Dialog 	    = Dialog_v ("Test") --ini:(getSourceFileName())
 	
-	Dialog.Event #OPEN ("TrackbarTools = TrackbarTools_v("+Dialog.id as string +")")	tooltip:"PRESSED Tooltip"
+	Dialog.Event #OPEN ("ToolsCallback = TrackbarToolsCallback_v("+Dialog.id as string +")")	tooltip:"PRESSED Tooltip"
 
 	/* DIALOG CONTROLS */  
 	_Controls   = Dialog.Controls height:256
@@ -46,12 +46,12 @@ function trackbarToolsDialog =
 	--
 	--_Controls2   = Dialog.Controls group:("Main Controls2 " )
 	--_Button      = _Controls2.control #BUTTON "Btn 2" 
-	Dialog.addLocal "TrackbarTools" undefined
+	Dialog.addLocal "ToolsCallback" undefined
 	
 	Dialog.addLocal "is_playing_now" false
 	
 	_Timer = _Controls.control #TIMER "Timer" id:#clock interval:500 active:true
-	_Timer.Event #TICK ("if TrackbarTools != undefined then TrackbarTools.onTimerTick(is_playing_now)")
+	_Timer.Event #TICK ("if ToolsCallback != undefined then ToolsCallback.onTimerTick(is_playing_now)")
 
 	bar   = _Controls.control #imgTag "" id:#status_bar color:red width:dialog_width height:1 across:1 pos:[0,0] visible:false --align:#CENTER
 	
@@ -73,7 +73,7 @@ function trackbarToolsDialog =
 	
 	Play.Event #CHANGED "is_playing_now = not is_playing_now"	tooltip:"Play animation"
 	
-	FPS_ddl.Event #SELECTED  ("TrackbarTools.setInterval" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
+	FPS_ddl.Event #SELECTED  ("ToolsCallback.setInterval" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
 	--FPS_ddl.Event #ENTERED ("format \"VAL: %\n\"" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
 
 	
@@ -85,8 +85,8 @@ function trackbarToolsDialog =
 	_Phase_dropdown	= _Controls.control #DROPDOWN "[Phase]"	groupbox:_right.id across:2 align:#RIGHT offset:[ 6, 8 ]  width:44  offset:[ 0, 8 ] items:( for i = 1 to 10 collect i as string ) height:11
 	
 	--_Phase.Event #CHANGED (Dialog.id as string +".clock.interval = EventFired.val as integer" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	_Switch.Event #PRESSED ("TrackbarTools.jumpToPhase(-1)" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	_Switch.Event #RIGHTCLICK ("TrackbarTools.jumpToPhase(1)" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
+	_Switch.Event #PRESSED ("ToolsCallback.jumpToPhase(-1)" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
+	_Switch.Event #RIGHTCLICK ("ToolsCallback.jumpToPhase(1)" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
 	
 	_Phase_dropdown.Event #SELECTED ("PHASE_LENGTH = EventFired.val" )  --("format \"EventFired: %\n\" EventFired " ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
 
@@ -111,13 +111,13 @@ function trackbarToolsDialog =
 	_End    = _Controls.control #BUTTON "1"	id:#btn_range_end	 width:width_btn_small	height:32 Start:32	pos:[ pos_x += width_slider - align_slider_to_buttons,  pos_y + 4 ] tooltip:"Set Animation range END\n\nCTRL: Set RANGE END by last button"
 	
 	/* EVENTS */ 
-	_Slider.Event #CHANGED ("TrackbarTools.setFrame" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
+	_Slider.Event #CHANGED ("ToolsCallback.setFrame" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
 
-	_Srart.Event #PRESSED	"TrackbarTools.setAnimRange #START ( animationRange.start.frame - 1 )"	tooltip:" - 1 frame"
-	_Srart.Event #RIGHTCLICK	"TrackbarTools.setAnimRange #START ( animationRange.start.frame + 1 )"	tooltip:" + 1 frame"
+	_Srart.Event #PRESSED	"ToolsCallback.setAnimRange #START ( animationRange.start.frame - 1 )"	tooltip:" - 1 frame"
+	_Srart.Event #RIGHTCLICK	"ToolsCallback.setAnimRange #START ( animationRange.start.frame + 1 )"	tooltip:" + 1 frame"
 	
-	_End.Event #PRESSED	"TrackbarTools.setAnimRange #END ( animationRange.end.frame - 1 )"	tooltip:" - 1 frame"
-	_End.Event #RIGHTCLICK	"TrackbarTools.setAnimRange #END ( animationRange.end.frame + 1 )"	tooltip:" + 1 frame"
+	_End.Event #PRESSED	"ToolsCallback.setAnimRange #END ( animationRange.end.frame - 1 )"	tooltip:" - 1 frame"
+	_End.Event #RIGHTCLICK	"ToolsCallback.setAnimRange #END ( animationRange.end.frame + 1 )"	tooltip:" + 1 frame"
 
 	 
 	/** Get highlight color
@@ -143,7 +143,7 @@ function trackbarToolsDialog =
 		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:[ pos_x_button += width_button , pos_y ] highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] )
 		
 		
-		_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then TrackbarTools.selectObjectsWithKey( "+i_str +") else TrackbarTools.setFrame( "+i_str +")" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
+		_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else ToolsCallback.setFrame( "+i_str +")" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 		
 		_Frame_btn.Event #RIGHTCLICK ("frameButtonRcMenu( "+i_str +")" ) tooltip:( "Open menu" )
 
