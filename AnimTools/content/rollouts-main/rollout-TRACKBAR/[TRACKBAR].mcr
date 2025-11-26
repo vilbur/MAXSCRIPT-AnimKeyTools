@@ -100,17 +100,19 @@ icon:	"control:spinner|type:#integer|ACROSS:2|align:#LEFT|fieldwidth:48|range:[0
 	(
 		format "EventFired: %\n" EventFired	
 		
-		start = ROLLOUT_animation.SPIN_range.value
-		end   = ROLLOUT_animation.SPIN_to.value
+		animationRange = Interval EventFired.val animationRange.end
 		
-		if start >= end then
-		(
-			end = start + 1
-			
-			ROLLOUT_animation.SPIN_to.value = end
-		)
-		
-		animationRange = Interval start end
+		--start = ROLLOUT_animation.SPIN_range.value
+		--end   = ROLLOUT_animation.SPIN_to.value
+		--
+		--if start >= end then
+		--(
+		--	end = start + 1
+		--	
+		--	ROLLOUT_animation.SPIN_to.value = end
+		--)
+		--
+		--animationRange = Interval start end
 	)
 	
 )
@@ -126,17 +128,19 @@ icon:	"control:spinner|type:#integer|ACROSS:2|align:#LEFT|fieldwidth:48|range:[1
 	(
 		format "EventFired: %\n" EventFired	
 		
-		start = ROLLOUT_animation.SPIN_range.value
-		end   = ROLLOUT_animation.SPIN_to.value
+		animationRange = Interval animationRange.start EventFired.val
 		
-		if start >= end then
-		(
-			start = end - 1
-			
-			ROLLOUT_animation.SPIN_range.value = start
-		)
-			
-		animationRange = Interval start end
+		--start = ROLLOUT_animation.SPIN_range.value
+		--end   = ROLLOUT_animation.SPIN_to.value
+		--
+		--if start >= end then
+		--(
+		--	start = end - 1
+		--	
+		--	ROLLOUT_animation.SPIN_range.value = start
+		--)
+		--	
+		--animationRange = Interval start end
 	)
 	
 )

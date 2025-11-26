@@ -9,11 +9,28 @@ struct TrackbarToolsCallback_v
 	_rollout,
 	
 	/* properties */
-	
+	--buttons = Dictionary #INTEGER,
+	buttons,
 	/* private */
 	green_color = COLOR_NAMES[#GREEN_DARK], -- coor active frame button 
 	
 	anim_button_state,
+	
+	hwnd_slider_tools,
+		
+	hwnd_slider_default,
+		
+	/** Update ui
+	 */
+	function updateUi =
+	(
+		--format "\n"; print "TrackbarToolsCallback_v.updateUi()"
+		this.setAnimRange animationRange.start animationRange.end
+		
+		this.showHideButtonsInRange currentTime.frame
+		
+		this.setFrame currentTime.frame		
+	),
 	
 	/** On timer tick
 	 */
@@ -31,17 +48,28 @@ struct TrackbarToolsCallback_v
 		_rollout.status_bar.visible = animButtonState
 
 		current_frame = currentTime.frame as integer
+
+
+		this.alignTimeSliders()
 		
+		
+		/* ENABLE CURRENT FRAME BUTTON */ 
+		this.updateButtons(frame)
 		
 		/* UPDATE CURRENT FRAME */ 
 		if not is_playing_now then
 		(
-			if this._sliderValue() != sliderTime.frame then
+			--_rollout.slider_time = sliderTime.frame
+		
+			--if this._sliderValue() != sliderTime.frame then
+			if _rollout.slider_time != sliderTime.frame then
 				this.setFrame sliderTime.frame
+
+			_rollout.slider_time = sliderTime.frame
 			
 		)
-		else /* SET NEXT FRAME OF PALYING ANIMATION */ 
-			this.setNextFrame()
+		--else /* SET NEXT FRAME OF PALYING ANIMATION */ 
+		--	this.setNextFrame()
 			
 			
 		/*
@@ -57,10 +85,10 @@ struct TrackbarToolsCallback_v
 
 			
 		/* SYNC WITH GLOBAL VAROABLE */
-		if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
-			_rollout.DL_phase.selection = PHASE_LENGTH
-
-
+		--if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
+		--	_rollout.DL_phase.selection = PHASE_LENGTH
+		--
+		
 		/* IF STATE OF ANIMATION MODE IS CHANGED */ 
 		if anim_button_state != animButtonState then
 		(
@@ -70,12 +98,60 @@ struct TrackbarToolsCallback_v
 			if ( frame_button = this._getFrameButton current_frame ) != undefined then
 			(
 				frame_button.highlightColor = (this.getFrameButtonColor current_frame)
-	
+		
 				frame_button.state = false
 				frame_button.state = true
 			)
 		)
+
+	),
+	
+	/** Align time sliders
+	 */
+	function alignTimeSliders =
+	(
+		--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
+		--hwnd_slider_tools = if ( window_data = windows.getChildHWND 0 "Time Slider Tools" parent:#max ) != undefined then window_data[1]
+		--
+		--hwnd_slider_default = if ( window_data = windows.getChildHWND 0 "Time Slider" parent:#max ) != undefined then window_data[1]
+
 		
+		if hwnd_slider_tools != undefined and hwnd_slider_default != undefined then 
+		(
+			slider_tools_pos = windows.getWindowPos hwnd_slider_tools
+			--format "slider_tools_pos: %\n" slider_tools_pos
+			slider_default_pos = windows.getWindowPos hwnd_slider_default
+			
+			if slider_default_pos.x != slider_tools_pos.x then
+			--if slider_default_pos.x != slider_tools_pos.x or slider_default_pos.w != slider_tools_pos.w then
+			(
+				
+				slider_default_height = 95
+		
+				slider_default_pos_new = Box2 (slider_default_pos.x) (slider_default_pos.y) (slider_tools_pos.w ) (slider_default_height)  -- return
+				
+				/* RESIZE SLIDER */
+				windows.setWindowPos hwnd_slider_default slider_default_pos_new true
+				
+				slider_tools_pos = windows.getWindowPos hwnd_slider_tools
+				slider_default_pos = windows.getWindowPos hwnd_slider_default
+				
+				slider_tools_pos_new = Box2 (slider_default_pos.x) (slider_default_pos.y + slider_default_height) (slider_tools_pos.w ) (slider_tools_pos.h)  -- return
+				
+				/* ALIGN POSITION SLIDER */
+				windows.setWindowPos hwnd_slider_tools slider_tools_pos_new true
+			)
+			
+		)
+		
+	),
+	
+	/** Get child window
+	 */
+	function getChildWindow title =
+	(
+		--format "\n"; print "TrackbarToolsCallback_v.getChildWindow()"
+		if ( window_data = windows.getChildHWND 0 title parent:#max ) != undefined then window_data[1] --return
 	),
 	
 	/* set frame */ 
@@ -85,22 +161,20 @@ struct TrackbarToolsCallback_v
 		--format "frame: %\n" frame
 
 		frame = frame as integer
-		--format "FRAME: %\n" FRAME
-		if not this.isInRange(frame) then
-			return false
+
+		--if not this.isInRange(frame) then
+			--return false
 		
 		sliderTime = frame
 		
 		/*------------------------------------------------------------------------------
 			SYNC CONTROLS 
 		--------------------------------------------------------------------------------*/
-		
-		/* ENABLE CURRENT FRAME BUTTON */ 
-		this.updateButtons(frame)
+
 
 		
 		/* SLIDER */ 
-		_rollout.slider_current_time.value = frame
+		--_rollout.slider_current_time.value = frame
 	),
 	
 	/** Set interval
@@ -162,29 +236,88 @@ struct TrackbarToolsCallback_v
 	function updateButtons frame =
 	(
 		--format "\n"; print "TrackbarTools_v.updateButtons()"
-
-		buttons = this._getFrameButtons()
-
-		phase_lenght = this._getPhaseLenght()
-		--format "phase_lenght: %\n" phase_lenght
 		
-		phase_start = frame - phase_lenght
-		--format "phase_start: %\n" phase_start
+		if buttons == undefined then 
+			buttons = this._getFrameButtons()
+
+		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
+		--format "frames_in_range: %\n" frames_in_range
+		visible_buttons = for btn in buttons where btn.visible collect btn 
 		
-		/* DISBALE OTHER FRAME BUTTONS */ 
-		for key in sort buttons.keys do
+		--hwnd_slider_default = this.getChildWindow "Time Slider"
+		
+		dialog_width = (windows.getWindowPos hwnd_slider_default).w
+		buttons_area = dialog_width - 108
+		
+		--btn_width = (buttons_area / frames_in_range) as integer
+		btn_width = (buttons_area / (frames_in_range ) ) 
+		--format "dialog_size: %\n" dialog_size
+		--format "visible_buttons[1].text: %\n" visible_buttons[1].text
+		
+		
+
+		--pos_x = 36
+		pos_x = 54
+		
+		if visible_buttons[1].text as integer != animationRange.start.frame as integer then
+			for i = 1 to buttons.count do
+				buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
+
+		--format "visible_buttons.count: %\n" visible_buttons.count
+		--format "frames_in_range: %\n" frames_in_range
+		--format "TEST: %\n" (visible_buttons.count != frames_in_range)
+				
+		if visible_buttons.count != frames_in_range then
 		(
-			is_current_frame_button = key == frame
+			--format "\n"
+			--format "frames_in_range: %\n" frames_in_range
+			--format "dialog_width: %\n" dialog_width
+			--format "buttons_area: %\n" buttons_area
+			--format "btn_width: %\n" btn_width
+			for i = 1 to buttons.count do
+			(
+				
+				
+				
+				buttons[i].visible = i <= frames_in_range
+				buttons[i].width   = btn_width
+				buttons[i].pos.x   = pos_x
+				
+				pos_x += btn_width
+				
+				--format "pos_x: %\n" pos_x
+				--buttons[i].text = "i as string"
+				
+				--if i <= frames_in_range then
+					--format "pos_x: %\n" pos_x
+			)
 			
-			buttons[key].state = is_current_frame_button
-			
-			buttons[key].highlightColor = this.getFrameButtonColor frame
 		)
 		
+		
+		
+		--format "buttons[frames_in_range]: %\n" buttons[frames_in_range].pos.x
+		--dialog_width = buttons[frames_in_range].pos.x	+ btn_width + 18
+
+		--setDialogSize _rollout [ dialog_width, dialog_size.y ]
+		
+		--phase_lenght = this._getPhaseLenght()
+		
+		--phase_start = frame - phase_lenght
+		
+		--/* DISBALE OTHER FRAME BUTTONS */ 
+		--for key in sort buttons.keys do
+		--(
+		--	is_current_frame_button = key == frame
+		--	
+		--	buttons[key].state = is_current_frame_button
+		--	
+		--	buttons[key].highlightColor = this.getFrameButtonColor frame
+		--)
+		
 		/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
-		for key in sort buttons.keys do
-			--buttons[key].text = if key > frame and key < frame + phase_lenght then  "[ "+ key as string +" ]" else key as string
-			buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
+		--for key in sort buttons.keys do
+			--buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
 	),
 	
 	/* Go to frame
@@ -274,23 +407,7 @@ struct TrackbarToolsCallback_v
 			this.setFrame shift_frame
 	),
 
-	/** Get frame buttons
-	 */
-	function _getFrameButtons =
-	(
-		--format "\n"; print "._getFrameButtons()"
-		buttons	=  Dictionary #INTEGER
-		--format "_rollout.controls: %\n" _rollout.controls
-		--for ctrl in _rollout.controls do
-		--format "ctrl: %\n" ctrl
-		
-		--buttons = for ctrl in _rollout.controls where matchPattern ctrl.name pattern:("btn_frame_*") collect ctrl
-		only_frame_buttons = for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl
-		
-		for i = 0 to only_frame_buttons.count - 1 collect buttons[i] = only_frame_buttons[i +1]
-		
-		buttons --return
-	),
+
 	
 	/** Get frame button
 	 */
@@ -332,10 +449,7 @@ struct TrackbarToolsCallback_v
 	on create do
 	(
 		format "\n"; print "TrackbarTools_v.onCreate()"
-		this.setAnimRange animationRange.start animationRange.end
-		
-		this.showHideButtonsInRange currentTime.frame
-		
-		this.setFrame currentTime.frame
+		hwnd_slider_tools = this.getChildWindow "Time Slider Tools"
+		hwnd_slider_default = this.getChildWindow "Time Slider"
 	)
 )
