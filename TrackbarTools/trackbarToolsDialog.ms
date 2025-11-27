@@ -83,7 +83,7 @@ function trackbarToolsDialog =
 	_Timer = _Controls.control #TIMER "Timer" id:#clock interval:500 active:true
 	
 	--_Timer.Event #TICK ("if trackbarDialogTicker != undefined then ToolsCallback.onTimerTick(is_playing_now)")
-	--_Timer.Event #TICK ("TrackbarDialogTicker.onTimerTick(is_playing_now)")
+	_Timer.Event #TICK ("TrackbarDialogTicker.onTimerTick(is_playing_now)")
 
 	/*------------------------------------------------------------------------------
 		COLORED BAR OT TOP OF DIALOG
@@ -174,22 +174,25 @@ function trackbarToolsDialog =
 		--_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:[ 0, 0 ] 	highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] )
 		
 		
-		_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else ToolsCallback.setFrame( "+i_str +")" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
+		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else ToolsCallback.setFrame( "+i_str +")" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 		
-		_Frame_btn.Event #RIGHTCLICK ("frameButtonRcMenu( "+i_str +")" ) tooltip:( "Open menu" )
+		--_Frame_btn.Event #RIGHTCLICK ("frameButtonRcMenu( "+i_str +")" ) tooltip:( "Open menu" )
 
 	)
 	
-	
+	--Dialog
 	
 	/*------------------------------------------------------------------------------
 		DIALOG CREATE
 	------------------------------------------------------------------------------*/
 	--------Dialog.create()
-	Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
-	--Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
-	Dialog.dock #BOTTOM
+	--Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
+	Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
+	--Dialog.dock #BOTTOM
+	--format "Dialog: %\n" Dialog
 	
-	--Dialog.register()
+	--format "Dialog_rollout.is_playing_now: %\n" Dialog_rollout.is_playing_now
+	
+	Dialog.register()
 	
 )
