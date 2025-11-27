@@ -27,15 +27,13 @@ struct TrackbarDialogTicker_v
 	
 	anim_button_state,
 	
-	hwnd_buttons,
-		
-	hwnd_slider_default,
-	
-	slider_pos_size,
+	buttons_hwnd,
 	
 	buttons_size_pos,
+		
+	slider_hwnd,
 	
-	slider_default_pos,
+	slider_pos_size,
 	
 	maxwin_pos_size = windows.getWindowPos ( windows.getMAXHWND() ),
 		
@@ -43,7 +41,7 @@ struct TrackbarDialogTicker_v
 	viewport_bottom_padding = 56,
 	--viewport_bottom_padding = 64,
 	viewport_width,
-	--slider_width,
+	slider_width,
 	
 	dock_state,
 	
@@ -64,61 +62,94 @@ struct TrackbarDialogTicker_v
 	function onTimerTick is_playing_now =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.onTimerTick()"
-		hwnd_buttons = this.getChildWindow "Time Slider Tools"
-		hwnd_slider_default = this.getChildWindow "Time Slider"
+		buttons_hwnd = this.getChildWindow "Time Slider Tools"
+		slider_hwnd = this.getChildWindow "Time Slider"
 		--/* SHOW \ HIDE RED STRIP ON TOP OF ROLLOUT IF AINMATION MODE IS ACTIVE */ 
 		--_rollout.status_bar.visible = animButtonState
 		--
 		--format "Dialog: %\n" Dialog
-		--format "hwnd_buttons: %\n" hwnd_buttons
+		--format "\n"
+		--format "buttons_hwnd: %\n" buttons_hwnd
+		--format "slider_hwnd:  %\n" slider_hwnd
 		--current_frame = currentTime.frame as integer
 		--is_docked =	cui.getDockState _rollout != #cui_floatable
+		update_buttons = false
+		--dock_state = if slider_hwnd	== undefined then #DOCKED else #UNDOCKED
+		chenage_window_position = true
 		
-		dock_state = if hwnd_slider_default	== undefined then #DOCKED else #UNDOCKED
+		if buttons_hwnd != undefined then 
+			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
+		slider_docked  = slider_hwnd  == undefined 
+		buttons_docked = buttons_hwnd == undefined 
 
-		if hwnd_slider_default != undefined then 
-			slider_default_pos = windows.getWindowPos hwnd_slider_default
+		if slider_hwnd != undefined then 
+			slider_pos_size = windows.getWindowPos slider_hwnd
 
-		
-		if hwnd_buttons == undefined and hwnd_slider_default == undefined then
-		(
-			cui.UnRegisterDialogBar _rollout
-			
-			
-		)
-
-		
-		/* IF NOT DOCKED */ 
-		if hwnd_buttons != undefined then
-		(
-	
-			buttons_size_pos = windows.getWindowPos hwnd_buttons
-
-
-			--format "buttons_size_pos: %\n" buttons_size_pos
-			
-			
 			buttons_size_pos_bak = copy buttons_size_pos
-	
+		
+
+		
 			this.setSliderWidth()
+
+		/* IF SLIDER DOCKED */ 
+		--if buttons_hwnd == undefined and slider_hwnd == undefined then
+		if slider_docked then
+		(
+			--slider_width = maxwin_pos_size.w
+		
+			if not buttons_docked then
+			(
+				--slider_width -= 32
+			
+				cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
+				
+				cui.DockDialogBar _rollout #cui_dock_bottom
+				
+				--chenage_window_position = false
+				
+				update_buttons = true
+			)
+		)
+		
+		/* IF SLIDER UN-DOCKED */ 
+		if not slider_docked then
+		(
+			--format "\nSLIDER UN-DOCKED"
 			
 			this.alignTimeSliders()
-			--format "\n"
-			--format "buttons_size_pos:   %\n" buttons_size_pos
-			--format "slider_default_pos: %\n" slider_default_pos
-			if buttons_size_pos != buttons_size_pos_bak then 
-				windows.setWindowPos hwnd_buttons buttons_size_pos true
+			--
+			--/* IF BUTTONS UN-DOCKED */ 
+			if buttons_docked then
+			(
+				
+				--try(
+					cui.UnRegisterDialogBar _rollout
+				--	true
+				--)catch(false)
+						buttons_hwnd = this.getChildWindow "Time Slider Tools"
+
+			)
+
+			if buttons_size_pos != buttons_size_pos_bak then
+				windows.setWindowPos buttons_hwnd buttons_size_pos true
+
+
+			--(
+			--	
+			--	/* SET DEFAULT TIME SLIDER POSITION */ 
+			--		windows.setWindowPos slider_hwnd slider_pos_size true
+			--	
+			--)
 	
-			/* SET DEFAULT TIME SLIDER POSITION */ 
-			if hwnd_slider_default != undefined then 
-				windows.setWindowPos hwnd_slider_default slider_default_pos true
-			
+				update_buttons = true
 		)
 		
-		/* ENABLE CURRENT FRAME BUTTON */ 
-		this.updateButtons(frame)
+		if update_buttons then
+			this.updateButtons(frame)
 		
+		
+		--CompleteRedraw()
 		--/* UPDATE CURRENT FRAME */ 
 		--if not is_playing_now then
 		--(
@@ -174,10 +205,13 @@ struct TrackbarDialogTicker_v
 	function setSliderWidth =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.setSliderWidth()"
+		--format "slider_hwnd:  %\n" slider_hwnd
+		--format "buttons_hwnd: %\n" buttons_hwnd
+		
 		slider_width = case of
 		(
-			(hwnd_slider_default	!= undefined): slider_default_pos.w
-			(hwnd_buttons	!= undefined): buttons_size_pos.w
+			(slider_hwnd	!= undefined): slider_pos_size.w
+			--(buttons_hwnd	!= undefined): buttons_size_pos.w
 			default: maxwin_pos_size.w
 		)
 		
@@ -208,21 +242,24 @@ struct TrackbarDialogTicker_v
 		
 
 		
-		if hwnd_slider_default != undefined then
+		if slider_hwnd != undefined then
 		(
+			--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
+			
 			/* RESET POSITION */ 
 			translate buttons_size_pos [ -buttons_size_pos.x, -buttons_size_pos.y ]
+		--format "buttons_size_pos: %\n" buttons_size_pos
+		--format "slider_pos_size: %\n" slider_pos_size
+			--center_position maxwin_pos_size.center.x  - ( -slider_pos_size.w / 2 )
 		
-			--center_position maxwin_pos_size.center.x  - ( -slider_default_pos.w / 2 )
-		
-			--translate slider_default_pos [ 0, -slider_default_pos.y ]
+			--translate slider_pos_size [ 0, -slider_pos_size.y ]
 			
 			/* MOVE IT TO BOTTOM */ 
-			--translate slider_default_pos [ 0, maxwin_pos_size.h - viewport_bottom_padding - slider_default_pos.h - buttons_size_pos.h ]
+			--translate slider_pos_size [ 0, maxwin_pos_size.h - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h ]
 	
-			--slider_default_pos.h = 95
+			--slider_pos_size.h = 95
 
-			translate buttons_size_pos [ slider_default_pos.x, slider_default_pos.bottom ]
+			translate buttons_size_pos [ slider_pos_size.x, slider_pos_size.bottom ]
 			
 		)
 		else
@@ -261,19 +298,26 @@ struct TrackbarDialogTicker_v
 			buttons = this._getFrameButtons()
 		--
 		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
-		----format "frames_in_range: %\n" frames_in_range
-		visible_buttons = for btn in buttons where btn.visible collect btn 
-		--format "visible_buttons: %\n" visible_buttons
-		--hwnd_slider_default = this.getChildWindow "Time Slider"
-		
-		
-		dialog_width = if hwnd_buttons != undefined then ( windows.getWindowPos hwnd_buttons).w else maxwin_pos_size.w
 
-		buttons_area = dialog_width - 108
+		visible_buttons = for btn in buttons where btn.visible collect btn 
+
+		
+		--dialog_width = if buttons_hwnd != undefined then ( windows.getWindowPos buttons_hwnd).w else maxwin_pos_size.w
+		--if visible_buttons.count != frames_in_range then
+		(
+			buttons_area = slider_width - 108
+
+			if slider_hwnd == undefined then
+				buttons_area -= 20
+		
+		--format "\n"; print "TrackbarDialogTicker_v.updateButtons()"
+		--format "slider_width: %\n" slider_width
+		--format "buttons_area: %\n" buttons_area
+		--format "frames_in_range: %\n" frames_in_range
 		--
 		----btn_width = (buttons_area / frames_in_range) as integer
 		btn_width = (buttons_area / (frames_in_range ) ) 
-		
+		--format "btn_width: %\n" btn_width
 		pos_x = 54
 		
 		if visible_buttons[1].text as integer != animationRange.start.frame as integer then
@@ -287,8 +331,6 @@ struct TrackbarDialogTicker_v
 			--format "\n"	
 			--format "visible_buttons.count: %\n" visible_buttons.count
 			--format "frames_in_range: %\n" frames_in_range
-		if visible_buttons.count != frames_in_range then
-		(
 			--format "\n"
 			--format "frames_in_range: %\n" frames_in_range
 			--format "dialog_width: %\n" dialog_width
@@ -390,8 +432,8 @@ struct TrackbarDialogTicker_v
 	on create do
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.onCreate()"
-		--hwnd_buttons = this.getChildWindow "Time Slider Tools"
-		--hwnd_slider_default = this.getChildWindow "Time Slider"
+		--buttons_hwnd = this.getChildWindow "Time Slider Tools"
+		--slider_hwnd = this.getChildWindow "Time Slider"
 		
 		this.viewport_width = this.setViewportWidth()
 	)

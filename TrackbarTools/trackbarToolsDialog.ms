@@ -94,7 +94,7 @@ function trackbarToolsDialog =
 	/*------------------------------------------------------------------------------
 		GROUPBOXES DEFINITION
 	------------------------------------------------------------------------------*/
-	_left   = _Controls.control #GroupBox "" id:#FRAMES_CONTROLS	width:width_groupbox pos:[ 0, 1 ] across:3
+	--_left   = _Controls.control #GroupBox "" id:#FRAMES_CONTROLS	width:width_groupbox pos:[ 0, 1 ] across:3
 	--_right  = _Controls.control #GroupBox "" id:#PHASE_CONTROLS	width:width_groupbox pos:[ dialog_width - width_groupbox, 1 ]
 	
 	
@@ -102,7 +102,7 @@ function trackbarToolsDialog =
 	/*------------------------------------------------------------------------------
 		LEFT GROUPBOX CONTROLS   
 	--------------------------------------------------------------------------------*/  
-	Play	= _Controls.control #CHECKBUTTON	"P L A Y"	groupbox:_left.id across:1 width:width_groupbox height:height_btn_big offset:[ 0, -16 ] color:COLOR_NAMES[#DARKGREEN]
+	--Play	= _Controls.control #CHECKBUTTON	"P L A Y"	groupbox:_left.id across:1 width:width_groupbox height:height_btn_big offset:[ 0, -16 ] color:COLOR_NAMES[#DARKGREEN]
 	--FPS_label	= _Controls.control #LABEL	"FPS"	groupbox:_left.id across:2 align:#LEFT  offset:[ 0, 10 ] 
 	--FPS_ddl	= _Controls.control #DROPDOWN	"[FPS]"	groupbox:_left.id across:2 align:#RIGHT offset:[ 6, 8 ]  width:48  offset:[ 0, 8 ] items:#( "24", "12", "6", "4", "2", "1" ) value:4 
 	
@@ -170,7 +170,8 @@ function trackbarToolsDialog =
 		
 		
 		
-		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:pos highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] ) --visible:( i < visible_buttons )
+		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:pos highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] ) visible:true
+		--_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:pos highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] ) --visible:( i < visible_buttons )
 		--_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:[ 0, 0 ] 	highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] )
 		
 		
@@ -186,13 +187,13 @@ function trackbarToolsDialog =
 		DIALOG CREATE
 	------------------------------------------------------------------------------*/
 	--------Dialog.create()
-	--Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
-	Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
+	Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
+	--Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
 	--Dialog.dock #BOTTOM
 	--format "Dialog: %\n" Dialog
 	
 	--format "Dialog_rollout.is_playing_now: %\n" Dialog_rollout.is_playing_now
 	
-	Dialog.register()
+	--Dialog.register()
 	
 )
