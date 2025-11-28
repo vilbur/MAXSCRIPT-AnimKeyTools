@@ -67,37 +67,29 @@ struct TrackbarDialogTicker_v
 		--/* SHOW \ HIDE RED STRIP ON TOP OF ROLLOUT IF AINMATION MODE IS ACTIVE */ 
 		--_rollout.status_bar.visible = animButtonState
 		--
-		--format "Dialog: %\n" Dialog
-		--format "\n"
-		--format "buttons_hwnd: %\n" buttons_hwnd
-		--format "slider_hwnd:  %\n" slider_hwnd
-		--current_frame = currentTime.frame as integer
-		--is_docked =	cui.getDockState _rollout != #cui_floatable
-		update_buttons = false
-		--dock_state = if slider_hwnd	== undefined then #DOCKED else #UNDOCKED
-		chenage_window_position = true
+		slider_docked  = slider_hwnd  == undefined 
+		buttons_docked = buttons_hwnd == undefined 
 		
 		if buttons_hwnd != undefined then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
-		slider_docked  = slider_hwnd  == undefined 
-		buttons_docked = buttons_hwnd == undefined 
 
 		if slider_hwnd != undefined then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 
-			buttons_size_pos_bak = copy buttons_size_pos
 		
+		update_buttons = false
 
+		chenage_window_position = true
+
+		buttons_size_pos_bak = copy buttons_size_pos
 		
-			this.setSliderWidth()
+		/* SET WIDTH OF SLIDER */ 
+		this.setSliderWidth()
 
 		/* IF SLIDER DOCKED */ 
-		--if buttons_hwnd == undefined and slider_hwnd == undefined then
 		if slider_docked then
 		(
-			--slider_width = maxwin_pos_size.w
-		
 			if not buttons_docked then
 			(
 				--slider_width -= 32
@@ -116,37 +108,29 @@ struct TrackbarDialogTicker_v
 		if not slider_docked then
 		(
 			--format "\nSLIDER UN-DOCKED"
-			
 			this.alignTimeSliders()
-			--
-			--/* IF BUTTONS UN-DOCKED */ 
+			
+			/* IF BUTTONS UN-DOCKED */ 
 			if buttons_docked then
 			(
-				
-				--try(
-					cui.UnRegisterDialogBar _rollout
-				--	true
-				--)catch(false)
-						buttons_hwnd = this.getChildWindow "Time Slider Tools"
+				cui.UnRegisterDialogBar _rollout
 
+				buttons_hwnd = this.getChildWindow "Time Slider Tools"
 			)
 
 			if buttons_size_pos != buttons_size_pos_bak then
-				windows.setWindowPos buttons_hwnd buttons_size_pos true
 
+			/* SET POSITION OF BUTTONS WINDOW */ 
+			windows.setWindowPos buttons_hwnd buttons_size_pos true
 
-			--(
-			--	
 			--	/* SET DEFAULT TIME SLIDER POSITION */ 
-			--		windows.setWindowPos slider_hwnd slider_pos_size true
-			--	
-			--)
+			--windows.setWindowPos slider_hwnd slider_pos_size true
 	
-				update_buttons = true
+			update_buttons = true
 		)
 		
-		if update_buttons then
-			this.updateButtons(frame)
+		--if update_buttons then
+			this.updateButtons(update_buttons)
 		
 		
 		--CompleteRedraw()
@@ -219,33 +203,22 @@ struct TrackbarDialogTicker_v
 		buttons_size_pos.w = slider_width
 	),
 	
+	
+	
+	
 	/** Align time sliders
 	 */
 	function alignTimeSliders =
 	(
 		--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
 		
-		--pos_y = maxwin_pos_size.h - viewport_bottom_padding - buttons_size_pos.h
-		--translate buttons_size_pos [ 0, -buttons_size_pos.y + maxwin_pos_size.h ]
-		--translate buttons_size_pos [ 0, -buttons_size_pos.y ]
-		
-		/* RESET WINNDOW TO X POSITION */ 
-		--translate buttons_size_pos [ -buttons_size_pos.x, 0 ]
-		--format "buttons_size_pos: %\n" buttons_size_pos
-
 		/* FIND LEFT TOP CORNER OF WINDOW ALIGNEND TO CENTER */ 
 		--centered_pos = [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
+		--/* MOVE WINDOW TO CENTERED POSTION */ 
 		
-		--format "buttons_size_pos: %\n" buttons_size_pos
-		/* MOVE WINDOW TO CENTERED POSTION */ 
-		--translate buttons_size_pos centered_pos
-		
-
 		
 		if slider_hwnd != undefined then
 		(
-			--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
-			
 			/* RESET POSITION */ 
 			translate buttons_size_pos [ -buttons_size_pos.x, -buttons_size_pos.y ]
 		--format "buttons_size_pos: %\n" buttons_size_pos
@@ -264,9 +237,6 @@ struct TrackbarDialogTicker_v
 		)
 		else
 			translate buttons_size_pos [ 0, -viewport_bottom_padding ]
-			
-			
-									
 	),
 	
 	/** Get child window
@@ -290,56 +260,36 @@ struct TrackbarDialogTicker_v
 	
 	/** Update buttons
 	 */
-	function updateButtons frame =
+	function updateButtons update_buttons =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.updateButtons()"
 		
 		if buttons == undefined then 
 			buttons = this._getFrameButtons()
-		--
+		
+		
 		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
 
 		visible_buttons = for btn in buttons where btn.visible collect btn 
 
-		
-		--dialog_width = if buttons_hwnd != undefined then ( windows.getWindowPos buttons_hwnd).w else maxwin_pos_size.w
-		--if visible_buttons.count != frames_in_range then
+
+		if update_buttons or visible_buttons.count != frames_in_range then
 		(
 			buttons_area = slider_width - 108
 
 			if slider_hwnd == undefined then
 				buttons_area -= 20
-		
-		--format "\n"; print "TrackbarDialogTicker_v.updateButtons()"
-		--format "slider_width: %\n" slider_width
-		--format "buttons_area: %\n" buttons_area
-		--format "frames_in_range: %\n" frames_in_range
-		--
-		----btn_width = (buttons_area / frames_in_range) as integer
-		btn_width = (buttons_area / (frames_in_range ) ) 
-		--format "btn_width: %\n" btn_width
-		pos_x = 54
-		
-		if visible_buttons[1].text as integer != animationRange.start.frame as integer then
-			for i = 1 to buttons.count do
-				buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
-		
-		--format "visible_buttons.count: %\n" visible_buttons.count
-		--format "frames_in_range: %\n" frames_in_range
-		--format "TEST: %\n" (visible_buttons.count != frames_in_range)
 			
-			--format "\n"	
-			--format "visible_buttons.count: %\n" visible_buttons.count
-			--format "frames_in_range: %\n" frames_in_range
-			--format "\n"
-			--format "frames_in_range: %\n" frames_in_range
-			--format "dialog_width: %\n" dialog_width
-			--format "buttons_area: %\n" buttons_area
-			--format "btn_width: %\n" btn_width
+			btn_width = (buttons_area / (frames_in_range ) ) 
+	
+			pos_x = 54
+			
+			if visible_buttons[1].text as integer != animationRange.start.frame as integer then
+				for i = 1 to buttons.count do
+					buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
+		
 			for i = 1 to buttons.count do
 			(
-				
-				
 				
 				buttons[i].visible = i <= frames_in_range
 				buttons[i].width   = btn_width
@@ -355,8 +305,6 @@ struct TrackbarDialogTicker_v
 			)
 			
 		)
-		
-		
 		
 		--format "buttons[frames_in_range]: %\n" buttons[frames_in_range].pos.x
 		--dialog_width = buttons[frames_in_range].pos.x	+ btn_width + 18
