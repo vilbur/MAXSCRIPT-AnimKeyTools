@@ -1,4 +1,4 @@
-clearListener(); print("Cleared in:\n"+getSourceFileName())
+--clearListener(); print("Cleared in:\n"+getSourceFileName())
 
 format "\nDEFINE GLOBALS"
 
@@ -11,7 +11,7 @@ global ROLLOUT_phasemaker_controls
 if PHASE_LENGTH == undefined then 
 	global PHASE_LENGTH = 1
 
-
+--format "XmlParser_v: %\n" XmlParser_v
 
 /*------------------------------------------------------------------------------
 	DEPENDENCY

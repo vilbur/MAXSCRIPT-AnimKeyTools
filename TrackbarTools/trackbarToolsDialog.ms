@@ -61,6 +61,7 @@ function trackbarToolsDialog =
 	
 	/* DIALOG EVENTS */ 
 	Dialog.Event #OPEN ("ToolsCallback = TrackbarToolsCallback_v("+Dialog.id as string +")")	tooltip:"PRESSED Tooltip"
+	Dialog.Event #UNDOCKED "print\"XXX\""
 
 	/* DIALOG CONTROLS */  
 	_Controls   = Dialog.Controls height:256

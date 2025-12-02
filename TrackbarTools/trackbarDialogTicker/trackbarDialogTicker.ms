@@ -70,6 +70,15 @@ struct TrackbarDialogTicker_v
 		slider_docked  = slider_hwnd  == undefined 
 		buttons_docked = buttons_hwnd == undefined 
 		
+		if slider_hwnd == undefined then
+		(
+			--format "slider_hwnd: %\n" slider_hwnd
+			hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
+
+			--format "hwnd: %\n" hwnd
+			
+		)
+		
 		if buttons_hwnd != undefined then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
@@ -77,6 +86,9 @@ struct TrackbarDialogTicker_v
 		if slider_hwnd != undefined then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 
+			
+			
+			
 		
 		update_buttons = false
 
