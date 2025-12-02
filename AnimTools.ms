@@ -1,6 +1,8 @@
 
 filein( getFilenamePath(getSourceFileName()) + "/includes.ms" )	--"./includes.ms"
 
+filein( getFilenamePath(getSourceFileName()) + "/AnimTools/Lib/showTimeSlider/showTimeSlider.ms" )	--"./AnimTools/Lib/showTimeSlider/showTimeSlider.ms"
+
 /** Load content and create dialog
  */
 function loadContentAndCreateDialog =

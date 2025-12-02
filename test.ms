@@ -7,61 +7,41 @@ Full sequence: save temp → reset → delete temp
 */
 function resetWorkspaceWithTemporary =
 (
-
-	/* Save temporary workspace same as current one
-	   
-	   USED TO FORCE RELOAD WORKSPACE AFTER CHANGE IN FILE
-	
-	*/
-	function makeTemporaryWorkspace current_identifier =
-	(
-		--current_identifier = WorkspaceManager.GetCurrentWorkspaceIdentifier()
-		temp_identifier = current_identifier + "_temp"
-		format "temp_identifier: %\n" temp_identifier
-		temp_name = WorkspaceManager.GetWorkspaceNameWithIdentifier current_identifier + " (TEMP)"
-	
-		WorkspaceManager.CreateNewWorkspace temp_identifier temp_name
-	
-		/* return identifier for later use -- return */
-		temp_identifier
-	)
-
 	/* GET CURRENT WORKSPACE */ 
-    current_identifier = WorkspaceManager.GetCurrentWorkspaceIdentifier()
+    current_workspace = WorkspaceManager.GetCurrentWorkspaceIdentifier()
 
-	workspace_file = (getDir #TEMP) + "\\..\\en-US\\UI\\Workspaces\\" + current_identifier + ".maxsettings"
+	workspace_file = (getDir #TEMP) + "\\..\\en-US\\UI\\Workspaces\\" + current_workspace + ".maxsettings"
 
 	/* GET TEMPORARY WORKSPACE */ 
-    temp_identifier = makeTemporaryWorkspace(current_identifier)
+	temp_workspace = current_workspace + "_temp"
+
+	--temp_name = WorkspaceManager.GetWorkspaceNameWithIdentifier current_workspace + " (TEMP)"
+
+	WorkspaceManager.CreateNewWorkspace temp_workspace temp_workspace
+
 	
-	/* CHANGE CURRENT WORKSPACE */ 
-	WorkspaceManager.SetCurrentWorkspaceByIdentifier temp_identifier
+	/* CHANGE CURRENT WORKSPACE TO TEMP */ 
+	WorkspaceManager.SetCurrentWorkspaceByIdentifier temp_workspace
 
 	/* XmlParser */
 	XmlParser = XmlParser_v(workspace_file)
 	
 	element = XmlParser.getElement "SystemSettings"
-	format "ELEMENT: %\n" element
 	
 	/* SET TRACKBAR VISIBLE */ 
-	show_trackbar_state = XmlParser.getAttribute element "ShowTrackbar"
-	format "SHOW_TRACKBAR_STATE: %\n" show_trackbar_state
-	
-	
-	/* SET ATTRIBUTE VALUE */ 
 	XmlParser.setAttribute element "ShowTrackbar" "true"
-	show_trackbar_state = XmlParser.getAttribute element "ShowTrackbar"
-	format "SHOW_TRACKBAR_STATE: %\n" show_trackbar_state
+
 	
-	WorkspaceManager.SetCurrentWorkspaceByIdentifier current_identifier
+	/* REVERT CURRENT WORKSPACE */ 
+	WorkspaceManager.SetCurrentWorkspaceByIdentifier(current_workspace)
 
-	WorkspaceManager.ResetToDefaults(current_identifier)
+	/* ROSET- show trackbar and time slider */ 
+	WorkspaceManager.ResetToDefaults(current_workspace)
 
-    WorkspaceManager.DeleteWorkspace(temp_identifier)
-
-    /* return */
+	/* DELETE TEMP */ 
+    WorkspaceManager.DeleteWorkspace(temp_workspace)
 )
 
 
-temp_identifier = resetWorkspaceWithTemporary()
+temp_workspace = resetWorkspaceWithTemporary()
 

@@ -7,15 +7,24 @@ icon:	"ACROSS:2"
 (
 	on execute do
 	(
-		state = trackbar.visible
-	
-		trackbar.visible = not state
-	
-		timeSlider.setVisible (not state)
-	
-		if state == trackbar.visible then
-			messageBox "Toggle does not work because of 3Ds Max Bug.\n\nWORKAROUND:\n\nRight-click on an empty area of the top Toolbar to bring up the drop-down menu, and click on the Time Slider checkbox." title:"SHOW TIMESLIDDE"
+		state = not trackbar.visible
 		
+		/* SHOW TRACKBAR */ 
+		trackbar.visible = state
+		
+		/* SHOW TIMESLIDER */ 
+		timeSlider.setVisible state
+
+		if state == true then
+		(
+			/* FORCE TO SHOW IN UI */ 
+			if not trackbar.visible then
+				showTimeSlider()
+			
+			/* CHECK IF SLIDER IS VISIBLE */ 
+			if not trackbar.visible then
+				messageBox "Toggle does not work because of 3Ds Max Bug.\n\nWORKAROUND:\n\nRight-click on an empty area of the top Toolbar to bring up the drop-down menu, and click on the Time Slider checkbox." title:"SHOW TIMESLIDDE"
+		)
 	)
 )
 
