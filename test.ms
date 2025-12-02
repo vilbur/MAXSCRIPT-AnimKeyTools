@@ -26,23 +26,24 @@ function resetWorkspaceWithTemporary =
 		temp_identifier
 	)
 
+	/* GET CURRENT WORKSPACE */ 
     current_identifier = WorkspaceManager.GetCurrentWorkspaceIdentifier()
 
-	
+	workspace_file = (getDir #TEMP) + "\\..\\en-US\\UI\\Workspaces\\" + current_identifier + ".maxsettings"
+
+	/* GET TEMPORARY WORKSPACE */ 
     temp_identifier = makeTemporaryWorkspace(current_identifier)
 	
+	/* CHANGE CURRENT WORKSPACE */ 
 	WorkspaceManager.SetCurrentWorkspaceByIdentifier temp_identifier
-	
-	format "TEMP_IDENTIFIER: %\n" temp_identifier
-	workspace_file = (getDir #TEMP) + "\\..\\en-US\\UI\\Workspaces\\" + current_identifier + ".maxsettings"
-	format "workspace_file: %\n" workspace_file
-	
+
+	/* XmlParser */
 	XmlParser = XmlParser_v(workspace_file)
 	
-	--XmlParser.fileOpen()
 	element = XmlParser.getElement "SystemSettings"
 	format "ELEMENT: %\n" element
 	
+	/* SET TRACKBAR VISIBLE */ 
 	show_trackbar_state = XmlParser.getAttribute element "ShowTrackbar"
 	format "SHOW_TRACKBAR_STATE: %\n" show_trackbar_state
 	
