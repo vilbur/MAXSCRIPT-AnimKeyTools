@@ -32,7 +32,7 @@ icon:	"ACROSS:2"
  */
 macroscript	_animation_set_frame_next
 category:	"_Animation"
-buttontext:	"Shift Frame"
+buttontext:	"Shift Time"
 tooltip:	"Set Next Anim Frame"
 icon:	"ACROSS:2"
 (
@@ -45,7 +45,7 @@ icon:	"ACROSS:2"
  */
 macroscript	_animation_set_frame_prev
 category:	"_Animation"
-buttontext:	"Shift Frame"
+buttontext:	"Shift Time"
 tooltip:	"Set Previous Anim Frame"
 icon:	"ACROSS:2"
 (

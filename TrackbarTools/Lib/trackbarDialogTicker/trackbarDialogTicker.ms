@@ -15,6 +15,8 @@ struct TrackbarDialogTicker_v
 	
 	
 	/* dependency */
+	TrackbarToolsCallback = TrackbarToolsCallback_v(_rollout),
+	
 	/* reference */
 	/* inhered */
 
@@ -86,82 +88,76 @@ struct TrackbarDialogTicker_v
 		if slider_hwnd != undefined then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 
-			
-			
-			
 		
-		update_buttons = false
+		force_update_buttons = false
 
-		chenage_window_position = true
-
-		buttons_size_pos_bak = copy buttons_size_pos
-		
 		/* SET WIDTH OF SLIDER */ 
 		this.setSliderWidth()
 
+		
 		/* IF SLIDER DOCKED */ 
 		if slider_docked then
 		(
 			if not buttons_docked then
 			(
-				--slider_width -= 32
-			
 				cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
 				
 				cui.DockDialogBar _rollout #cui_dock_bottom
 				
-				--chenage_window_position = false
-				
-				update_buttons = true
+				force_update_buttons = true
 			)
 		)
 		
 		/* IF SLIDER UN-DOCKED */ 
 		if not slider_docked then
 		(
-			--format "\nSLIDER UN-DOCKED"
-			this.alignTimeSliders()
-			
-			/* IF BUTTONS UN-DOCKED */ 
-			if buttons_docked then
+			if slider_pos_size.bottom != buttons_size_pos.top or slider_pos_size.left != buttons_size_pos.left then
 			(
-				cui.UnRegisterDialogBar _rollout
-
-				buttons_hwnd = this.getChildWindow "Time Slider Tools"
-			)
-
-			if buttons_size_pos != buttons_size_pos_bak then
-
-			/* SET POSITION OF BUTTONS WINDOW */ 
-			windows.setWindowPos buttons_hwnd buttons_size_pos true
-
-			--	/* SET DEFAULT TIME SLIDER POSITION */ 
-			--windows.setWindowPos slider_hwnd slider_pos_size true
+				--format "\nSLIDER UN-DOCKED"
+				this.alignTimeSliders()
+				
+				/* UN DOCK BUTTONS */ 
+				if buttons_docked then
+				(
+					cui.UnRegisterDialogBar _rollout
 	
-			update_buttons = true
+					buttons_hwnd = this.getChildWindow "Time Slider Tools"
+				)
+	
+				/* SET POSITION OF BUTTONS WINDOW */ 
+				windows.setWindowPos buttons_hwnd buttons_size_pos true
+	
+				--	/* SET DEFAULT TIME SLIDER POSITION */ 
+				--windows.setWindowPos slider_hwnd slider_pos_size true
+		
+				force_update_buttons = true
+				
+			)
 		)
 		
-		--if update_buttons then
-			this.updateButtons(update_buttons)
+		
+		this.updateButtons(force_update_buttons)
+		
+
+		/* UPDATE CURRENT FRAME */ 
+		if not is_playing_now then
+		(
+			/* SYNC buttons with time slider - if slider has been changed */ 
+			--if _rollout.slider_time != sliderTime.frame then
+				TrackbarToolsCallback.setFrame sliderTime.frame
+		
+			_rollout.slider_time = sliderTime.frame
+			
+		)
+		else /* SET NEXT FRAME OF PALYING ANIMATION */ 
+			TrackbarToolsCallback.setNextFrame()
 		
 		
-		--CompleteRedraw()
-		--/* UPDATE CURRENT FRAME */ 
-		--if not is_playing_now then
-		--(
-		--	--_rollout.slider_time = sliderTime.frame
-		--
-		--	--if this._sliderValue() != sliderTime.frame then
-		--	if _rollout.slider_time != sliderTime.frame then
-		--		this.setFrame sliderTime.frame
-		--
-		--	_rollout.slider_time = sliderTime.frame
-		--	
-		--)
-		----else /* SET NEXT FRAME OF PALYING ANIMATION */ 
-		----	this.setNextFrame()
-		--	
-		--	
+		_rollout.SPN_range_start.value	= animationRange.start
+		_rollout.SPN_range_end.value	= animationRange.end
+		
+		
+			
 		--/*
 		--	AUTO FILTER KEYS ON TIME SLIDER
 		--  
@@ -214,9 +210,6 @@ struct TrackbarDialogTicker_v
 		/* SET WINDOW WIDTH */ 
 		buttons_size_pos.w = slider_width
 	),
-	
-	
-	
 	
 	/** Align time sliders
 	 */
@@ -272,20 +265,19 @@ struct TrackbarDialogTicker_v
 	
 	/** Update buttons
 	 */
-	function updateButtons update_buttons =
+	function updateButtons force_update_buttons =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.updateButtons()"
-		
-		if buttons == undefined then 
+
+		if buttons == undefined then
 			buttons = this._getFrameButtons()
-		
-		
+
 		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
 
 		visible_buttons = for btn in buttons where btn.visible collect btn 
 
-
-		if update_buttons or visible_buttons.count != frames_in_range then
+		
+		if force_update_buttons or visible_buttons.count != frames_in_range then
 		(
 			buttons_area = slider_width - 108
 
@@ -295,7 +287,9 @@ struct TrackbarDialogTicker_v
 			btn_width = (buttons_area / (frames_in_range ) ) 
 	
 			pos_x = 54
+			pos_x_last = 0
 			
+			if visible_buttons[1] != undefined then -- DEV LINE
 			if visible_buttons[1].text as integer != animationRange.start.frame as integer then
 				for i = 1 to buttons.count do
 					buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
@@ -312,11 +306,15 @@ struct TrackbarDialogTicker_v
 				--format "pos_x: %\n" pos_x
 				--buttons[i].text = "i as string"
 				
-				--if i <= frames_in_range then
-					--format "pos_x: %\n" pos_x
+				if buttons[i].visible then
+					pos_x_last = pos_x
+				
 			)
 			
+			_rollout.BTN_play.pos = [ pos_x_last + 4, 0 ]
 		)
+		
+		
 		
 		--format "buttons[frames_in_range]: %\n" buttons[frames_in_range].pos.x
 		--dialog_width = buttons[frames_in_range].pos.x	+ btn_width + 18
@@ -341,6 +339,7 @@ struct TrackbarDialogTicker_v
 		--for key in sort buttons.keys do
 			--buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
 	),
+	
 	/** Get frame buttons
 	  
 	  @return Dictionary #INTEGER
@@ -362,6 +361,47 @@ struct TrackbarDialogTicker_v
 		
 		for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl --return
 	),
+	
+	
+	/* set frame */ 
+	function setFrame frame =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.setFrame()"
+		--format "frame: %\n" frame
+
+		frame = frame as integer
+
+		--if not this.isInRange(frame) then
+			--return false
+		
+		sliderTime = frame
+
+		for btn in buttons do
+			btn.checked = btn.text as integer == frame
+		
+		/*------------------------------------------------------------------------------
+			SYNC CONTROLS 
+		--------------------------------------------------------------------------------*/
+
+
+		
+		/* SLIDER */ 
+		--_rollout.slider_current_time.value = frame
+	),
+
+	/** Set next frame
+	 */
+	function setNextFrame =
+	(
+		--format "\n"; print "TrackbarTools_v.setNextFrame()"
+			if sliderTime >= animationRange.end.frame then
+			sliderTime = animationRange.start.frame 
+		else
+			sliderTime += 1
+			
+		this.setFrame sliderTime.frame
+	),
+	
 
 	/** Get height of maximized viewport to find out height of docked dialog
 	 */
