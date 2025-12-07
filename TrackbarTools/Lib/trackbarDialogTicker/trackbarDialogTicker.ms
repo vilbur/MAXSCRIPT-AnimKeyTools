@@ -15,7 +15,7 @@ struct TrackbarDialogTicker_v
 	
 	
 	/* dependency */
-	TrackbarToolsCallback = TrackbarToolsCallback_v(_rollout),
+	--TrackbarToolsCallback = _rollout.ToolsCallback,
 	
 	/* reference */
 	/* inhered */
@@ -40,6 +40,8 @@ struct TrackbarDialogTicker_v
 	maxwin_pos_size = windows.getWindowPos ( windows.getMAXHWND() ),
 		
 	/* private */
+	current_time,
+		
 	viewport_bottom_padding = 56,
 	--viewport_bottom_padding = 64,
 	viewport_width,
@@ -59,27 +61,29 @@ struct TrackbarDialogTicker_v
 		this.setFrame currentTime.frame		
 	),
 	
-	/** On timer tick
+	/** On timer tick update Dialog
 	 */
-	function onTimerTick is_playing_now =
+	function updateDialog =
 	(
-		--format "\n\n"; print "TrackbarDialogTicker_v.onTimerTick()"
+		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
 		buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		slider_hwnd = this.getChildWindow "Time Slider"
 		--/* SHOW \ HIDE RED STRIP ON TOP OF ROLLOUT IF AINMATION MODE IS ACTIVE */ 
 		--_rollout.status_bar.visible = animButtonState
 		--
-		slider_docked  = slider_hwnd  == undefined 
-		buttons_docked = buttons_hwnd == undefined 
-		
+		--format "slider_hwnd: %\n" slider_hwnd
 		if slider_hwnd == undefined then
 		(
 			--format "slider_hwnd: %\n" slider_hwnd
-			hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
+			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
 
-			--format "hwnd: %\n" hwnd
-			
+			--format "slider_docked_hwnd: %\n" slider_docked_hwnd
 		)
+		
+		slider_docked  = slider_hwnd  == undefined 
+		buttons_docked = buttons_hwnd == undefined 
+		
+		
 		
 		if buttons_hwnd != undefined then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
@@ -136,22 +140,22 @@ struct TrackbarDialogTicker_v
 		)
 		
 		
-		this.updateButtons(force_update_buttons)
+		this.updateButtonsVisibility(force_update_buttons)
 		
 
-		/* UPDATE CURRENT FRAME */ 
-		if not is_playing_now then
-		(
-			/* SYNC buttons with time slider - if slider has been changed */ 
-			--if _rollout.slider_time != sliderTime.frame then
-				TrackbarToolsCallback.setFrame sliderTime.frame
-		
-			_rollout.slider_time = sliderTime.frame
-			
-		)
-		else /* SET NEXT FRAME OF PALYING ANIMATION */ 
-			TrackbarToolsCallback.setNextFrame()
-		
+		--/* UPDATE CURRENT FRAME */ 
+		--if not is_playing_now then
+		--(
+		--	/* SYNC buttons with time slider - if slider has been changed */ 
+		--	--if _rollout.slider_time != sliderTime.frame then
+		--		_rollout.ToolsCallback.setFrame sliderTime.frame
+		--
+		--	_rollout.slider_time = sliderTime.frame
+		--	
+		--)
+		--else /* SET NEXT FRAME OF PALYING ANIMATION */ 
+		--	_rollout.ToolsCallback.setNextFrame()
+		--
 		
 		_rollout.SPN_range_start.value	= animationRange.start
 		_rollout.SPN_range_end.value	= animationRange.end
@@ -191,6 +195,35 @@ struct TrackbarDialogTicker_v
 		--)
 
 	),
+	
+	/** Update active button
+	 */
+	function updateActiveButton =
+	(
+		if this._currentTimeChanged() then
+		(
+			format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
+			
+			btn_index = 0
+			--current_time = currentTime.frame as integer
+			
+			for frame = animationRange.start to animationRange.end where (btn = _rollout.frame_buttons[btn_index += 1]) != undefined do
+			(
+				btn.state = frame == currentTime.frame
+				
+				btn.highlightColor = this.getFrameButtonColor frame
+			)
+				
+				
+			
+		)
+
+		
+		--format "i: %\n" i
+		--_rollout.frame_buttons
+		
+	),
+	
 	
 	/** Set slider width
 	 */
@@ -265,9 +298,9 @@ struct TrackbarDialogTicker_v
 	
 	/** Update buttons
 	 */
-	function updateButtons force_update_buttons =
+	function updateButtonsVisibility force_update_buttons =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.updateButtons()"
+		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsVisibility()"
 
 		if buttons == undefined then
 			buttons = this._getFrameButtons()
@@ -347,18 +380,6 @@ struct TrackbarDialogTicker_v
 	function _getFrameButtons =
 	(
 		--format "\n"; print "._getFrameButtons()"
-		--buttons	=  Dictionary #INTEGER
-		----format "_rollout.controls: %\n" _rollout.controls
-		----for ctrl in _rollout.controls do
-		----format "ctrl: %\n" ctrl
-		--
-		----buttons = for ctrl in _rollout.controls where matchPattern ctrl.name pattern:("btn_frame_*") collect ctrl
-		--only_frame_buttons = for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl
-		--
-		--for i = 0 to only_frame_buttons.count - 1 collect buttons[i] = only_frame_buttons[i +1]
-		--
-		--buttons --return
-		
 		for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl --return
 	),
 	
@@ -403,6 +424,26 @@ struct TrackbarDialogTicker_v
 	),
 	
 
+		
+	/** Get frame button color
+	 */
+	function getFrameButtonColor frame =
+	(
+		if animButtonState then red else ( if frame != 0 then green_color else orange )
+	),
+	
+	/** Current time changed
+	 */
+	function _currentTimeChanged =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.currentTimeChanged()"
+	
+		if ( time_changed = current_time == undefined or current_time != currentTime ) then
+			current_time = currentTime
+		
+		time_changed --return
+	),
+	
 	/** Get height of maximized viewport to find out height of docked dialog
 	 */
 	function setViewportWidth =
@@ -429,9 +470,10 @@ struct TrackbarDialogTicker_v
 
 	),
 
+	
 	on create do
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.onCreate()"
+		format "\n"; print "TrackbarDialogTicker_v.onCreate()"
 		--buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		--slider_hwnd = this.getChildWindow "Time Slider"
 		

@@ -1,5 +1,16 @@
 
 /** Create Trackbar Tools Dialog
+  
+	ALIGN size and position witrh time slider
+	
+	
+	SYNC count of frame buttons with anim range - update visible buttons count
+	
+	SYNC current frame -> update active button
+	
+	PLAY ANIMATION -> update active button
+  
+  
  */
 function trackbarToolsDialog =
 (
@@ -17,14 +28,8 @@ function trackbarToolsDialog =
 	buttons_count	= 101 -- 0-nth frame
 	
 	visible_buttons = animationRange.end.frame - animationRange.start.frame + 1
-	format "visible_buttons: %\n" visible_buttons
-	format "width_button: %\n" width_button
-	
-	format "visible_buttons * width_button: %\n" ( visible_buttons * width_button)
-	format "width_groupbox * 2: %\n" (width_groupbox * 2)
 	
 	dialog_width = (visible_buttons * width_button ) + ( width_groupbox * 2 ) + (width_button  ) 
-	format "dialog_width: %\n" dialog_width
 	
 	--frame_buttons = buttons_count + 1
 	--
@@ -58,33 +63,34 @@ function trackbarToolsDialog =
 	/* DIALOG */
 	--Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 ) ini:(getSourceFileName())
 	Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 )
-	
-	/* DIALOG EVENTS */ 
-	Dialog.Event #OPEN ("ToolsCallback = TrackbarToolsCallback_v("+Dialog.id as string +")")	tooltip:"PRESSED Tooltip"
-	Dialog.Event #UNDOCKED "print\"XXX\""
-
 	/* DIALOG CONTROLS */  
-	--_Controls   = Dialog.Controls height:256
 	_Controls   = Dialog.Controls()
-	--_Button      = _Controls.control #BUTTON "Btn" 
-	--
-	--_Controls2   = Dialog.Controls group:("Main Controls2 " )
-	--_Button      = _Controls2.control #BUTTON "Btn 2" 
+
 	Dialog.addLocal "ToolsCallback" undefined
-	--Dialog.addLocal "TrackbarDialogTicker" ("TrackbarDialogTicker_v("+Dialog.id as string +")")
 	
 	Dialog.addLocal  "TrackbarDialogTicker" ("TrackbarDialogTicker_v("+Dialog.id as string +")")
 
 	Dialog.addLocal "is_playing_now" false
 	Dialog.addLocal "slider_time" undefined
+	Dialog.addLocal "frame_buttons" undefined
 	
+	
+	/*------------------------------------------------------------------------------
+		DIALOG EVENTS
+	--------------------------------------------------------------------------------*/
+	Dialog.Event #OPEN ("ToolsCallback = TrackbarToolsCallback_v("+Dialog.id as string +")")
+	
+	Dialog.Event #OPEN ("frame_buttons = for ctrl in "+Dialog.id as string +".controls where matchPattern (ctrl as string ) pattern:(\"*btn_frame_*\") collect ctrl")	tooltip:"PRESSED Tooltip"
 	
 	/*------------------------------------------------------------------------------
 		TIMER
 	--------------------------------------------------------------------------------*/
-	_Timer = _Controls.control #TIMER "Timer" id:#clock interval:500 active:true
+	TIMER_updateDialog = _Controls.control #TIMER "TIMER_updateDialog"       interval:500 active:true
+	TIMER_updateButton = _Controls.control #TIMER "TIMER_updateActiveButton" interval:500 active:true
 	
-	_Timer.Event #TICK ("TrackbarDialogTicker.onTimerTick(is_playing_now)")
+	--TIMER_updateDialog.Event #TICK ("TrackbarDialogTicker.TIMER_updateDialog(is_playing_now)")
+	TIMER_updateDialog.Event #TICK ("TrackbarDialogTicker.updateDialog()")
+	TIMER_updateButton.Event #TICK ("TrackbarDialogTicker.updateActiveButton()")
 
 
 	/*------------------------------------------------------------------------------
@@ -108,8 +114,8 @@ function trackbarToolsDialog =
 	rangeStart = _Controls.control #SPINNER "" id:#SPN_range_start	type:#integer pos:[ 8 , 0 ] range:[-10,1000, animationRange.start ]	tooltip:"Set anim range start" fieldWidth:26
 	rangeEnd   = _Controls.control #SPINNER "" id:#SPN_range_end	type:#integer pos:[ 8, 20 ] range:[  0,1000, animationRange.end ]	tooltip:"Set anim range start" fieldWidth:26
 	
-	shiftStart	= _Controls.control #BUTTON	"<>"	id:#BTN_shift_start	width:20 height:16 pos:[ 34 , 0 ]
-	shiftEnd	= _Controls.control #BUTTON	"<>"	id:#BTN_shift_end	width:20 height:16 pos:[ 34 , 20 ]
+	shiftStart	= _Controls.control #BUTTON	"<>"	id:#BTN_shift_start	width:20 height:16 pos:[ 34 , 0 ]	tooltip:"Set Animation range START"
+	shiftEnd	= _Controls.control #BUTTON	"<>"	id:#BTN_shift_end	width:20 height:16 pos:[ 34 , 20 ]	tooltip:"Set Animation range END"
 
 	--FPS_label	= _Controls.control #LABEL	"FPS"	groupbox:_left.id across:2 align:#LEFT  offset:[ 0, 10 ] 
 	--FPS_ddl	= _Controls.control #DROPDOWN	"[FPS]"	groupbox:_left.id across:2 align:#RIGHT offset:[ 6, 8 ]  width:48  offset:[ 0, 8 ] items:#( "24", "12", "6", "4", "2", "1" ) value:4 
@@ -119,11 +125,11 @@ function trackbarToolsDialog =
 	
 	--shiftStart.Event	#PRESSED "DIALOG_time_slider_tools.animation_range_start.value	= animationRange.start + 1"	tooltip:"Set Animation range START"
 	
-	shiftStart.Event	#PRESSED	"ToolsCallback.setAnimRange START: ( animationRange.start.frame - 1 )"	tooltip:"Set Animation range START"
-	shiftStart.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange START: ( animationRange.start.frame + 1 )"	tooltip:"Set Animation range START"
+	shiftStart.Event	#PRESSED	"ToolsCallback.setAnimRange START: ( animationRange.start.frame - 1 )"
+	shiftStart.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange START: ( animationRange.start.frame + 1 )"
 
-	shiftEnd.Event	#PRESSED	"ToolsCallback.setAnimRange END: ( animationRange.end.frame - 1 )"	tooltip:"Set Animation range END"
-	shiftEnd.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange END: ( animationRange.end.frame + 1 )"	tooltip:"Set Animation range END"
+	shiftEnd.Event	#PRESSED	"ToolsCallback.setAnimRange END: ( animationRange.end.frame - 1 )"	
+	shiftEnd.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange END: ( animationRange.end.frame + 1 )"
 	
 	
 	--FPS_ddl.Event #SELECTED  ("ToolsCallback.setInterval" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
@@ -187,14 +193,12 @@ function trackbarToolsDialog =
 		pos = [ pos_x_button += width_button , pos_y ]
 		
 		/* ADD BUTTON */ 
-		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:pos highlightColor:(if i == 0 then orange else COLOR_NAMES[#DARKGREEN] ) visible:true
+		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:false
 		
 		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else ToolsCallback.setFrame( "+i_str +")" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 		_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = "+i_str ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 		--_Frame_btn.Event #CHANGED ( "format \"EventFired: %\n\" EventFired.control.text " ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
-
-
 	)
 	
 	PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:48 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
@@ -209,12 +213,9 @@ function trackbarToolsDialog =
 		DIALOG CREATE
 	------------------------------------------------------------------------------*/
 	--------Dialog.create()
-	Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
-	--Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
-	--Dialog.dock #BOTTOM
-	--format "Dialog: %\n" Dialog
+	--Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
 	
-	--format "Dialog_rollout.is_playing_now: %\n" Dialog_rollout.is_playing_now
+	Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
 	
 	--Dialog.register()
 	

@@ -1,5 +1,5 @@
 /* 
-	Struct: TrackbarTools_v
+	Struct: TrackbarToolsCallback_v
 	
 	Functions for working with Time Slider and animation ranges
 */
@@ -43,7 +43,7 @@ struct TrackbarToolsCallback_v
 	/* set frame */ 
 	function setFrame frame =
 	(
-		--format "\n"; print "TrackbarTools_v.setFrame()"
+		--format "\n"; print "TrackbarToolsCallback_v.setFrame()"
 		--format "frame: %\n" frame
 
 		frame = frame as integer
@@ -67,7 +67,7 @@ struct TrackbarToolsCallback_v
 	 */
 	function setInterval val =
 	(
-		--format "\n"; print "TrackbarTools_v.setInterval()"
+		--format "\n"; print "TrackbarToolsCallback_v.setInterval()"
 		--format "EventFired: %\n" EventFired
 		fps = EventFired.Control.selected as integer
 
@@ -78,7 +78,7 @@ struct TrackbarToolsCallback_v
 	 */
 	function setNextFrame =
 	(
-		--format "\n"; print "TrackbarTools_v.setNextFrame()"
+		--format "\n"; print "TrackbarToolsCallback_v.setNextFrame()"
 			if sliderTime >= animationRange.end.frame then
 			sliderTime = animationRange.start.frame 
 		else
@@ -90,7 +90,7 @@ struct TrackbarToolsCallback_v
 	/* Is in range */
 	function isInRange frame =
 	(
-		--format "\n"; print "TrackbarTools_v.isInRange()"
+		--format "\n"; print "TrackbarToolsCallback_v.isInRange()"
 		--format "frame: %\n" frame
 
 		frame >= animationRange.start.frame and frame <= animationRange.end.frame
@@ -100,7 +100,7 @@ struct TrackbarToolsCallback_v
 	 */
 	function selectObjectsWithKey frame =
 	(
-		format "\n"; print "TrackbarTools_v.selectObjectsWithKey()"
+		format "\n"; print "TrackbarToolsCallback_v.selectObjectsWithKey()"
 		
 		format "\n FUNCTION IS PLACHOLDER"
 	),
@@ -130,7 +130,7 @@ struct TrackbarToolsCallback_v
 	*/
 	function jumpToPhase direction =
 	(
-		--format "\n"; print "TrackbarTools_v.jumpToPhase()"
+		--format "\n"; print "TrackbarToolsCallback_v.jumpToPhase()"
 		--format "EventFired: %\n" EventFired
 		--direction = if EventFired.type == #rightClick  then -1 else 1
 		
@@ -153,7 +153,7 @@ struct TrackbarToolsCallback_v
 	/* Set anim range */
 	function setAnimRange start: end: =
 	(
-		--format "\n"; print "TrackbarTools_v.setAnimRange()"
+		--format "\n"; print "TrackbarToolsCallback_v.setAnimRange()"
 		
 		--local _Interval
 		_Interval = animationRange
@@ -216,18 +216,18 @@ struct TrackbarToolsCallback_v
 	 */
 	function _getFrameButton frame =
 	(
-		--format "\n"; print "TrackbarTools_v._getFrameButton()"
+		--format "\n"; print "TrackbarToolsCallback_v._getFrameButton()"
 		
 		execute ( _rollout.name + ".btn_frame_" + frame as string ) --return
 	),
-		
-	/** Get frame button color
-	 */
-	function getFrameButtonColor frame =
-	(
-		if animButtonState then red else ( if frame != 0 then green_color else orange )
-	),
-	
+	--	
+	--/** Get frame button color
+	-- */
+	--function getFrameButtonColor frame =
+	--(
+	--	if animButtonState then red else ( if frame != 0 then green_color else orange )
+	--),
+	--
 	
 	/*------------------------------------------------------------------------------
 		GET\SET UI VALUES
@@ -237,7 +237,7 @@ struct TrackbarToolsCallback_v
 	 */
 	function _sliderValue =
 	(
-		--format "\n"; print "TrackbarTools_v._sliderValue()"
+		--format "\n"; print "TrackbarToolsCallback_v._sliderValue()"
 		_rollout.slider_current_time.value
 	),
 	
@@ -245,13 +245,13 @@ struct TrackbarToolsCallback_v
 	 */
 	function _getPhaseLenght =
 	(
-		--format "\n"; print "TrackbarTools_v._getPhaseLenght()"
+		--format "\n"; print "TrackbarToolsCallback_v._getPhaseLenght()"
 		_rollout.DL_phase.selected as integer
 	),
 	
 	on create do
 	(
-		format "\n"; print "TrackbarTools_v.onCreate()"
+		format "\n"; print "TrackbarToolsCallback_v.onCreate()"
 		hwnd_slider_tools = this.getChildWindow "Time Slider Tools"
 		hwnd_slider_default = this.getChildWindow "Time Slider"
 	)
