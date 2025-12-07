@@ -190,38 +190,37 @@ struct TrackbarDialogTicker_v
 		----
 		--
 		--/* IF STATE OF ANIMATION MODE IS CHANGED */ 
-		--if anim_button_state != animButtonState then
-		--(
-		--	anim_button_state = animButtonState
-		--	
-		--	/* UPDATE HIGHLIGH COLOR OF BUTTON */ 
-		--	if ( frame_button = this._getFrameButton current_frame ) != undefined then
-		--	(
-		--		frame_button.highlightColor = (this.getFrameButtonColor current_frame)
-		--
-		--		frame_button.state = false
-		--		frame_button.state = true
-		--	)
-		--)
-
+		if anim_button_state != animButtonState then
+		(
+			anim_button_state = animButtonState
+			
+			this.updateActiveButton force:true
+		)
 	),
 	
 	/** Update active button
 	 */
-	function updateActiveButton =
+	function updateActiveButton force:false =
 	(
-		if this._currentTimeChanged() then
+			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
+		if force or this._currentTimeChanged() then
 		(
-			format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
-			
 			btn_index = 0
 			--current_time = currentTime.frame as integer
 			
 			for frame = animationRange.start to animationRange.end where (btn = _rollout.frame_buttons[btn_index += 1]) != undefined do
 			(
-				btn.state = frame == currentTime.frame
+				/* TURN ALL FRAME BUTTONS OFF */ 				
+				btn.state = false
 				
-				btn.highlightColor = this.getFrameButtonColor frame
+				if frame == currentTime.frame then
+				(
+					/* SET COLOR */ 
+					btn.highlightColor = this.getFrameButtonColor frame
+					
+					/* SET STATE TRUE -- force to update highlight color */ 
+					btn.state = true
+				)
 			)
 		)
 	),
@@ -262,7 +261,7 @@ struct TrackbarDialogTicker_v
 	 */
 	function alignTimeSliders =
 	(
-		format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
+		--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
 		
 		/* FIND LEFT TOP CORNER OF WINDOW ALIGNEND TO CENTER */ 
 		--centered_pos = [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
@@ -443,7 +442,9 @@ struct TrackbarDialogTicker_v
 	 */
 	function getFrameButtonColor frame =
 	(
-		if animButtonState then red else ( if frame != 0 then green_color else orange )
+		--format "\n"; print "TrackbarDialogTicker_v.getFrameButtonColor()"
+		--format "animButtonState: %\n" animButtonState
+		if animButtonState then red else ( if frame as integer != 0 then green_color else orange )
 	),
 	
 	/** Current time changed
@@ -487,7 +488,7 @@ struct TrackbarDialogTicker_v
 	
 	on create do
 	(
-		format "\n"; print "TrackbarDialogTicker_v.onCreate()"
+		--format "\n"; print "TrackbarDialogTicker_v.onCreate()"
 		--buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		--slider_hwnd = this.getChildWindow "Time Slider"
 		
