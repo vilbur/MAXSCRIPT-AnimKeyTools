@@ -83,8 +83,6 @@ struct TrackbarDialogTicker_v
 		slider_docked  = slider_hwnd  == undefined 
 		buttons_docked = buttons_hwnd == undefined 
 		
-		
-		
 		if buttons_hwnd != undefined then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
@@ -92,11 +90,13 @@ struct TrackbarDialogTicker_v
 		if slider_hwnd != undefined then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 
+		--format "\n"
+		--format "buttons_size_pos: %\n" buttons_size_pos
+		--format "slider_pos_size:  %\n" slider_pos_size
+		
 		
 		force_update_buttons = false
 
-		/* SET WIDTH OF SLIDER */ 
-		this.setSliderWidth()
 
 		
 		/* IF SLIDER DOCKED */ 
@@ -112,12 +112,23 @@ struct TrackbarDialogTicker_v
 			)
 		)
 		
+		
 		/* IF SLIDER UN-DOCKED */ 
 		if not slider_docked then
 		(
-			if slider_pos_size.bottom != buttons_size_pos.top or slider_pos_size.left != buttons_size_pos.left then
+			--format "\n"
+			--format "slider_pos_size.w:  %\n" slider_pos_size.w
+			--format "buttons_size_pos.w: %\n" buttons_size_pos.w
+			--format "TEST: %\n" (slider_pos_size.bottom != buttons_size_pos.top or slider_pos_size.left != buttons_size_pos.left or slider_pos_size.w != buttons_size_pos.w )
+			
+			if slider_pos_size.left 	 != buttons_size_pos.left \  -- NOT ALIGN ALIGN LEFT
+			or slider_pos_size.w 	 != buttons_size_pos.w    \  -- WIDTH CHANGED
+			or slider_pos_size.bottom != buttons_size_pos.top then -- NOT ALIGN ALIGN TOP
 			(
-				--format "\nSLIDER UN-DOCKED"
+				/* SET WIDTH OF SLIDER */ 
+				this.setSliderWidth()
+
+				/* ALIG MPOSITION */ 
 				this.alignTimeSliders()
 				
 				/* UN DOCK BUTTONS */ 
@@ -139,8 +150,12 @@ struct TrackbarDialogTicker_v
 			)
 		)
 		
-		
+		/* UPDATE BUTTONS */ 
 		this.updateButtonsVisibility(force_update_buttons)
+
+		
+		_rollout.SPN_range_start.value	= animationRange.start
+		_rollout.SPN_range_end.value	= animationRange.end
 		
 
 		--/* UPDATE CURRENT FRAME */ 
@@ -155,12 +170,7 @@ struct TrackbarDialogTicker_v
 		--)
 		--else /* SET NEXT FRAME OF PALYING ANIMATION */ 
 		--	_rollout.ToolsCallback.setNextFrame()
-		--
-		
-		_rollout.SPN_range_start.value	= animationRange.start
-		_rollout.SPN_range_end.value	= animationRange.end
-		
-		
+		--		
 			
 		--/*
 		--	AUTO FILTER KEYS ON TIME SLIDER
@@ -213,17 +223,21 @@ struct TrackbarDialogTicker_v
 				
 				btn.highlightColor = this.getFrameButtonColor frame
 			)
-				
-				
-			
 		)
-
-		
-		--format "i: %\n" i
-		--_rollout.frame_buttons
-		
 	),
 	
+	/** Playback
+	 */
+	function playback is_playing_now =
+	(
+		--format "\n"; print "TrackbarToolsCallback_v.playback()"
+
+		if is_playing_now then
+			sliderTime = if sliderTime >= animationRange.end.frame then
+							animationRange.start.frame
+						else
+							sliderTime + 1
+	),
 	
 	/** Set slider width
 	 */
@@ -248,7 +262,7 @@ struct TrackbarDialogTicker_v
 	 */
 	function alignTimeSliders =
 	(
-		--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
+		format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
 		
 		/* FIND LEFT TOP CORNER OF WINDOW ALIGNEND TO CENTER */ 
 		--centered_pos = [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
@@ -344,7 +358,7 @@ struct TrackbarDialogTicker_v
 				
 			)
 			
-			_rollout.BTN_play.pos = [ pos_x_last + 4, 0 ]
+			_rollout.BTN_play.pos = [ pos_x_last, 0 ]
 		)
 		
 		

@@ -71,7 +71,6 @@ function trackbarToolsDialog =
 	Dialog.addLocal  "TrackbarDialogTicker" ("TrackbarDialogTicker_v("+Dialog.id as string +")")
 
 	Dialog.addLocal "is_playing_now" false
-	Dialog.addLocal "slider_time" undefined
 	Dialog.addLocal "frame_buttons" undefined
 	
 	
@@ -85,12 +84,13 @@ function trackbarToolsDialog =
 	/*------------------------------------------------------------------------------
 		TIMER
 	--------------------------------------------------------------------------------*/
-	TIMER_updateDialog = _Controls.control #TIMER "TIMER_updateDialog"       interval:500 active:true
-	TIMER_updateButton = _Controls.control #TIMER "TIMER_updateActiveButton" interval:500 active:true
+	TIMER_updateDialog	= _Controls.control #TIMER "TIMER_updateDialog"	interval:500 active:true
+	TIMER_updateButton	= _Controls.control #TIMER "TIMER_updateActiveButton"	interval:100 active:true
+	TIMER_playBack	= _Controls.control #TIMER "TIMER_playBack"	interval:500 active:true
 	
-	--TIMER_updateDialog.Event #TICK ("TrackbarDialogTicker.TIMER_updateDialog(is_playing_now)")
-	TIMER_updateDialog.Event #TICK ("TrackbarDialogTicker.updateDialog()")
-	TIMER_updateButton.Event #TICK ("TrackbarDialogTicker.updateActiveButton()")
+	TIMER_updateDialog.Event	#TICK ("TrackbarDialogTicker.updateDialog()")
+	TIMER_updateButton.Event	#TICK ("TrackbarDialogTicker.updateActiveButton()")
+	TIMER_playBack.Event	#TICK ("TrackbarDialogTicker.playback(is_playing_now)")
 
 
 	/*------------------------------------------------------------------------------
@@ -149,39 +149,7 @@ function trackbarToolsDialog =
 	--
 	--_Phase_dropdown.Event #SELECTED ("PHASE_LENGTH = EventFired.val" )  --("format \"EventFired: %\n\" EventFired " ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
 	--
-	
-	/*------------------------------------------------------------------------------
-		SLIDER & CONTROLS 
-	--------------------------------------------------------------------------------*/
 
-	/* SLIDER */ 
-	--_Srart  = _Controls.control #BUTTON "0"	id:#btn_range_start	 width:width_btn_small	height:32	pos:[ pos_x, pos_y + 4 ]	tooltip:"Set Animation range START"
-	--_Slider = _Controls.control #SLIDER ""	id:#slider_current_time	 width:width_slider	type:#INTEGER	pos:[ pos_x += width_button - align_slider_to_buttons , pos_y ]  range:[0, buttons_count, 0] ticks:buttons_count
-	--_End    = _Controls.control #BUTTON "1"	id:#btn_range_end	 width:width_btn_small	height:32 Start:32	pos:[ pos_x += width_slider - align_slider_to_buttons,  pos_y + 4 ] tooltip:"Set Animation range END\n\nCTRL: Set RANGE END by last button"
-	--
-	
-	/* EVENTS */ 
-	--_Slider.Event #CHANGED ("ToolsCallback.setFrame" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-
-	--_Srart.Event #PRESSED	"ToolsCallback.setAnimRange #START ( animationRange.start.frame - 1 )"	tooltip:" - 1 frame"
-	--_Srart.Event #RIGHTCLICK	"ToolsCallback.setAnimRange #START ( animationRange.start.frame + 1 )"	tooltip:" + 1 frame"
-	
-	--_End.Event #PRESSED	"ToolsCallback.setAnimRange #END ( animationRange.end.frame - 1 )"	tooltip:" - 1 frame"
-	--_End.Event #RIGHTCLICK	"ToolsCallback.setAnimRange #END ( animationRange.end.frame + 1 )"	tooltip:" + 1 frame"
-
-	 
-	/** Get highlight color
-	 */
-	function getHighlightColor =
-	(
-		--format "\n"; print ".getHighlightColor()"
-	)
-	
-	
-	/* SHIFT BUTTON DOWN */ 
-	--pos_y += width_button
-	 
-	
 	/*------------------------------------------------------------------------------
 		FRAME BUTTONS
 	------------------------------------------------------------------------------*/
@@ -193,29 +161,28 @@ function trackbarToolsDialog =
 		pos = [ pos_x_button += width_button , pos_y ]
 		
 		/* ADD BUTTON */ 
-		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:width_button height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:false
+		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:0 height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:false
 		
-		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else ToolsCallback.setFrame( "+i_str +")" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 		_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
-		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = "+i_str ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
-		--_Frame_btn.Event #CHANGED ( "format \"EventFired: %\n\" EventFired.control.text " ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
 	)
 	
-	PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:48 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
+	/*------------------------------------------------------------------------------
+		PLAY BUTTON
+	--------------------------------------------------------------------------------*/
 	
-	PlayBtn.Event #CHANGED "is_playing_now = not is_playing_now"	tooltip:"Set Animation range START"
+	PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
+	
+	PlayBtn.Event #CHANGED "is_playing_now = not is_playing_now"	tooltip:"Start \ Stop playback"
+	PlayBtn.Event #RIGHTCLICK "ToolsCallback.showFpsRcMenu()"	tooltip:"Set FPS"
 
-	
-	
-	--Dialog
 	
 	/*------------------------------------------------------------------------------
 		DIALOG CREATE
 	------------------------------------------------------------------------------*/
 	--------Dialog.create()
-	--Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
+	Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
 	
-	Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true --style:#()
+	--Dialog.create height:dialog_height width:0 lockWidth:true lockHeight:true --style:#()
 	
 	--Dialog.register()
 	

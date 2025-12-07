@@ -20,18 +20,23 @@ struct TrackbarToolsCallback_v
 		
 	hwnd_slider_default,
 		
-	/** Update ui
+	/** Show fps rc menu
 	 */
-	function updateUi =
+	function showFpsRcMenu =
 	(
-		--format "\n"; print "TrackbarToolsCallback_v.updateUi()"
-		this.setAnimRange animationRange.start animationRange.end
+		format "\n"; print "TrackbarToolsCallback_v.showFpsRcMenu()"
+		Menu = RcMenu_v name:"FpsRcMenu"
 		
-		this.showHideButtonsInRange currentTime.frame
+		Menu.item	"24"	"callback"
 		
-		this.setFrame currentTime.frame		
+		/* DEFINE SUBMENU */
+		submenu = Menu.menu "Submenu"
+		
+		Menu.separator()
+			
+		popUpMenu (Menu.create())
 	),
-
+	
 	/** Get child window
 	 */
 	function getChildWindow title =
@@ -74,19 +79,19 @@ struct TrackbarToolsCallback_v
 		_rollout.clock.interval = 1000 / fps
 	),
 	
-	/** Set next frame
-	 */
-	function setNextFrame =
-	(
-		--format "\n"; print "TrackbarToolsCallback_v.setNextFrame()"
-			if sliderTime >= animationRange.end.frame then
-			sliderTime = animationRange.start.frame 
-		else
-			sliderTime += 1
-			
-		this.setFrame sliderTime.frame
-	),
-	
+	--/** Set next frame
+	-- */
+	--function setNextFrame =
+	--(
+	--	--format "\n"; print "TrackbarToolsCallback_v.setNextFrame()"
+	--		if sliderTime >= animationRange.end.frame then
+	--		sliderTime = animationRange.start.frame 
+	--	else
+	--		sliderTime += 1
+	--		
+	--	this.setFrame sliderTime.frame
+	--),
+	--
 	/* Is in range */
 	function isInRange frame =
 	(
@@ -103,25 +108,6 @@ struct TrackbarToolsCallback_v
 		format "\n"; print "TrackbarToolsCallback_v.selectObjectsWithKey()"
 		
 		format "\n FUNCTION IS PLACHOLDER"
-	),
-	
-
-	/* Show / hide buttons in range (logic placeholder, UI removed) */
-	function showHideButtonsInRange frame =
-	(
-		-- originally changed button visibility, now only logic kept
-		
-		buttons = this._getFrameButtons()
-		
-		for frame_of_button in sort buttons.keys where frame_of_button != frame do
-			buttons[frame_of_button].visible = this.isInRange frame_of_button
-	),
-	
-	/** Update buttons
-	 */
-	function updateButtons frame =
-	(
-
 	),
 	
 	/* Go to frame
@@ -142,13 +128,6 @@ struct TrackbarToolsCallback_v
 			this.setFrame next_frame
 	),
 
-	/* Update anim range buttons (UI removed) */
-	function updateAnimRangeButtons =
-	(
-		_rollout.btn_range_start.text = ( (animationRange.start.frame as integer ) as string )
-
-		_rollout.btn_range_end.text   = ( (  animationRange.end.frame as integer ) as string )
-	),
 	
 	/* Set anim range */
 	function setAnimRange start: end: =
@@ -173,28 +152,28 @@ struct TrackbarToolsCallback_v
 				 _Interval.end += 1
 			
 		)
-		else
-		(
-			local last_frame_button
-			
-			buttons = this._getFrameButtons()
-			--format "buttons: %\n" buttons
-			for i = buttons.keys.count - 1 to 0 by -1  do
-			--format "buttons[i]: %\n" buttons[i].visible
-			
-			for i = buttons.keys.count - 1 to 0 by -1 while last_frame_button == undefined where buttons[i].visible do last_frame_button = buttons[i]
-			--format "last_frame_button: %\n" last_frame_button
-			frame_start = animationRange.start.frame
-			frame_end = animationRange.end.frame
-			
-			 if start != unsupplied then
-				frame_start = _rollout.btn_range_start.text as integer
-			else
-				frame_end = last_frame_button.text as integer
-			
-			
-			_Interval = Interval frame_start frame_end
-		)
+		--else
+		--(
+		--	local last_frame_button
+		--	
+		--	buttons = this._getFrameButtons()
+		--	--format "buttons: %\n" buttons
+		--	for i = buttons.keys.count - 1 to 0 by -1  do
+		--	--format "buttons[i]: %\n" buttons[i].visible
+		--	
+		--	for i = buttons.keys.count - 1 to 0 by -1 while last_frame_button == undefined where buttons[i].visible do last_frame_button = buttons[i]
+		--	--format "last_frame_button: %\n" last_frame_button
+		--	frame_start = animationRange.start.frame
+		--	frame_end = animationRange.end.frame
+		--	
+		--	 if start != unsupplied then
+		--		frame_start = _rollout.btn_range_start.text as integer
+		--	else
+		--		frame_end = last_frame_button.text as integer
+		--	
+		--	
+		--	_Interval = Interval frame_start frame_end
+		--)
 		
 		--format "_INTERVAL: %\n" _Interval
 		/* Set new animation range */
