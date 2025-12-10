@@ -24,26 +24,25 @@ struct TrackbarDialogTicker_v
 	/* properties */
 	--buttons = Dictionary #INTEGER,
 	buttons,
+	
 	/* private */
 	green_color = COLOR_NAMES[#GREEN_DARK], -- coor active frame button 
 	
 	anim_button_state,
 	
 	buttons_hwnd,
-	
 	buttons_size_pos,
+	buttons_docked,
 		
 	slider_hwnd,
-	
 	slider_pos_size,
+	slider_docked,
 	
 	maxwin_pos_size = windows.getWindowPos ( windows.getMAXHWND() ),
 		
 	/* private */
 	current_time,
 		
-	viewport_bottom_padding = 56,
-	--viewport_bottom_padding = 64,
 	viewport_width,
 	slider_width,
 	
@@ -51,6 +50,10 @@ struct TrackbarDialogTicker_v
 	
 	last_pos,
 	pos_is_changing = false,
+	
+	/* STATIC */ 
+	viewport_bottom_padding = 56,
+	
 	
 	/** Update ui
 	 */
@@ -64,17 +67,14 @@ struct TrackbarDialogTicker_v
 		this.setFrame currentTime.frame		
 	),
 	
-	/** On timer tick update Dialog
+
+	/** Get positions and size of windows
 	 */
-	function updateDialog =
+	function _getPositionsAndSizeOfWindows =
 	(
-		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
+		--format "\n"; print "TrackbarDialogTicker_v._getPositionsAndSizeOfWindows()"
 		buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		slider_hwnd = this.getChildWindow "Time Slider"
-
-		
-		if slider_hwnd == undefined then
-			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
 		
 		slider_docked  = slider_hwnd  == undefined 
 		buttons_docked = buttons_hwnd == undefined 
@@ -86,111 +86,132 @@ struct TrackbarDialogTicker_v
 		if slider_hwnd != undefined then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 		
+		if slider_hwnd == undefined then
+			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
+	),
+	
+	/** Is window position changed
+	 */
+	function _isWindowPositionChanged =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._isWindowPositionChanged()"
 		
 		buttons_win_need_update = last_pos == undefined	
-			
+		
+		/* INI VALUE */ 	
 		if last_pos == undefined then
 			last_pos = copy slider_pos_size
 
-
+		
+		/* IF CHANGING POSITION ENDS */ 
 		if pos_is_changing and last_pos == slider_pos_size then
 		(
 			pos_is_changing = false
 		
 			buttons_win_need_update = true
 		)
+		/* IF CHANGING POSITION STARTS */ 
 		else if not pos_is_changing and last_pos != slider_pos_size then
 			pos_is_changing = true
-
 			
+		/* STORE VALUE FOR NEXT TICK */ 
+		last_pos = copy slider_pos_size
+
+		buttons_win_need_update --return
+	),
+	
+	/** Dock buttons win
+	 */
+	function _dockButtonsWin =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._dockButtonsWin()"
+		cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
+		
+		cui.DockDialogBar _rollout #cui_dock_bottom
+		
+		force_update_buttons = true
+	),
+
+	/** Resize and reposition windows
+	 */
+	function _resizeAndRepositionWindows =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._resizeAndRepositionWindows()"
+		--format "slider_pos_size: %\n" slider_pos_size
+		this.snapSliderToBottomOfViewport()
+		
+		/* SET WIDTH OF SLIDER */ 
+		this.setSliderWidth()
+
+		/* ALIG POSITION */ 
+		this.alignTimeSliders()
+		
+		/* UN DOCK BUTTONS */ 
+		if buttons_docked then
+		(
+			cui.UnRegisterDialogBar _rollout
+
+			buttons_hwnd = this.getChildWindow "Time Slider Tools"
+		)
+
+		/* SET POSITION OF BUTTONS WINDOW */ 
+		windows.setWindowPos buttons_hwnd buttons_size_pos true
+
+		/* SET TIME SLIDER POSITION */ 
+		windows.setWindowPos slider_hwnd slider_pos_size true		
+		
+	),
+	
+	/** Windows aligned
+	 */
+	function _windowsAreAligned =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._windowsAligned()"
+		  slider_pos_size.left 	 == buttons_size_pos.left \  -- NOT ALIGN ALIGN LEFT
+		and slider_pos_size.w 	 == buttons_size_pos.w    \  -- WIDTH CHANGED
+		and slider_pos_size.bottom == buttons_size_pos.top -- NOT ALIGN ALIGN TOP
+	),
+	
+	/** On timer tick update Dialog
+	 */
+	function updateDialog =
+	(
+		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
 		force_update_buttons = false
 
+		this._getPositionsAndSizeOfWindows()
 
-		if buttons_win_need_update then
-		(
-			
+		/*------------------------------------------------------------------------------
+			IF POSITION OF TIME SLIDER
+		--------------------------------------------------------------------------------*/
+		if this._isWindowPositionChanged() then
+		(			
 			/*------------------------------------------------------------------------------
 				DOCK BUTTONS IF TIMNE SLIDER IS DOCKED
 			--------------------------------------------------------------------------------*/
-			if slider_docked then
-			(
-				if not buttons_docked then
-				(
-					cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
-					
-					cui.DockDialogBar _rollout #cui_dock_bottom
-					
-					force_update_buttons = true
-				)
-			)
+			if slider_docked and not buttons_docked then
+				this._dockButtonsWin()
 			
 			
 			/*------------------------------------------------------------------------------
 				IF SLIDER UN-DOCKED
 			--------------------------------------------------------------------------------*/
-			if not slider_docked then
+			else if not slider_docked and not this._windowsAreAligned() then
 			(
-				--format "\n"
-				--format "slider_pos_size.w:  %\n" slider_pos_size.w
-				--format "buttons_size_pos.w: %\n" buttons_size_pos.w
-				--format "TEST: %\n" (slider_pos_size.bottom != buttons_size_pos.top or slider_pos_size.left != buttons_size_pos.left or slider_pos_size.w != buttons_size_pos.w )
-				
-				if slider_pos_size.left 	 != buttons_size_pos.left \  -- NOT ALIGN ALIGN LEFT
-				or slider_pos_size.w 	 != buttons_size_pos.w    \  -- WIDTH CHANGED
-				or slider_pos_size.bottom != buttons_size_pos.top then -- NOT ALIGN ALIGN TOP
-				(
-					--format "slider_pos_size: %\n" slider_pos_size
-					this.alignSliderToBottomOfViewport()
+				this._resizeAndRepositionWindows()
 					
-					/* SET WIDTH OF SLIDER */ 
-					this.setSliderWidth()
-	
-					/* ALIG MPOSITION */ 
-					this.alignTimeSliders()
-					
-					/* UN DOCK BUTTONS */ 
-					if buttons_docked then
-					(
-						cui.UnRegisterDialogBar _rollout
-		
-						buttons_hwnd = this.getChildWindow "Time Slider Tools"
-					)
-		
-					/* SET POSITION OF BUTTONS WINDOW */ 
-					windows.setWindowPos buttons_hwnd buttons_size_pos true
-		
-					/* SET TIME SLIDER POSITION */ 
-					windows.setWindowPos slider_hwnd slider_pos_size true
-			
-					force_update_buttons = true
-					
-				)
+				force_update_buttons = true
 			)
 		)
 		
 		/* UPDATE BUTTONS */ 
 		this.updateButtonsVisibility(force_update_buttons)
 
-		last_pos = copy slider_pos_size
 
 		--_rollout.SPN_range_start.value	= animationRange.start
 		--_rollout.SPN_range_end.value	= animationRange.end
 		
 
-		--/* UPDATE CURRENT FRAME */ 
-		--if not is_playing_now then
-		--(
-		--	/* SYNC buttons with time slider - if slider has been changed */ 
-		--	--if _rollout.slider_time != sliderTime.frame then
-		--		_rollout.ToolsCallback.setFrame sliderTime.frame
-		--
-		--	_rollout.slider_time = sliderTime.frame
-		--	
-		--)
-		--else /* SET NEXT FRAME OF PALYING ANIMATION */ 
-		--	_rollout.ToolsCallback.setNextFrame()
-		--		
-			
 		--/*
 		--	AUTO FILTER KEYS ON TIME SLIDER
 		--  
@@ -277,23 +298,37 @@ struct TrackbarDialogTicker_v
 	),
 	
 	
-	/** Align slider to bottom of viewport
+	/** Snamp  time slider to left bottom corner of max if is close enough
 	 */
-	function alignSliderToBottomOfViewport =
+	function snapSliderToBottomOfViewport =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.alignSliderToBottomOfViewport()"
+		--format "\n"; print "TrackbarDialogTicker_v.snapSliderToBottomOfViewport()"
+		snap_treshold = 128
 		
-		if abs( slider_pos_size.x - maxwin_pos_size.left ) < 100 then
+		/*------------------------------------------------------------------------------
+			SNAP TO LEFT EDGE
+		--------------------------------------------------------------------------------*/
+		if  abs( slider_pos_size.x      - maxwin_pos_size.left	) < snap_treshold then
 		(
 			/* RESET POSITION */ 
-			translate slider_pos_size [ -slider_pos_size.x, -slider_pos_size.y ]
+			translate slider_pos_size [ -slider_pos_size.x, 0 ]
 			
-			/* MOVE IT TO BOTTOM */ 
-			translate slider_pos_size [ maxwin_pos_size.left + 8, maxwin_pos_size.bottom - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h ]
-			
+			/* MOVE TO LEFT */ 
+			translate slider_pos_size [ maxwin_pos_size.left + 8, 0 ]
 		)
 		
-
+		/*------------------------------------------------------------------------------
+			SNAP TO BOTTOM EDGE
+		--------------------------------------------------------------------------------*/
+		if abs( slider_pos_size.bottom - maxwin_pos_size.bottom	) < snap_treshold then
+		(
+			/* RESET POSITION */ 
+			translate slider_pos_size [ 0, -slider_pos_size.y ]
+			
+			/* MOVE TO BOTTOM */ 
+			translate slider_pos_size [ 0, maxwin_pos_size.bottom - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h ]
+		)
+		
 	),
 	
 	/** Align time sliders
