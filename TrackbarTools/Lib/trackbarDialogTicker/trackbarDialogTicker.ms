@@ -49,6 +49,9 @@ struct TrackbarDialogTicker_v
 	
 	dock_state,
 	
+	last_pos,
+	pos_is_changing = false,
+	
 	/** Update ui
 	 */
 	function updateUi =
@@ -68,17 +71,10 @@ struct TrackbarDialogTicker_v
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
 		buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		slider_hwnd = this.getChildWindow "Time Slider"
-		--/* SHOW \ HIDE RED STRIP ON TOP OF ROLLOUT IF AINMATION MODE IS ACTIVE */ 
-		--_rollout.status_bar.visible = animButtonState
-		--
-		--format "slider_hwnd: %\n" slider_hwnd
-		if slider_hwnd == undefined then
-		(
-			--format "slider_hwnd: %\n" slider_hwnd
-			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
 
-			--format "slider_docked_hwnd: %\n" slider_docked_hwnd
-		)
+		
+		if slider_hwnd == undefined then
+			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
 		
 		slider_docked  = slider_hwnd  == undefined 
 		buttons_docked = buttons_hwnd == undefined 
@@ -89,73 +85,96 @@ struct TrackbarDialogTicker_v
 
 		if slider_hwnd != undefined then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
+		
+		
+		buttons_win_need_update = last_pos == undefined	
+			
+		if last_pos == undefined then
+			last_pos = copy slider_pos_size
 
-		--format "\n"
-		--format "buttons_size_pos: %\n" buttons_size_pos
-		--format "slider_pos_size:  %\n" slider_pos_size
+
+		if pos_is_changing and last_pos == slider_pos_size then
+		(
+			pos_is_changing = false
 		
-		
+			buttons_win_need_update = true
+		)
+		else if not pos_is_changing and last_pos != slider_pos_size then
+			pos_is_changing = true
+
+			
 		force_update_buttons = false
 
 
-		
-		/* IF SLIDER DOCKED */ 
-		if slider_docked then
+		if buttons_win_need_update then
 		(
-			if not buttons_docked then
-			(
-				cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
-				
-				cui.DockDialogBar _rollout #cui_dock_bottom
-				
-				force_update_buttons = true
-			)
-		)
-		
-		
-		/* IF SLIDER UN-DOCKED */ 
-		if not slider_docked then
-		(
-			--format "\n"
-			--format "slider_pos_size.w:  %\n" slider_pos_size.w
-			--format "buttons_size_pos.w: %\n" buttons_size_pos.w
-			--format "TEST: %\n" (slider_pos_size.bottom != buttons_size_pos.top or slider_pos_size.left != buttons_size_pos.left or slider_pos_size.w != buttons_size_pos.w )
 			
-			if slider_pos_size.left 	 != buttons_size_pos.left \  -- NOT ALIGN ALIGN LEFT
-			or slider_pos_size.w 	 != buttons_size_pos.w    \  -- WIDTH CHANGED
-			or slider_pos_size.bottom != buttons_size_pos.top then -- NOT ALIGN ALIGN TOP
+			/*------------------------------------------------------------------------------
+				DOCK BUTTONS IF TIMNE SLIDER IS DOCKED
+			--------------------------------------------------------------------------------*/
+			if slider_docked then
 			(
-				/* SET WIDTH OF SLIDER */ 
-				this.setSliderWidth()
-
-				/* ALIG MPOSITION */ 
-				this.alignTimeSliders()
-				
-				/* UN DOCK BUTTONS */ 
-				if buttons_docked then
+				if not buttons_docked then
 				(
-					cui.UnRegisterDialogBar _rollout
-	
-					buttons_hwnd = this.getChildWindow "Time Slider Tools"
+					cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
+					
+					cui.DockDialogBar _rollout #cui_dock_bottom
+					
+					force_update_buttons = true
 				)
-	
-				/* SET POSITION OF BUTTONS WINDOW */ 
-				windows.setWindowPos buttons_hwnd buttons_size_pos true
-	
-				--	/* SET DEFAULT TIME SLIDER POSITION */ 
-				--windows.setWindowPos slider_hwnd slider_pos_size true
-		
-				force_update_buttons = true
+			)
+			
+			
+			/*------------------------------------------------------------------------------
+				IF SLIDER UN-DOCKED
+			--------------------------------------------------------------------------------*/
+			if not slider_docked then
+			(
+				--format "\n"
+				--format "slider_pos_size.w:  %\n" slider_pos_size.w
+				--format "buttons_size_pos.w: %\n" buttons_size_pos.w
+				--format "TEST: %\n" (slider_pos_size.bottom != buttons_size_pos.top or slider_pos_size.left != buttons_size_pos.left or slider_pos_size.w != buttons_size_pos.w )
 				
+				if slider_pos_size.left 	 != buttons_size_pos.left \  -- NOT ALIGN ALIGN LEFT
+				or slider_pos_size.w 	 != buttons_size_pos.w    \  -- WIDTH CHANGED
+				or slider_pos_size.bottom != buttons_size_pos.top then -- NOT ALIGN ALIGN TOP
+				(
+					--format "slider_pos_size: %\n" slider_pos_size
+					this.alignSliderToBottomOfViewport()
+					
+					/* SET WIDTH OF SLIDER */ 
+					this.setSliderWidth()
+	
+					/* ALIG MPOSITION */ 
+					this.alignTimeSliders()
+					
+					/* UN DOCK BUTTONS */ 
+					if buttons_docked then
+					(
+						cui.UnRegisterDialogBar _rollout
+		
+						buttons_hwnd = this.getChildWindow "Time Slider Tools"
+					)
+		
+					/* SET POSITION OF BUTTONS WINDOW */ 
+					windows.setWindowPos buttons_hwnd buttons_size_pos true
+		
+					/* SET TIME SLIDER POSITION */ 
+					windows.setWindowPos slider_hwnd slider_pos_size true
+			
+					force_update_buttons = true
+					
+				)
 			)
 		)
 		
 		/* UPDATE BUTTONS */ 
 		this.updateButtonsVisibility(force_update_buttons)
 
-		
-		_rollout.SPN_range_start.value	= animationRange.start
-		_rollout.SPN_range_end.value	= animationRange.end
+		last_pos = copy slider_pos_size
+
+		--_rollout.SPN_range_start.value	= animationRange.start
+		--_rollout.SPN_range_end.value	= animationRange.end
 		
 
 		--/* UPDATE CURRENT FRAME */ 
@@ -257,6 +276,26 @@ struct TrackbarDialogTicker_v
 		buttons_size_pos.w = slider_width
 	),
 	
+	
+	/** Align slider to bottom of viewport
+	 */
+	function alignSliderToBottomOfViewport =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.alignSliderToBottomOfViewport()"
+		
+		if abs( slider_pos_size.x - maxwin_pos_size.left ) < 100 then
+		(
+			/* RESET POSITION */ 
+			translate slider_pos_size [ -slider_pos_size.x, -slider_pos_size.y ]
+			
+			/* MOVE IT TO BOTTOM */ 
+			translate slider_pos_size [ maxwin_pos_size.left + 8, maxwin_pos_size.bottom - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h ]
+			
+		)
+		
+
+	),
+	
 	/** Align time sliders
 	 */
 	function alignTimeSliders =
@@ -278,9 +317,7 @@ struct TrackbarDialogTicker_v
 		
 			--translate slider_pos_size [ 0, -slider_pos_size.y ]
 			
-			/* MOVE IT TO BOTTOM */ 
-			--translate slider_pos_size [ 0, maxwin_pos_size.h - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h ]
-	
+
 			--slider_pos_size.h = 95
 
 			translate buttons_size_pos [ slider_pos_size.x, slider_pos_size.bottom ]
