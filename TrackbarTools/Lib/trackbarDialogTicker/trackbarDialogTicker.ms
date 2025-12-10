@@ -337,26 +337,15 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
 		
-		/* FIND LEFT TOP CORNER OF WINDOW ALIGNEND TO CENTER */ 
-		--centered_pos = [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
 		--/* MOVE WINDOW TO CENTERED POSTION */ 
-		
+		--centered_pos = [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
 		
 		if slider_hwnd != undefined then
 		(
 			/* RESET POSITION */ 
 			translate buttons_size_pos [ -buttons_size_pos.x, -buttons_size_pos.y ]
-		--format "buttons_size_pos: %\n" buttons_size_pos
-		--format "slider_pos_size: %\n" slider_pos_size
-			--center_position maxwin_pos_size.center.x  - ( -slider_pos_size.w / 2 )
-		
-			--translate slider_pos_size [ 0, -slider_pos_size.y ]
 			
-
-			--slider_pos_size.h = 95
-
 			translate buttons_size_pos [ slider_pos_size.x, slider_pos_size.bottom ]
-			
 		)
 		else
 			translate buttons_size_pos [ 0, -viewport_bottom_padding ]

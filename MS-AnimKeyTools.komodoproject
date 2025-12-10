@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Komodo Project File - DO NOT EDIT -->
 <project id="1113d1d2-74de-42d8-913a-3406d6b9a29d" kpf_version="5" name="MS-AnimKeyTools.komodoproject">
-<livefolder id="4ec5ae84-ca77-4483-8d12-9fc28546e2a9" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="PhaseMaker" url="PhaseMaker/">
-</livefolder>
-<file id="5038502e-da7e-4d48-8e6d-5d2f0b50d140" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="TrackbarTools.ms" url="TrackbarTools.ms">
-</file>
 <livefolder id="562b4b98-a419-4847-83d5-f3a39aae5e20" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="ObjectControllerKeys" url="Lib/ObjectControllerKeys/">
 </livefolder>
-<file id="59810a0a-168f-4982-9d58-af2671eeb284" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="PhaseMaker.ms" url="PhaseMaker.ms">
-</file>
-<livefolder id="6e9bc2f5-68a3-4db5-9d6e-e7ae40ed82e6" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="TrackbarTools" url="TrackbarTools/">
-</livefolder>
-<file id="850ef898-80e2-44dc-a248-9bd2ddbb8127" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="AnimTools.ms" url="AnimTools.ms">
-</file>
+<folder id="5af1249a-22f0-4572-a7b7-fca63ea84995" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="Dialogs">
+</folder>
 <livefolder id="d5c06223-ea47-4d8a-8387-fc0b8b05c2b5" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="Lib" url="Lib/">
 </livefolder>
-<livefolder id="fd892adc-4160-4a28-bca1-4e4941d372cc" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="AnimTools" url="AnimTools/">
+<file id="1b9a4099-fd6d-4c40-a0d7-ba4ec8f49ce0" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools.ms" url="AnimTools.ms">
+</file>
+<file id="a38bbe5d-265a-4250-8aa6-69a02eaafc87" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="PhaseMaker.ms" url="PhaseMaker.ms">
+</file>
+<livefolder id="c12576a3-b432-4d9f-a42e-5d468d68cbf6" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools" url="TrackbarTools/">
 </livefolder>
+<livefolder id="e7e3a4c2-4c50-4a58-a357-2ca4949ea70a" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools" url="AnimTools/">
+</livefolder>
+<livefolder id="eedd9dbb-4ea9-4bd7-a3a1-c19dda41d34f" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="PhaseMaker" url="PhaseMaker/">
+</livefolder>
+<file id="f0246cc1-38c3-4e17-bfc8-9f7fcc246b69" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools.ms" url="TrackbarTools.ms">
+</file>
 <preference-set idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" id="project" preftype="project">
   <long id="prefs_version">1</long>
 </preference-set>

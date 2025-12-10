@@ -191,14 +191,14 @@ struct TrackbarToolsCallback_v
 
 
 	
-	/** Get frame button
-	 */
-	function _getFrameButton frame =
-	(
-		--format "\n"; print "TrackbarToolsCallback_v._getFrameButton()"
-		
-		execute ( _rollout.name + ".btn_frame_" + frame as string ) --return
-	),
+	--/** Get frame button
+	-- */
+	--function _getFrameButton frame =
+	--(
+	--	--format "\n"; print "TrackbarToolsCallback_v._getFrameButton()"
+	--	
+	--	execute ( _rollout.name + ".btn_frame_" + frame as string ) --return
+	--),
 	--	
 	--/** Get frame button color
 	-- */
@@ -225,7 +225,7 @@ struct TrackbarToolsCallback_v
 	function _getPhaseLenght =
 	(
 		--format "\n"; print "TrackbarToolsCallback_v._getPhaseLenght()"
-		_rollout.DL_phase.selected as integer
+		ROLLOUT_phasemaker_options.DL_phase_length.selected as integer
 	),
 	
 	on create do

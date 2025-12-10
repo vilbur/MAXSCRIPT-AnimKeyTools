@@ -4,7 +4,7 @@
 
   
  */
-function frameButtonRcMenu frame =
+function frameButtonRcMenu =
 (
 	/** Get int string
 	 */
@@ -23,7 +23,9 @@ function frameButtonRcMenu frame =
 	transform_tracks = #( "POSITION", "ROTATION", "SCALE" ) 
 	--format "\n"; print ".frameButtonRcMenu()"
 	--format "DIALOG_time_slider_tools.DL_phase.selection: %\n" DIALOG_time_slider_tools.DL_phase.selection
-	phase_length = DIALOG_time_slider_tools.DL_phase.items[DIALOG_time_slider_tools.DL_phase.selection] as integer
+	phase_dll = ROLLOUT_phasemaker_options.DL_phase_length 
+	
+	phase_length = phase_dll.items[phase_dll.selection] as integer
 	
 	phase = [ currentTime, currentTime + phase_length - 1 ] 
 	--format "PAHSE_RANGE: %\n" phase

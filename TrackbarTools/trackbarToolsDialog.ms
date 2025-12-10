@@ -160,11 +160,25 @@ function trackbarToolsDialog =
 		
 		pos = [ pos_x_button += width_button , pos_y ]
 		
+		tooltip = "Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str
+		
 		/* ADD BUTTON */ 
 		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:0 height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:false
 		
-		_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:("Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str )
+		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
+		
+		keep_button_state = " EventFired.control.state = not EventFired.control.state "
+		
+		if_control_pressed_jump_to_phase = "if keyboard.controlPressed then ("+keep_button_state+"; ToolsCallback.jumpToPhase"
+		
+		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
+		--_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(1)  )else if ( frame = EventFired.control.text as integer ) != sliderTime then sliderTime = frame" ) tooltip:tooltip
+		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(-1) )else frameButtonRcMenu()" ) tooltip:tooltip
+		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
+		
 	)
+	
+	
 	
 	/*------------------------------------------------------------------------------
 		PLAY BUTTON
