@@ -25,8 +25,9 @@ filein( getFilenamePath(getSourceFileName()) + "/../MAXSCRIPT-COLOR_NAMES/COLOR_
 
 
 /*------------------------------------------------------------------------------
-	COMMON
+	SHARED
 --------------------------------------------------------------------------------*/
+
 
 filein( getFilenamePath(getSourceFileName()) + "/Lib/ObjectControllerKeys/ObjectControllerKeys.ms" )	--"./Lib/ObjectControllerKeys/ObjectControllerKeys.ms"
 
@@ -34,7 +35,7 @@ filein( getFilenamePath(getSourceFileName()) + "/Lib/RigWrapper/RigWrapper.ms" )
 
 filein( getFilenamePath(getSourceFileName()) + "/Lib/KeyFrameManager/KeyFrameManager.ms" )	--"./Lib/KeyFrameManager/KeyFrameManager.ms"
 
-
+filein( getFilenamePath(getSourceFileName()) + "/Lib/showTimeSlider/showTimeSlider.ms" )	--"./Lib/showTimeSlider/showTimeSlider.ms"
 
 /*------------------------------------------------------------------------------
 	MACROS - imported in production

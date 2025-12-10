@@ -2,7 +2,7 @@
  */
 function showTimeSlider =
 (
-	--format "\n"; print ".showTimeSlider()"
+	format "\n"; print ".showTimeSlider()"
 	
 	/** FORCE RELOAD WORKSPACE AFTER CHANGE IN FILE TO SHOW TIMESLIDER
 	  
