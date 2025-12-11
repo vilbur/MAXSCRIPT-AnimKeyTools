@@ -10,19 +10,12 @@ struct TrackbarDialogTicker_v
 	_rollout,
 	
 	/* required */
-	
 	/* properties */
-	
-	
 	/* dependency */
-	--TrackbarToolsCallback = _rollout.ToolsCallback,
-	
 	/* reference */
 	/* inhered */
-
 	
 	/* properties */
-	--buttons = Dictionary #INTEGER,
 	buttons,
 	
 	/* private */
@@ -55,18 +48,7 @@ struct TrackbarDialogTicker_v
 	/* STATIC */ 
 	viewport_bottom_padding = 56,
 	
-	
-	--/** Update ui
-	-- */
-	--function updateUi =
-	--(
-	--	--format "\n"; print "TrackbarToolsCallback_v.updateUi()"
-	--	this.setAnimRange animationRange.start animationRange.end
-	--	
-	--	this.showHideButtonsInRange currentTime.frame
-	--	
-	--	this.setFrame currentTime.frame		
-	--),
+	init = false,
 	
 	/** On timer tick update Dialog
 	 */
@@ -105,9 +87,15 @@ struct TrackbarDialogTicker_v
 		)
 		
 		
-		/* UPDATE BUTTONS */ 
-		this.updateButtonsVisibility(force_update_buttons)
+		/* UPDATE BUTTONS */
+		--if not init then
+		--(
+		--	--init = true
+			this.updateButtonsVisibility(force_update_buttons)
+		--)
 		
+		
+		/* SHOW \ HIDE KEYS by type */ 
 		this._filterTrackbarKeysByCurrentTool()
 		
 		/* UPDATE ANIM RANGE START \ END */ 
@@ -407,74 +395,73 @@ struct TrackbarDialogTicker_v
 	function updateButtonsVisibility force_update_buttons =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsVisibility()"
-		/* GET BUTTONSON INIT */ 		
-		if buttons == undefined then
-			buttons = this._getFrameButtons()
-
-			
-		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
-
-		visible_buttons = for btn in buttons where btn.visible collect btn 
-
 		
-		if force_update_buttons or visible_buttons.count != frames_in_range then
+		/** Set button text by frame
+		 */
+		function setButtonTextByFrame visible_buttons =
 		(
-			--format "\nWTF"
+			--format "\n"; print "TrackbarDialogTicker_v.setButtonTextByFrame()"
+			is_first_frame_changed = visible_buttons[1].text as integer != animationRange.start.frame as integer
+			
+			/* EDIT TEXT */ 
+			if is_first_frame_changed then
+				for i = 1 to this.buttons.count do
+					this.buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
+		)
+		
+		/** Fit buttons to dialog
+		 */
+		function fitButtonsToDialog frames_in_range =
+		(
+			--format "\n"; print "TrackbarDialogTicker_v.fitButtonsToDialog()"
+			pos_x = 54 -- left margin on trackbar
+			
 			buttons_area = slider_width - 108
 
+			/* FIX WIDTH OF DOCKED DIALOG */ 
 			if slider_hwnd == undefined then
 				buttons_area -= 20
 			
-			btn_width = (buttons_area / (frames_in_range ) ) 
-	
-			pos_x = 54
-			pos_x_last = 0
+			btn_width = ( buttons_area / (frames_in_range ) ) 
 			
-			if visible_buttons[1] != undefined then -- DEV LINE
-			if visible_buttons[1].text as integer != animationRange.start.frame as integer then
-				for i = 1 to buttons.count do
-					buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
-		
+			
 			for i = 1 to buttons.count do
 			(
-				
+				/* EDIT BUTTON */ 
 				buttons[i].visible = i <= frames_in_range
 				buttons[i].width   = btn_width
 				buttons[i].pos.x   = pos_x
 				
+				/* UPDADTE POS FOR NEXT BUTTON */ 
 				pos_x += btn_width
-				
-				--format "pos_x: %\n" pos_x
-				--buttons[i].text = "i as string"
-				
-				if buttons[i].visible then
-					pos_x_last = pos_x
-				
 			)
 			
-			_rollout.BTN_play.pos = [ pos_x_last, 0 ]
-		)
-		
-		
-		
-		--format "buttons[frames_in_range]: %\n" buttons[frames_in_range].pos.x
-		--dialog_width = buttons[frames_in_range].pos.x	+ btn_width + 18
+			/* SET POSITION OF "PLAY" BUTTON */
+			pos_after_last_button = buttons[frames_in_range + 1].pos
 
-		--setDialogSize _rollout [ dialog_width, dialog_size.y ]
+			_rollout.BTN_play.pos = pos_after_last_button
+		)
+
 		
-		--phase_lenght = this._getPhaseLenght()
+		/* GET BUTTON CONTROLS ON INIT */ 		
+		if this.buttons == undefined then
+			this.buttons = this._getFrameButtons()
+
 		
-		--phase_start = frame - phase_lenght
-		
-		--/* DISBALE OTHER FRAME BUTTONS */ 
-		--for key in sort buttons.keys do
-		--(
-		--	is_current_frame_button = key == frame
-		--	
-		--	buttons[key].state = is_current_frame_button
-		--	
-		--	buttons[key].highlightColor = this.getFrameButtonColor frame
-		--)
+		/* GET BUTTONS */ 
+		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
+
+		visible_buttons = for btn in buttons where btn.visible collect btn 
+
+		/* UPDATE BUTTONS */ 
+		if force_update_buttons or visible_buttons.count != frames_in_range then
+		(
+			--format "\nWTF"
+			setButtonTextByFrame( visible_buttons )
+			
+			fitButtonsToDialog( frames_in_range )
+		)
+
 		
 		/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
 		--for key in sort buttons.keys do
