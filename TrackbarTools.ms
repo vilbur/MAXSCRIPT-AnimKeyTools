@@ -1,5 +1,5 @@
 
-filein( getFilenamePath(getSourceFileName()) + "/includes.ms" )	--"./includes.ms"
+filein( getFilenamePath(getSourceFileName()) + "/main_script.ms" )	--"./main_script.ms"
 
 filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/Lib/frameButtonRcMenu/frameButtonRcMenu.ms" )	--"./TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms"
 

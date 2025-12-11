@@ -1,7 +1,6 @@
+filein( getFilenamePath(getSourceFileName()) + "/main_script.ms" )	--"./main_script.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/includes.ms" )	--"./incldes.ms"
-
-filein( getFilenamePath(getSourceFileName()) + "/AnimTools/Lib/showTimeSlider/showTimeSlider.ms" )	--"./AnimTools/Lib/showTimeSlider/showTimeSlider.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Lib/showTimeSlider/showTimeSlider.ms" )	--"./Lib/showTimeSlider/showTimeSlider.ms"
 
 /** Load content and create dialog
  */
