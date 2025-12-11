@@ -23,11 +23,11 @@ function frameButtonRcMenu =
 	transform_tracks = #( "POSITION", "ROTATION", "SCALE" ) 
 	--format "\n"; print ".frameButtonRcMenu()"
 	--format "DIALOG_time_slider_tools.DL_phase.selection: %\n" DIALOG_time_slider_tools.DL_phase.selection
-	phase_dll = ROLLOUT_phasemaker_options.DL_phase_length 
+	--phase_dll = ROLLOUT_phasemaker_options.DL_phase_length 
 	
-	phase_length = phase_dll.items[phase_dll.selection] as integer
+	--phase_length = phase_dll.items[phase_dll.selection] as integer
 	
-	phase = [ currentTime, currentTime + phase_length - 1 ] 
+	phase = [ currentTime, currentTime + PHASE_LENGTH - 1 ] 
 	--format "PAHSE_RANGE: %\n" phase
 	time_delete = if keyboard.controlPressed then "#RIGHT" else "#CURRENT"
 	KeyFrameManager_side   = "(KeyFrameManager_v( if keyboard.controlPressed then #LEFT else #RIGHT ))"
@@ -37,7 +37,7 @@ function frameButtonRcMenu =
 	--------------------------------------------------------------------------------*/
 	removeKeys_cmd = "(KeyFrameManager_v( "+time_delete+" )).removeKeys "
 	copyKeys_cmd   = "(KeyFrameManager_v( "+phase as string +" )).copyKeys "
-	mirrorKeys_cmd   = "(KeyFrameManager_v( "+phase as string +" )).mirrorKeys "
+	mirrorKeys_cmd = "(KeyFrameManager_v( "+phase as string +" )).mirrorKeys "
 
 	/*------------------------------------------------------------------------------
 		HELPERS
@@ -125,10 +125,6 @@ function frameButtonRcMenu =
 		Menu.item "TRIM all keys from scene RIGHT • Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+KeyFrameManager_side+".removeKeys objs:( objects as Array )")
 	)
 	
-	
-		
-
-	
 	--submenu = Menu.menu "COPY KEYS"
 
 	/* SUBMENU TRANSFORMS */
@@ -140,10 +136,7 @@ function frameButtonRcMenu =
 	
 	/* COPY POSITION KEYS ABOUT 30 FRAMES FORWARD */ 
 	--KeyFrameManager.copyKeys time:[ 0, 10 ] increment:30 transforms:#POSITION
-	
 
 	
-	popUpMenu (Menu.create())
-	
-	
+	Menu.popUp()
 )

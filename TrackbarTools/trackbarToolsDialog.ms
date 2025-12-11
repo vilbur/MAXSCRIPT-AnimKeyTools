@@ -153,7 +153,7 @@ function trackbarToolsDialog =
 	/*------------------------------------------------------------------------------
 		FRAME BUTTONS
 	------------------------------------------------------------------------------*/
-	format "FRAME_RANGE: %\n" buttons_count
+	--format "FRAME_RANGE: %\n" buttons_count
 	for i = 0 to buttons_count do
 	(
 		i_str = i as string
@@ -171,9 +171,9 @@ function trackbarToolsDialog =
 		
 		if_control_pressed_jump_to_phase = "if keyboard.controlPressed then ("+keep_button_state+"; ToolsCallback.jumpToPhase"
 		
-		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
+		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
 		--_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(1)  )else if ( frame = EventFired.control.text as integer ) != sliderTime then sliderTime = frame" ) tooltip:tooltip
-		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(-1) )else frameButtonRcMenu()" ) tooltip:tooltip
+		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:tooltip
 		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
 		
 	)
@@ -184,7 +184,8 @@ function trackbarToolsDialog =
 		PLAY BUTTON
 	--------------------------------------------------------------------------------*/
 	
-	PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
+	--PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
+	PlayBtn	= _Controls.control #CHECKBUTTON	"▶"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
 	
 	PlayBtn.Event #CHANGED "is_playing_now = not is_playing_now"	tooltip:"Start \ Stop playback"
 	PlayBtn.Event #RIGHTCLICK "ToolsCallback.showFpsRcMenu()"	tooltip:"Set FPS"

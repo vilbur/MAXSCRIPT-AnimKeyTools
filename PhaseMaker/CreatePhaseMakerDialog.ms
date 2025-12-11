@@ -25,7 +25,7 @@ function createPhaseMakerDialog =
 	
 	Dialog.register()
 	
-	Dialog.alignToDialog( DIALOG_time_slider_tools ) height:#BOTTOM
+	--Dialog.alignToDialog( DIALOG_time_slider_tools ) height:#BOTTOM
 	
 	format "ROLLOUT_phasemaker_options: %\n" ROLLOUT_phasemaker_options
 	--format "ROLLOUT_phasemaker_options.DL_rig_select: %\n" ROLLOUT_phasemaker_options.DL_rig_select

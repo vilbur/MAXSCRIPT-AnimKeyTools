@@ -110,8 +110,9 @@ struct TrackbarDialogTicker_v
 		
 		this._filterTrackbarKeysByCurrentTool()
 		
-		--_rollout.SPN_range_start.value	= animationRange.start
-		--_rollout.SPN_range_end.value	= animationRange.end
+		/* UPDATE ANIM RANGE START \ END */ 
+		_rollout.SPN_range_start.value	= animationRange.start
+		_rollout.SPN_range_end.value	= animationRange.end
 		
 
 		--/* SYNC WITH GLOBAL VAROABLE */
@@ -139,28 +140,20 @@ struct TrackbarDialogTicker_v
 		slider_hwnd	= this.getChildWindow "Time Slider"
 		
 		
-		--slider_docked  = slider_hwnd  == undefined
-		--buttons_docked = buttons_hwnd == undefined
-		
-		
 		/* IF BUTTONS ARE UN DOCKED */ 
-		--if buttons_hwnd != undefined then 
 		if not ( buttons_docked  = buttons_hwnd == undefined ) then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
 
 		/* IF TIMESLIDER IS UN DOCKED */ 
-		--if slider_hwnd != undefined then 
 		if not ( slider_docked  = slider_hwnd == undefined ) then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 		
 		
 		/* IF TIMESLIDER IS DOCKED */ 
-		--else if slider_hwnd == undefined and slider_docked_hwnd == undefined then
 		else if slider_hwnd == undefined then
 			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
 		
-
 		--format "\n"
 		--format "buttons_hwnd: %\n" buttons_hwnd
 		--format "slider_hwnd:  %\n" slider_hwnd

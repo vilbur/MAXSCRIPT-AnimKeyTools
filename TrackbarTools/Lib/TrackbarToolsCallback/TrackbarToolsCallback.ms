@@ -19,7 +19,10 @@ struct TrackbarToolsCallback_v
 	hwnd_slider_tools,
 		
 	hwnd_slider_default,
-		
+	
+	playback_fps = #( 24, 12, 6, 4, 2, 1 ),
+	--playback_fps = #( "24", "12", "6", "4", "2", "1" ),
+	
 	/** Show fps rc menu
 	 */
 	function showFpsRcMenu =
@@ -27,14 +30,11 @@ struct TrackbarToolsCallback_v
 		format "\n"; print "TrackbarToolsCallback_v.showFpsRcMenu()"
 		Menu = RcMenu_v name:"FpsRcMenu"
 		
-		Menu.item	"24"	"callback"
-		
-		/* DEFINE SUBMENU */
-		submenu = Menu.menu "Submenu"
-		
-		Menu.separator()
+		/* ADD ITEMS */ 
+		for fps in playback_fps do
+			Menu.item	( fps as string )	"callback"
 			
-		popUpMenu (Menu.create())
+		Menu.popUp()
 	),
 	
 	/** Get child window
