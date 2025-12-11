@@ -1,8 +1,7 @@
 clearListener(); print("Cleared in:\n"+getSourceFileName())
 
-filein( getFilenamePath(getSourceFileName()) + "/../TransformFlipper.ms" )	--"./../TransformFlipper.ms"
 
-
+filein( getFilenamePath(getSourceFileName()) + "/../../Lib/TransformFlipper/TransformFlipper.ms" )	--"./../../Lib/TransformFlipper/TransformFlipper.ms"
 
 
 
@@ -56,7 +55,11 @@ times_all = for i = amin ( times_A + times_B ) to amax ( times_A + times_B ) col
 
 current_time = #( currentTime.frame as integer )
 
-/* CREATE TEST OBJECTS */ 
+
+
+/*------------------------------------------------------------------------------
+	CREATE TEST OBJECTS
+--------------------------------------------------------------------------------*/
 --delete objects
 
 --obj_A = createTestObject [ -50, 0, 0 ] times_A  wirecolor:red
@@ -64,7 +67,9 @@ current_time = #( currentTime.frame as integer )
 --obj_B = createTestObject [  50, 0, 0 ] times_B wirecolor:green
 
 
-/* GET TEST SELECTED OBJECTS */ 
+/*------------------------------------------------------------------------------
+	GET TEST SELECTED OBJECTS
+--------------------------------------------------------------------------------*/
 obj_A = selection[1]
 
 obj_B = selection[2]

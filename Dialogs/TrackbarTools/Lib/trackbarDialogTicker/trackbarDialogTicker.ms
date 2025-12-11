@@ -324,8 +324,9 @@ struct TrackbarDialogTicker_v
 			default: maxwin_pos_size.w
 		)
 		
-		/* SET WINDOW WIDTH */ 
-		buttons_size_pos.w = slider_width
+		/* SET WINDOW WIDTH */
+		if buttons_size_pos != undefined then 
+			buttons_size_pos.w = slider_width
 	),
 	
 	

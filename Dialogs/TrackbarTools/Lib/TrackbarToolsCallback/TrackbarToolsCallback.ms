@@ -27,12 +27,18 @@ struct TrackbarToolsCallback_v
 	 */
 	function showFpsRcMenu =
 	(
-		format "\n"; print "TrackbarToolsCallback_v.showFpsRcMenu()"
+		--format "\n"; print "TrackbarToolsCallback_v.showFpsRcMenu()"
+		fps_current = DIALOG_time_slider_tools.SPN_FPS_holder.value
+		
 		Menu = RcMenu_v name:"FpsRcMenu"
 		
 		/* ADD ITEMS */ 
 		for fps in playback_fps do
-			Menu.item	( fps as string )	"callback"
+		(
+			command = "DIALOG_time_slider_tools.SPN_FPS_holder.value = " + ( fps as string )
+			--format "%: %\n" fps (fps == fps_current)
+			Menu.item	( fps as string ) command enabled:( fps != fps_current ) checked:( fps == fps_current )
+		)
 			
 		Menu.popUp()
 	),
@@ -105,9 +111,9 @@ struct TrackbarToolsCallback_v
 	 */
 	function selectObjectsWithKey frame =
 	(
-		format "\n"; print "TrackbarToolsCallback_v.selectObjectsWithKey()"
+		--format "\n"; print "TrackbarToolsCallback_v.selectObjectsWithKey()"
 		
-		format "\n FUNCTION IS PLACHOLDER"
+		--format "\n FUNCTION IS PLACHOLDER"
 	),
 	
 	/* Go to frame
@@ -230,7 +236,7 @@ struct TrackbarToolsCallback_v
 	
 	on create do
 	(
-		format "\n"; print "TrackbarToolsCallback_v.onCreate()"
+		--format "\n"; print "TrackbarToolsCallback_v.onCreate()"
 		hwnd_slider_tools = this.getChildWindow "Time Slider Tools"
 		hwnd_slider_default = this.getChildWindow "Time Slider"
 	)

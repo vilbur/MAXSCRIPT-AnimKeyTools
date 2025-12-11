@@ -31,24 +31,9 @@ function trackbarToolsDialog =
 	
 	dialog_width = (visible_buttons * width_button ) + ( width_groupbox * 2 ) + (width_button  ) 
 	
-	--frame_buttons = buttons_count + 1
-	--
-	--
-	----margin = 4
-	--across = frame_buttons + 1
-	--
-	--align_slider_to_buttons = 6 -- offset for pixel perfect postion of slider
-	--
-	--buttons_margin = 2 * width_button
-	--
-	--width_slider	= width_button * buttons_count + ( width_button / 2) + align_slider_to_buttons
-	--
-	----dialog_width = (width_groupbox * 2) + width_slider + buttons_margin - ( width_button / 2)
-	--
 	dialog_height = 36
 	
 
-	
 	/* ORIGIN OF CONTROLS  */ 
 	pos_x_origin = pos_x = (width_groupbox ) 
 	
@@ -57,12 +42,11 @@ function trackbarToolsDialog =
 	pos_x_button =  pos_x_origin - ( width_button / 2 )
 	
 		
-	
-	--id = #DIALOG_trackbar_tools
-	 
 	/* DIALOG */
-	--Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 ) ini:(getSourceFileName())
-	Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 )
+	Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 ) ini:(getSourceFileName())
+	--Dialog 	    = Dialog_v ("Time Slider Tools") width:(dialog_width + 0 )
+	
+	
 	/* DIALOG CONTROLS */  
 	_Controls   = Dialog.Controls()
 
@@ -81,6 +65,8 @@ function trackbarToolsDialog =
 	
 	Dialog.Event #OPEN ("frame_buttons = for ctrl in "+Dialog.id as string +".controls where matchPattern (ctrl as string ) pattern:(\"*btn_frame_*\") collect ctrl")	tooltip:"PRESSED Tooltip"
 	
+	
+	
 	/*------------------------------------------------------------------------------
 		TIMER
 	--------------------------------------------------------------------------------*/
@@ -93,89 +79,57 @@ function trackbarToolsDialog =
 	TIMER_playBack.Event	#TICK ("TrackbarDialogTicker.playback(is_playing_now)")
 
 
-	/*------------------------------------------------------------------------------
-		COLORED BAR OT TOP OF DIALOG
-	--------------------------------------------------------------------------------*/
-	--bar   = _Controls.control #imgTag "" id:#status_bar color:red width:dialog_width height:1 across:1 pos:[0,0] visible:false --align:#CENTER
-	
-	
-	/*------------------------------------------------------------------------------
-		GROUPBOXES DEFINITION
-	------------------------------------------------------------------------------*/
-	--_left   = _Controls.control #GroupBox "" id:#FRAMES_CONTROLS	width:width_groupbox pos:[ 0, 1 ] across:3
-	--_right  = _Controls.control #GroupBox "" id:#PHASE_CONTROLS	width:width_groupbox pos:[ dialog_width - width_groupbox, 1 ]
-	
-	pos = [ 0 , 0 ]
 
-	
 	/*------------------------------------------------------------------------------
-		LEFT GROUPBOX CONTROLS   
+		ANIM RANGE CONTROLS   
 	--------------------------------------------------------------------------------*/  
-	rangeStart = _Controls.control #SPINNER "" id:#SPN_range_start	type:#integer pos:[ 8 , 0 ] range:[-10,1000, animationRange.start ]	tooltip:"Set anim range start" fieldWidth:26
-	rangeEnd   = _Controls.control #SPINNER "" id:#SPN_range_end	type:#integer pos:[ 8, 20 ] range:[  0,1000, animationRange.end ]	tooltip:"Set anim range start" fieldWidth:26
 	
-	shiftStart	= _Controls.control #BUTTON	"<>"	id:#BTN_shift_start	width:20 height:16 pos:[ 34 , 0 ]	tooltip:"Set Animation range START"
-	shiftEnd	= _Controls.control #BUTTON	"<>"	id:#BTN_shift_end	width:20 height:16 pos:[ 34 , 20 ]	tooltip:"Set Animation range END"
-
-	--FPS_label	= _Controls.control #LABEL	"FPS"	groupbox:_left.id across:2 align:#LEFT  offset:[ 0, 10 ] 
-	--FPS_ddl	= _Controls.control #DROPDOWN	"[FPS]"	groupbox:_left.id across:2 align:#RIGHT offset:[ 6, 8 ]  width:48  offset:[ 0, 8 ] items:#( "24", "12", "6", "4", "2", "1" ) value:4 
+	/* SPINNERS */ 	
+	spinner_start = _Controls.control #SPINNER "" id:#SPN_range_start	type:#integer pos:[ 8 , 0 ] range:[-10, 1000, animationRange.start ]	tooltip:"Set anim range START" fieldWidth:26
+	spinner_end   = _Controls.control #SPINNER "" id:#SPN_range_end	type:#integer pos:[ 8, 20 ] range:[  0, 1000, animationRange.end ]	tooltip:"Set anim range END" fieldWidth:26
 	
-	rangeStart.Event	#CHANGED "ToolsCallback.setAnimRange START: EventFired.val"	tooltip:"Set Animation range START"
-	rangeEnd.Event	#CHANGED "ToolsCallback.setAnimRange END: EventFired.val"	tooltip:"Set Animation range END"
-	
-	--shiftStart.Event	#PRESSED "DIALOG_time_slider_tools.animation_range_start.value	= animationRange.start + 1"	tooltip:"Set Animation range START"
-	
-	shiftStart.Event	#PRESSED	"ToolsCallback.setAnimRange START: ( animationRange.start.frame - 1 )"
-	shiftStart.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange START: ( animationRange.start.frame + 1 )"
-
-	shiftEnd.Event	#PRESSED	"ToolsCallback.setAnimRange END: ( animationRange.end.frame - 1 )"	
-	shiftEnd.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange END: ( animationRange.end.frame + 1 )"
-	
-	
-	--FPS_ddl.Event #SELECTED  ("ToolsCallback.setInterval" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	--FPS_ddl.Event #ENTERED ("format \"VAL: %\n\"" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
+	/* BUTTONS */
+	btn_start	= _Controls.control #BUTTON	"<>"	id:#BTN_btn_sstart	width:20 height:16 pos:[ 34 , 0 ]	tooltip:"Shift FIRST frame"
+	btn_end	= _Controls.control #BUTTON	"<>"	id:#BTN_btn_send	width:20 height:16 pos:[ 34 , 20 ]	tooltip:"Shift LAST frame"
 
 	
-	/*------------------------------------------------------------------------------
-		RIGHT GROUPBOX CONTROLS  
-	--------------------------------------------------------------------------------*/ 
-	--_Switch	= _Controls.control #BUTTON "J U M P"	groupbox:_right.id across:1 width:width_groupbox height:height_btn_big offset:[ 0, -16 ] 
-	--_Phase_label	= _Controls.control #LABEL "PHASE"	groupbox:_right.id across:2 align:#LEFT  offset:[-6, 10 ] tooltip:"Number of frames in phase"
-	--_Phase_dropdown	= _Controls.control #DROPDOWN "[Phase]"	groupbox:_right.id across:2 align:#RIGHT offset:[ 6, 8 ]  width:44  offset:[ 0, 8 ] items:( for i = 1 to 10 collect i as string ) height:11
-	--
-	----_Phase.Event #CHANGED (Dialog.id as string +".clock.interval = EventFired.val as integer" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	--_Switch.Event #PRESSED ("ToolsCallback.jumpToPhase(-1)" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	--_Switch.Event #RIGHTCLICK ("ToolsCallback.jumpToPhase(1)" ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	--
-	--_Phase_dropdown.Event #SELECTED ("PHASE_LENGTH = EventFired.val" )  --("format \"EventFired: %\n\" EventFired " ) --params:#("EventFired.control")	tooltip:("Set Frame " + i as string )
-	--
+	/* EVENTS SPINNERS */ 	
+	spinner_start.Event	#CHANGED "ToolsCallback.setAnimRange START: EventFired.val"	tooltip:"Set anim range START"
+	spinner_end.Event	#CHANGED "ToolsCallback.setAnimRange END: EventFired.val"	tooltip:"Set anim range END"
+	
+	
+	/* EVENTS BUTTONS */
+	btn_start.Event	#PRESSED	"ToolsCallback.setAnimRange START: ( animationRange.start.frame - 1 )" tooltip:" -1"
+	btn_start.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange START: ( animationRange.start.frame + 1 )" tooltip:" +1"
+
+	btn_end.Event	#PRESSED	"ToolsCallback.setAnimRange END: ( animationRange.end.frame - 1 )" tooltip:" -1"
+	btn_end.Event	#RIGHTCLICK	"ToolsCallback.setAnimRange END: ( animationRange.end.frame + 1 )" tooltip:" +1"
+	
+
 
 	/*------------------------------------------------------------------------------
 		FRAME BUTTONS
 	------------------------------------------------------------------------------*/
-	--format "FRAME_RANGE: %\n" buttons_count
+
 	for i = 0 to buttons_count do
 	(
 		i_str = i as string
 		
 		pos = [ pos_x_button += width_button , pos_y ]
 		
-		tooltip = "Go to frame Frame.\n\nCTRL: Select objects with key on frame " + i_str
-		
-		/* ADD BUTTON */ 
-		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:0 height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:false
-		
-		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
-		
+		/* CALLBACK */ 
 		keep_button_state = " EventFired.control.state = not EventFired.control.state "
 		
 		if_control_pressed_jump_to_phase = "if keyboard.controlPressed then ("+keep_button_state+"; ToolsCallback.jumpToPhase"
 		
-		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
-		--_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(1)  )else if ( frame = EventFired.control.text as integer ) != sliderTime then sliderTime = frame" ) tooltip:tooltip
-		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:tooltip
-		--_Frame_btn.Event #CHANGED ("if keyboard.controlPressed then ToolsCallback.selectObjectsWithKey( "+i_str +") else sliderTime = EventFired.control.text as integer" ) tooltip:tooltip
 		
+		/* ADD BUTTON */ "CTRL + LMB | RMB: Jump to phase"
+		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:0 height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:false tooltip:"CTRL + LMB | RMB: Jump to phase"
+		
+		
+		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:"Go to frame"
+		
+		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:"Show Menu"
 	)
 	
 	
@@ -187,10 +141,13 @@ function trackbarToolsDialog =
 	--PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
 	PlayBtn	= _Controls.control #CHECKBUTTON	"▶"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
 	
-	PlayBtn.Event #CHANGED "is_playing_now = not is_playing_now"	tooltip:"Start \ Stop playback"
-	PlayBtn.Event #RIGHTCLICK "ToolsCallback.showFpsRcMenu()"	tooltip:"Set FPS"
+    PlayBtn.Event #CHANGED   	"is_playing_now = not is_playing_now" tooltip:"START \ STOP playback"
+    PlayBtn.Event #RIGHTCLICK	"ToolsCallback.showFpsRcMenu()"       tooltip:"Set FPS"
 
 	
+	/* HOLDER OF FPS VALUE */ 
+    _Controls.control #SPINNER "" id:#SPN_FPS_holder type:#integer range:[ 1, 24, 1 ] visible:false
+
 	/*------------------------------------------------------------------------------
 		DIALOG CREATE
 	------------------------------------------------------------------------------*/
