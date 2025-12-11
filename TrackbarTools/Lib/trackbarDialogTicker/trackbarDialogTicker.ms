@@ -56,17 +56,17 @@ struct TrackbarDialogTicker_v
 	viewport_bottom_padding = 56,
 	
 	
-	/** Update ui
-	 */
-	function updateUi =
-	(
-		--format "\n"; print "TrackbarToolsCallback_v.updateUi()"
-		this.setAnimRange animationRange.start animationRange.end
-		
-		this.showHideButtonsInRange currentTime.frame
-		
-		this.setFrame currentTime.frame		
-	),
+	--/** Update ui
+	-- */
+	--function updateUi =
+	--(
+	--	--format "\n"; print "TrackbarToolsCallback_v.updateUi()"
+	--	this.setAnimRange animationRange.start animationRange.end
+	--	
+	--	this.showHideButtonsInRange currentTime.frame
+	--	
+	--	this.setFrame currentTime.frame		
+	--),
 	
 	/** On timer tick update Dialog
 	 */
@@ -75,15 +75,8 @@ struct TrackbarDialogTicker_v
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
 		force_update_buttons = false
 
-		--showTimeSlider()
-		
 		this._getPositionsAndSizeOfWindows()
 
-		--format "slider_pos_size.h: %\n" slider_pos_size.h
-		--format "TEST: %\n" ( slider_pos_size.h < 50 )
-		--
-		--if slider_pos_size.h < 50 then
-		
 		/* SET WIDTH OF SLIDER */ 
 		this.setSliderWidth()
 			
@@ -114,24 +107,13 @@ struct TrackbarDialogTicker_v
 		
 		/* UPDATE BUTTONS */ 
 		this.updateButtonsVisibility(force_update_buttons)
-
-
+		
+		this._filterTrackbarKeysByCurrentTool()
+		
 		--_rollout.SPN_range_start.value	= animationRange.start
 		--_rollout.SPN_range_end.value	= animationRange.end
 		
 
-		--/*
-		--	AUTO FILTER KEYS ON TIME SLIDER
-		--  
-		--	https://help.autodesk.com/view/MAXDEV/2022/ENU/?guid=GUID-5120D063-E771-4700-98FF-60E4E578BE52
-		--*/ 
-		--trackbar.filter = if toolmode.commandmode == #ROTATE or toolmode.commandmode == #MOVE then
-		--	--#currentTM
-		--	#TMOnly 
-		--else
-		--	#all
-		--
-		--	
 		--/* SYNC WITH GLOBAL VAROABLE */
 		----if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
 		----	_rollout.DL_phase.selection = PHASE_LENGTH
@@ -145,7 +127,6 @@ struct TrackbarDialogTicker_v
 			this.updateActiveButton force:true
 		)
 	),
-	
 
 	/** Get positions and size of windows
 	 */
@@ -158,17 +139,19 @@ struct TrackbarDialogTicker_v
 		slider_hwnd	= this.getChildWindow "Time Slider"
 		
 		
-		slider_docked  = slider_hwnd  == undefined 
-		buttons_docked = buttons_hwnd == undefined 
+		--slider_docked  = slider_hwnd  == undefined
+		--buttons_docked = buttons_hwnd == undefined
 		
 		
 		/* IF BUTTONS ARE UN DOCKED */ 
-		if buttons_hwnd != undefined then 
+		--if buttons_hwnd != undefined then 
+		if not ( buttons_docked  = buttons_hwnd == undefined ) then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
 
 		/* IF TIMESLIDER IS UN DOCKED */ 
-		if slider_hwnd != undefined then 
+		--if slider_hwnd != undefined then 
+		if not ( slider_docked  = slider_hwnd == undefined ) then 
 			slider_pos_size = windows.getWindowPos slider_hwnd
 		
 		
@@ -183,7 +166,14 @@ struct TrackbarDialogTicker_v
 		--format "slider_hwnd:  %\n" slider_hwnd
 		--format "slider_docked_hwnd: %\n" slider_docked_hwnd
 		--format "slider_pos_size: %\n" slider_pos_size
+		
+		/* FORCE TO SHOW TRACKBAR IS IT IS HIDDEN */ 
+		if not trackbar.visible then
+		(
+			showTimeSlider()
 			
+			this._getPositionsAndSizeOfWindows()
+		)
 	),
 	
 	/** Is window position changed
@@ -509,44 +499,44 @@ struct TrackbarDialogTicker_v
 	
 	
 	/* set frame */ 
-	function setFrame frame =
-	(
-		--format "\n"; print "TrackbarDialogTicker_v.setFrame()"
-		--format "frame: %\n" frame
-
-		frame = frame as integer
-
-		--if not this.isInRange(frame) then
-			--return false
-		
-		sliderTime = frame
-
-		for btn in buttons do
-			btn.checked = btn.text as integer == frame
-		
-		/*------------------------------------------------------------------------------
-			SYNC CONTROLS 
-		--------------------------------------------------------------------------------*/
-
-
-		
-		/* SLIDER */ 
-		--_rollout.slider_current_time.value = frame
-	),
-
-	/** Set next frame
-	 */
-	function setNextFrame =
-	(
-		--format "\n"; print "TrackbarTools_v.setNextFrame()"
-			if sliderTime >= animationRange.end.frame then
-			sliderTime = animationRange.start.frame 
-		else
-			sliderTime += 1
-			
-		this.setFrame sliderTime.frame
-	),
-	
+	--function setFrame frame =
+	--(
+	--	--format "\n"; print "TrackbarDialogTicker_v.setFrame()"
+	--	--format "frame: %\n" frame
+	--
+	--	frame = frame as integer
+	--
+	--	--if not this.isInRange(frame) then
+	--		--return false
+	--	
+	--	sliderTime = frame
+	--
+	--	for btn in buttons do
+	--		btn.checked = btn.text as integer == frame
+	--	
+	--	/*------------------------------------------------------------------------------
+	--		SYNC CONTROLS 
+	--	--------------------------------------------------------------------------------*/
+	--
+	--
+	--	
+	--	/* SLIDER */ 
+	--	--_rollout.slider_current_time.value = frame
+	--),
+	--
+	--/** Set next frame
+	-- */
+	--function setNextFrame =
+	--(
+	--	--format "\n"; print "TrackbarTools_v.setNextFrame()"
+	--		if sliderTime >= animationRange.end.frame then
+	--		sliderTime = animationRange.start.frame 
+	--	else
+	--		sliderTime += 1
+	--		
+	--	this.setFrame sliderTime.frame
+	--),
+	--
 
 		
 	/** Get frame button color
@@ -556,6 +546,20 @@ struct TrackbarDialogTicker_v
 		--format "\n"; print "TrackbarDialogTicker_v.getFrameButtonColor()"
 		--format "animButtonState: %\n" animButtonState
 		if animButtonState then red else ( if frame as integer != 0 then green_color else orange )
+	),
+	
+	/** Filter trackbar keys by current tool
+		
+		AUTO FILTER KEYS ON TIME SLIDER: https://help.autodesk.com/view/MAXDEV/2022/ENU/?guid=GUID-5120D063-E771-4700-98FF-60E4E578BE52
+	 */
+	function _filterTrackbarKeysByCurrentTool =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._filterTrackbarKeysByCurrentTool()"
+		trackbar.filter = if toolmode.commandmode == #ROTATE or toolmode.commandmode == #MOVE then
+			----#currentTM
+			#TMOnly 
+		else
+			#all		
 	),
 	
 	/** Current time changed

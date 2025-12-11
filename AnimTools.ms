@@ -1,5 +1,5 @@
 
-filein( getFilenamePath(getSourceFileName()) + "/includes.ms" )	--"./includes.ms"
+filein( getFilenamePath(getSourceFileName()) + "/includes.ms" )	--"./incldes.ms"
 
 filein( getFilenamePath(getSourceFileName()) + "/AnimTools/Lib/showTimeSlider/showTimeSlider.ms" )	--"./AnimTools/Lib/showTimeSlider/showTimeSlider.ms"
 
