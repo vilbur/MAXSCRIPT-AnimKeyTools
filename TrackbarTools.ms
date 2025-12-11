@@ -1,16 +1,16 @@
 
 filein( getFilenamePath(getSourceFileName()) + "/main_script.ms" )	--"./main_script.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/Lib/frameButtonRcMenu/frameButtonRcMenu.ms" )	--"./TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/frameButtonRcMenu/frameButtonRcMenu.ms" )	--"./Dialogs/TrackbarTools/frameButtonRcMenu/frameButtonRcMenu.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/Lib/trackbarDialogTicker/trackbarDialogTicker.ms" )	--"./TrackbarTools/trackbarDialogTicker/trackbarDialogTicker.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/trackbarDialogTicker/trackbarDialogTicker.ms" )	--"./Dialogs/TrackbarTools/trackbarDialogTicker/trackbarDialogTicker.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/Lib/TrackbarToolsCallback/TrackbarToolsCallback.ms" )	--"./TrackbarTools/TrackbarToolsCallback/TrackbarToolsCallback.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/TrackbarToolsCallback/TrackbarToolsCallback.ms" )	--"./Dialogs/TrackbarTools/TrackbarToolsCallback/TrackbarToolsCallback.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/TrackbarTools/trackbarToolsDialog.ms" )	--"./TrackbarTools/trackbarToolsDialog.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/trackbarToolsDialog.ms" )	--"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"
 
 
 /*------------------------------------------------------------------------------
 	CREATE DIALOG
 --------------------------------------------------------------------------------*/
-trackbarToolsDialog()
+trackbarToolsDialog() --"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"

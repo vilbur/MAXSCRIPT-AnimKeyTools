@@ -11,13 +11,15 @@ function loadContentAndCreateDialog =
 	
 	
 	/* LOAD CONTENT FROM FOLDERS */
-	ContentLoader	= ContentLoader_v path:(current_dir+"/AnimTools/content") ini:( getSourceFileName()) --DEBUG:DEBUG
+	ContentLoader	= ContentLoader_v path:(current_dir+"/Dialogs/AnimTools/content") ini:( getSourceFileName()) --DEBUG:DEBUG
 	--ContentLoader	= ContentLoader_v path:(current_dir+"/Groupbox-Test")
 	
 	ContentLoader.Dialog.title = "AnimTools"
 
 	/* CREATE UI */
-	ContentLoader.create() --width:512
+	Dialog = ContentLoader.create() --width:512
+	
+	Dialog.register()
 )
 
 
