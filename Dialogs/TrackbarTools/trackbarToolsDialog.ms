@@ -124,7 +124,17 @@ function trackbarToolsDialog =
 		
 		
 		/* ADD BUTTON */ 
-		_Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) id:("btn_frame_"+ i_str ) width:0 height:width_button pos:pos highlightColor:COLOR_NAMES[#GREEN_DARK] visible:true tooltip:"CTRL + LMB | RMB: Jump to phase"
+        _Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) \
+                        id:("btn_frame_"+ i_str )	\
+                        width:0	\
+                        height:width_button	\
+                        pos:pos	\
+                        highlightColor:COLOR_NAMES[#GREEN_DARK]	\
+                        visible:true	\
+                        border:false	\
+                        tooltip:"CTRL + LMB | RMB: Jump to phase"
+		
+		
 		
 		/* BUTTON EVENTS */ 
 		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:"Go to frame"

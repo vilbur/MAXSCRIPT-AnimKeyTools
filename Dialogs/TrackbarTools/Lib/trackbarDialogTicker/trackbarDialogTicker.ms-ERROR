@@ -61,14 +61,24 @@ struct TrackbarDialogTicker_v
 
 		/* SET WIDTH OF SLIDER */ 
 		this.setSliderWidth()
-		
+			
 		
 		/*------------------------------------------------------------------------------
 			IF POSITION OF TIME SLIDER
 		--------------------------------------------------------------------------------*/
 		if this._isWindowPositionChanged() then
 		(
-			force_update_buttons = true
+			
+			/* SET WINDOW WIDTH */
+			--if buttons_size_pos != undefined then 
+				--buttons_size_pos.w = slider_width
+				
+			format "slider_pos_size:  %\n" slider_pos_size
+			format "buttons_size_pos: %\n" buttons_size_pos
+			
+			if not this._windowsAreAligned() then
+				this._resizeAndRepositionWindows()
+			
 			
 			/*------------------------------------------------------------------------------
 				DOCK BUTTONS IF TIMNE SLIDER IS DOCKED
@@ -76,12 +86,13 @@ struct TrackbarDialogTicker_v
 			if slider_docked and not buttons_docked then
 				this._dockButtonsWin()
 			
+			
 			/*------------------------------------------------------------------------------
 				IF SLIDER UN-DOCKED
 			--------------------------------------------------------------------------------*/
-			else if not slider_docked and not this._windowsAreAligned() then
-				this._resizeAndRepositionWindows()
+			else if not slider_docked then
 					
+				force_update_buttons = true
 		)
 		
 		
@@ -208,10 +219,6 @@ struct TrackbarDialogTicker_v
 	function _dockButtonsWin =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v._dockButtonsWin()"
-		
-		/* SET POSITION OF BUTTONS WINDOW */ 
-		windows.setWindowPos buttons_hwnd buttons_size_pos true
-		
 		cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
 		
 		cui.DockDialogBar _rollout #cui_dock_bottom
@@ -223,7 +230,7 @@ struct TrackbarDialogTicker_v
 	 */
 	function _resizeAndRepositionWindows =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v._resizeAndRepositionWindows()"
+		format "\n"; print "TrackbarDialogTicker_v._resizeAndRepositionWindows()"
 		--format "slider_pos_size: %\n" slider_pos_size
 		
 		/* SET WINDOW WIDTH */
@@ -264,7 +271,7 @@ struct TrackbarDialogTicker_v
 	 */
 	function _windowsAreAligned =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v._windowsAligned()"
+		format "\n"; print "TrackbarDialogTicker_v._windowsAligned()"
 		--format "slider_pos_size.w: %\n" slider_pos_size.w
 		--format "buttons_size_pos.w: %\n" buttons_size_pos.w
 		
