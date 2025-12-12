@@ -31,7 +31,7 @@ struct TrackbarDialogTicker_v
 	slider_pos_size,
 	slider_docked,
 	
-	maxwin_pos_size = windows.getWindowPos ( windows.getMAXHWND() ),
+	maxwin_pos_size,
 		
 	/* private */
 	current_time,
@@ -55,14 +55,13 @@ struct TrackbarDialogTicker_v
 	function updateDialog =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
-		force_update_buttons = false
+		/* IF MAX WIDOW SIZE CHANGED */ 
+		force_update_buttons = this._maxWidowSizeChanged()
 
 		this._getPositionsAndSizeOfWindows()
-
+		
 		/* SET WIDTH OF SLIDER */ 
 		this.setSliderWidth()
-		
-		
 		/*------------------------------------------------------------------------------
 			IF POSITION OF TIME SLIDER
 		--------------------------------------------------------------------------------*/
@@ -83,7 +82,7 @@ struct TrackbarDialogTicker_v
 				this._resizeAndRepositionWindows()
 					
 		)
-		
+
 		
 		/* UPDATE BUTTONS */
 		this.updateButtonsVisibility(force_update_buttons)
@@ -110,6 +109,23 @@ struct TrackbarDialogTicker_v
 			
 			this.updateActiveButton force:true
 		)
+	),
+	
+	/** Max widow size changed
+	 */
+	function _maxWidowSizeChanged =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._maxWidowSizeChanged()"
+
+		 if ( maxwin_pos_size_current = this._getMaxWindowSize() ) != maxwin_pos_size then
+		 (
+			format "maxwin_pos_size_current: %\n" maxwin_pos_size_current
+			maxwin_pos_size = maxwin_pos_size_current
+				
+			true --return	
+		 )
+		 else
+			false --return
 	),
 
 	/** Get positions and size of windows
@@ -579,13 +595,13 @@ struct TrackbarDialogTicker_v
 	
 	/** Get height of maximized viewport to find out height of docked dialog
 	 */
-	function setViewportWidth =
+	function _getViewportWidth =
 	(
 		--print "Dialog_v._getViewportHeight()"
 		is_maximized	= viewport.numViews == 1
 
-		height_of_ui	= 0 -- Add heigh
-		dialog_title_height	= 30
+		--height_of_ui	= 0 -- Add heigh
+		--dialog_title_height	= 30
 
 		--if( trackbar.visible ) then
 		--	height_of_ui	+= 27
@@ -596,13 +612,22 @@ struct TrackbarDialogTicker_v
 		if not( is_maximized ) then
 			actionMan.executeAction 0 "50026"  -- Tools: Maximize Viewport Toggle
 
-		viewport_width = getViewSize()
+		_viewport_width = getViewSize()
 		--format "viewport_area_size	= % \n" viewport_area_size
 		if not( is_maximized ) then
 			actionMan.executeAction 0 "50026"  -- Tools: Maximize Viewport Toggle
-
+			
+		_viewport_width --return
 	),
 
+	
+	/** Set max window size
+	 */
+	function _getMaxWindowSize =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._getMaxWindowSize()"
+		windows.getWindowPos ( windows.getMAXHWND() )
+	),
 	
 	on create do
 	(
@@ -610,6 +635,8 @@ struct TrackbarDialogTicker_v
 		--buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		--slider_hwnd = this.getChildWindow "Time Slider"
 		
-		this.viewport_width = this.setViewportWidth()
+		this.viewport_width = this._getViewportWidth()
+		
+		 this.maxwin_pos_size = this._getMaxWindowSize()
 	)
 )
