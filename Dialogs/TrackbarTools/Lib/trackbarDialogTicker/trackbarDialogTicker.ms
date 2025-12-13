@@ -62,6 +62,8 @@ struct TrackbarDialogTicker_v
 		
 		/* SET WIDTH OF SLIDER */ 
 		this.setSliderWidth()
+		
+		
 		/*------------------------------------------------------------------------------
 			IF POSITION OF TIME SLIDER
 		--------------------------------------------------------------------------------*/
@@ -255,7 +257,7 @@ struct TrackbarDialogTicker_v
 		buttons_size_pos.w = slider_width
 
 		
-		this.snapSliderToBottomOfViewport()
+		this.snapSliderPosition()
 		
 		/* ALIG POSITION */ 
 		this.alignTimeSliders()
@@ -356,23 +358,36 @@ struct TrackbarDialogTicker_v
 	),
 	
 	
-	/** Snamp  time slider to left bottom corner of max if is close enough
+	/** Snamp time slider to 3DS MAX WINDOW
 	 */
-	function snapSliderToBottomOfViewport =
+	function snapSliderPosition =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.snapSliderToBottomOfViewport()"
+		--format "\n"; print "TrackbarDialogTicker_v.snapSliderPosition()"
 		snap_treshold = 128
 		
 		/*------------------------------------------------------------------------------
 			SNAP TO LEFT EDGE
 		--------------------------------------------------------------------------------*/
-		if  abs( slider_pos_size.x      - maxwin_pos_size.left	) < snap_treshold then
+		if abs( slider_pos_size.x - maxwin_pos_size.left	) < snap_treshold then
 		(
 			/* RESET POSITION */ 
 			translate slider_pos_size [ -slider_pos_size.x, 0 ]
 			
 			/* MOVE TO LEFT */ 
 			translate slider_pos_size [ maxwin_pos_size.left + 8, 0 ]
+		)
+		
+		/*------------------------------------------------------------------------------
+			SNAP TO CENTER
+		--------------------------------------------------------------------------------*/
+		else if abs( slider_pos_size.center.x - maxwin_pos_size.center.x	) < maxwin_pos_size.w / 4 then
+		(
+			/* RESET POSITION */ 
+			translate slider_pos_size [ -slider_pos_size.x, 0 ]
+			
+			/* MOVE WINDOW TO CENTERED POSTION */ 
+			--translate slider_pos_size [ -slider_pos_size.x, 0 ]
+			translate slider_pos_size [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
 		)
 		
 		/*------------------------------------------------------------------------------
@@ -394,10 +409,7 @@ struct TrackbarDialogTicker_v
 	function alignTimeSliders =
 	(
 		--format "\n"; print "TrackbarToolsCallback_v.alignTimeSliders()"
-		
-		--/* MOVE WINDOW TO CENTERED POSTION */ 
-		--centered_pos = [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
-		
+
 		if slider_hwnd != undefined then
 		(
 			/* RESET POSITION */ 
@@ -637,6 +649,6 @@ struct TrackbarDialogTicker_v
 		
 		this.viewport_width = this._getViewportWidth()
 		
-		 this.maxwin_pos_size = this._getMaxWindowSize()
+		this.maxwin_pos_size = this._getMaxWindowSize()
 	)
 )
