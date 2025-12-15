@@ -50,13 +50,27 @@ struct TrackbarDialogTicker_v
 	
 	init = false,
 	
+	animation_range,
+	
 	/** On timer tick update Dialog
 	 */
 	function updateDialog =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
+		/* GET BUTTON CONTROLS ON INIT */
+		this._setFrameButtons()
+		
+		visible_buttons = this.getVisibleButtons()
+		
+		--current_time_changed = this._currentTimeChanged() 
+		
+		anim_range_changed = this._animRangeChanged()
+		
 		/* IF MAX WIDOW SIZE CHANGED */ 
-		force_update_buttons = this._maxWidowSizeChanged()
+		update_button_position = anim_range_changed or this._maxWidowSizeChanged()
+		--format "update_button_position: %\n" update_button_position
+		
+		update_button_text = anim_range_changed or this._currentTimeChanged() 
 
 		this._getPositionsAndSizeOfWindows()
 		
@@ -69,7 +83,7 @@ struct TrackbarDialogTicker_v
 		--------------------------------------------------------------------------------*/
 		if this._isWindowPositionChanged() then
 		(
-			force_update_buttons = true
+			update_button_position = true
 			
 			/*------------------------------------------------------------------------------
 				DOCK BUTTONS IF TIMNE SLIDER IS DOCKED
@@ -87,8 +101,13 @@ struct TrackbarDialogTicker_v
 
 		
 		/* UPDATE BUTTONS */
-		this.updateButtonsVisibility(force_update_buttons)
+		if update_button_position then
+			this.updateButtonsSizeAndPosition()
 		
+		
+		if update_button_text then
+			this.updateActiveButton()
+
 		
 		/* SHOW \ HIDE KEYS by type */ 
 		this._filterTrackbarKeysByCurrentTool()
@@ -109,25 +128,42 @@ struct TrackbarDialogTicker_v
 		(
 			anim_button_state = animButtonState
 			
-			this.updateActiveButton force:true
 		)
 	),
 	
+	/** Current time changed
+	 */
+	function _currentTimeChanged = this.testAndResetProperty #current_time currentTime.frame,
+	
 	/** Max widow size changed
 	 */
-	function _maxWidowSizeChanged =
-	(
-		--format "\n"; print "TrackbarDialogTicker_v._maxWidowSizeChanged()"
+	function _maxWidowSizeChanged this.testAndResetProperty #maxwin_pos_size_current (this._getMaxWindowSize()),
+	
+	/** Is anim range changed
+	 */
+	function _animRangeChanged = this.testAndResetProperty #animation_range animationRange,
+	
+	
+	/*  testAndResetProperty
 
-		 if ( maxwin_pos_size_current = this._getMaxWindowSize() ) != maxwin_pos_size then
-		 (
-			format "maxwin_pos_size_current: %\n" maxwin_pos_size_current
-			maxwin_pos_size = maxwin_pos_size_current
+	   Tests whether a property on a given object differs from a tested value.
+	   If different, resets the property to the tested value and returns true.
+	*/
+	function testAndResetProperty key val =
+	(
+		--local current_value = undefined
+	
+		if isProperty this key then
+		(
+			is_changed = getProperty this key != val
+			
+			if is_changed then
+				setProperty this key val
 				
-			true --return	
-		 )
-		 else
-			false --return
+			is_changed --return
+		)
+		else
+			false
 	),
 
 	/** Get positions and size of windows
@@ -234,7 +270,7 @@ struct TrackbarDialogTicker_v
 		
 		cui.DockDialogBar _rollout #cui_dock_bottom
 		
-		force_update_buttons = true
+		update_button_position = true
 	),
 
 	/** Resize and reposition windows
@@ -297,33 +333,7 @@ struct TrackbarDialogTicker_v
 		
 	),
 
-	/** Update active button
-	 */
-	function updateActiveButton force:false =
-	(
-			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
-		if force or this._currentTimeChanged() then
-		(
-			btn_index = 0
-			--current_time = currentTime.frame as integer
-			
-			for frame = animationRange.start to animationRange.end where (btn = _rollout.frame_buttons[btn_index += 1]) != undefined do
-			(
-				/* TURN ALL FRAME BUTTONS OFF */ 				
-				btn.state = false
-				
-				if frame == currentTime.frame then
-				(
-					/* SET COLOR */ 
-					btn.highlightColor = this.getFrameButtonColor frame
-					
-					/* SET STATE TRUE -- force to update highlight color */ 
-					btn.state = true
-				)
-			)
-		)
-	),
-	
+
 	/** Playback
 	 */
 	function playback is_playing_now =
@@ -428,42 +438,21 @@ struct TrackbarDialogTicker_v
 		--format "\n"; print "TrackbarToolsCallback_v.getChildWindow()"
 		if ( window_data = windows.getChildHWND 0 title parent:#max ) != undefined then window_data[1] --return
 	),
-
-	/* Show / hide buttons in range (logic placeholder, UI removed) */
-	function showHideButtonsInRange frame =
-	(
-		-- originally changed button visibility, now only logic kept
-		
-		buttons = this._getFrameButtons()
-		
-		for frame_of_button in sort buttons.keys where frame_of_button != frame do
-			buttons[frame_of_button].visible = this.isInRange frame_of_button
-	),
 	
 	/** Update buttons
 	 */
-	function updateButtonsVisibility force_update_buttons =
+	function updateButtonsSizeAndPosition =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsVisibility()"
+		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsSizeAndPosition()"
 		
-		/** Set button text by frame
-		 */
-		function setButtonTextByFrame visible_buttons =
+		/* GET BUTTONS */ 
+		frames_count = this.getFramesCount()
+
+		--visible_buttons = for btn in buttons where btn.visible collect btn 
+
+		/* UPDATE BUTTONS */ 
+		--if update_button_position or visible_buttons.count != frames_count then
 		(
-			--format "\n"; print "TrackbarDialogTicker_v.setButtonTextByFrame()"
-			is_first_frame_changed = visible_buttons[1].text as integer != animationRange.start.frame as integer
-			
-			/* EDIT TEXT */ 
-			if is_first_frame_changed then
-				for i = 1 to this.buttons.count do
-					this.buttons[i].text = (( animationRange.start.frame + i - 1 ) as integer ) as string
-		)
-		
-		/** Fit buttons to dialog
-		 */
-		function fitButtonsToDialog frames_in_range =
-		(
-			--format "\n"; print "TrackbarDialogTicker_v.fitButtonsToDialog()"
 			pos_x = 54 -- left margin on trackbar
 			
 			buttons_area = slider_width - 108
@@ -472,13 +461,13 @@ struct TrackbarDialogTicker_v
 			if slider_hwnd == undefined then
 				buttons_area -= 20
 			
-			btn_width = ( buttons_area / (frames_in_range ) ) 
+			btn_width = ( buttons_area / (frames_count ) ) 
 			
 			
 			for i = 1 to buttons.count do
 			(
 				/* EDIT BUTTON */ 
-				buttons[i].visible = i <= frames_in_range
+				buttons[i].visible = i <= frames_count
 				buttons[i].width   = btn_width
 				buttons[i].pos.x   = pos_x
 				
@@ -487,88 +476,80 @@ struct TrackbarDialogTicker_v
 			)
 			
 			/* SET POSITION OF "PLAY" BUTTON */
-			pos_after_last_button = buttons[frames_in_range + 1].pos
+			pos_after_last_button = buttons[frames_count + 1].pos
 
-			_rollout.BTN_play.pos = pos_after_last_button
 		)
-
 		
-		/* GET BUTTON CONTROLS ON INIT */ 		
-		if this.buttons == undefined then
-			this.buttons = this._getFrameButtons()
-
-		
-		/* GET BUTTONS */ 
-		frames_in_range = animationRange.end.frame - animationRange.start.frame + 1
-
-		visible_buttons = for btn in buttons where btn.visible collect btn 
-
-		/* UPDATE BUTTONS */ 
-		if force_update_buttons or visible_buttons.count != frames_in_range then
-		(
-			--format "\nWTF"
-			setButtonTextByFrame( visible_buttons )
-			
-			fitButtonsToDialog( frames_in_range )
-		)
-
-		
-		/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
+		/* WRA TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
 		--for key in sort buttons.keys do
 			--buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
+	),
+	
+	/** Update button text and state
+	 */
+	function updateActiveButton =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
+		this._setFrameButtons()
+		
+		frames_count = this.getFramesCount()
+
+		/*------------------------------------------------------------------------------
+			EDIT EACH BUTTON IN ANIM RANGE
+		--------------------------------------------------------------------------------*/
+		for i = 1 to frames_count where ( btn = buttons[i]) != undefined do
+		(
+			frame = ( animationRange.start.frame + i - 1 ) as integer
+			
+			/* SET BUTTON TEXT BY FRAME */ 
+			btn.text = frame as string
+			
+			/* ADD BRACKET TO FRAMES IN PHASE */ 
+			 if i > currentTime.frame - PHASE_LENGTH  and i <= currentTime.frame then
+				btn.text = "[ "+ btn.text +" ]"
+			
+				
+		
+				/* TURN ALL FRAME BUTTONS OFF */ 				
+				btn.state = frame == currentTime.frame
+				
+				if btn.state then
+				(
+					/* SET COLOR */ 
+					btn.highlightColor = this.getFrameButtonColor frame
+					
+					/* SET STATE TRUE -- force to update highlight color */ 
+					btn.state = true
+				)
+		)
 	),
 	
 	/** Get frame buttons
 	  
 	  @return Dictionary #INTEGER
 	 */
-	function _getFrameButtons =
+	function _setFrameButtons =
 	(
-		--format "\n"; print "._getFrameButtons()"
-		for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl --return
+		--format "\n"; print "._setFrameButtons()"
+		if this.buttons == undefined then
+			this.buttons = for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl --return
 	),
 	
+	/** Get frames count
+	 */
+	function getFramesCount =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.getFramesCount()"
+		animationRange.end.frame - animationRange.start.frame + 1 --return
+	),
 	
-	/* set frame */ 
-	--function setFrame frame =
-	--(
-	--	--format "\n"; print "TrackbarDialogTicker_v.setFrame()"
-	--	--format "frame: %\n" frame
-	--
-	--	frame = frame as integer
-	--
-	--	--if not this.isInRange(frame) then
-	--		--return false
-	--	
-	--	sliderTime = frame
-	--
-	--	for btn in buttons do
-	--		btn.checked = btn.text as integer == frame
-	--	
-	--	/*------------------------------------------------------------------------------
-	--		SYNC CONTROLS 
-	--	--------------------------------------------------------------------------------*/
-	--
-	--
-	--	
-	--	/* SLIDER */ 
-	--	--_rollout.slider_current_time.value = frame
-	--),
-	--
-	--/** Set next frame
-	-- */
-	--function setNextFrame =
-	--(
-	--	--format "\n"; print "TrackbarTools_v.setNextFrame()"
-	--		if sliderTime >= animationRange.end.frame then
-	--		sliderTime = animationRange.start.frame 
-	--	else
-	--		sliderTime += 1
-	--		
-	--	this.setFrame sliderTime.frame
-	--),
-	--
-
+	/** Get visible buttons
+	 */
+	function getVisibleButtons =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.getVisibleButtons()"
+		for btn in buttons where btn.visible collect btn
+	),
 		
 	/** Get frame button color
 	 */
@@ -576,7 +557,7 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.getFrameButtonColor()"
 		--format "animButtonState: %\n" animButtonState
-		if animButtonState then red else ( if frame as integer != 0 then green_color else orange )
+		if animButtonState then color 125 13 13 else ( if frame as integer != 0 then green_color else orange )
 	),
 	
 	/** Filter trackbar keys by current tool
@@ -593,17 +574,6 @@ struct TrackbarDialogTicker_v
 			#all		
 	),
 	
-	/** Current time changed
-	 */
-	function _currentTimeChanged =
-	(
-		--format "\n"; print "TrackbarDialogTicker_v.currentTimeChanged()"
-	
-		if ( time_changed = current_time == undefined or current_time != currentTime ) then
-			current_time = currentTime
-		
-		time_changed --return
-	),
 	
 	/** Get height of maximized viewport to find out height of docked dialog
 	 */

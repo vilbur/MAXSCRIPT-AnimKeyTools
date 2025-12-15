@@ -23,6 +23,18 @@ struct TrackbarToolsCallback_v
 	playback_fps = #( 24, 12, 6, 4, 2, 1 ),
 	--playback_fps = #( "24", "12", "6", "4", "2", "1" ),
 	
+	/** Go to frame of button
+	 */
+	function goToFrameOfButton button_text =
+	(
+		format "\n--------------------------------------------\n"
+		format "\n"; print "TrackbarToolsCallback_v.goToFrameOfButton()"
+		
+		frame	= trimRight ( trimLeft button_text "[" )  "]"
+		format "frame: %\n" frame
+		sliderTime = frame as integer
+	),
+	
 	/** Show fps rc menu
 	 */
 	function showFpsRcMenu =
@@ -50,6 +62,7 @@ struct TrackbarToolsCallback_v
 		--format "\n"; print "TrackbarToolsCallback_v.getChildWindow()"
 		if ( window_data = windows.getChildHWND 0 title parent:#max ) != undefined then window_data[1] --return
 	),
+	
 	
 	/* set frame */ 
 	function setFrame frame =
@@ -122,7 +135,7 @@ struct TrackbarToolsCallback_v
 	*/
 	function jumpToPhase direction =
 	(
-		--format "\n"; print "TrackbarToolsCallback_v.jumpToPhase()"
+		format "\n"; print "TrackbarToolsCallback_v.jumpToPhase()"
 		--format "EventFired: %\n" EventFired
 		--direction = if EventFired.type == #rightClick  then -1 else 1
 		

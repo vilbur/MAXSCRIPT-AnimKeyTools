@@ -55,7 +55,7 @@ function trackbarToolsDialog =
 	Dialog.addLocal  "TrackbarDialogTicker" ("TrackbarDialogTicker_v("+Dialog.id as string +")")
 
 	Dialog.addLocal "is_playing_now" false
-	Dialog.addLocal "frame_buttons" undefined
+	--Dialog.addLocal "frame_buttons" undefined
 	
 	
 	/*------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ function trackbarToolsDialog =
 	--------------------------------------------------------------------------------*/
 	Dialog.Event #OPEN ("ToolsCallback = TrackbarToolsCallback_v("+Dialog.id as string +")")
 	
-	Dialog.Event #OPEN ("frame_buttons = for ctrl in "+Dialog.id as string +".controls where matchPattern (ctrl as string ) pattern:(\"*btn_frame_*\") collect ctrl")	tooltip:"PRESSED Tooltip"
+	--Dialog.Event #OPEN ("frame_buttons = for ctrl in "+Dialog.id as string +".controls where matchPattern (ctrl as string ) pattern:(\"*btn_frame_*\") collect ctrl")	tooltip:"PRESSED Tooltip"
 	
 	
 	
@@ -107,10 +107,12 @@ function trackbarToolsDialog =
 	
 
 
-	/*------------------------------------------------------------------------------
-		FRAME BUTTONS
-	------------------------------------------------------------------------------*/
-
+	/*==============================================================================
+	
+			FRAME BUTTONS
+	
+	================================================================================*/
+		
 	for i = 0 to buttons_count do
 	(
 		i_str = i as string
@@ -123,7 +125,9 @@ function trackbarToolsDialog =
 		if_control_pressed_jump_to_phase = "if keyboard.controlPressed then ("+keep_button_state+"; ToolsCallback.jumpToPhase"
 		
 		
-		/* ADD BUTTON */ 
+		/*------------------------------------------------------------------------------
+			ADD BUTTON
+		--------------------------------------------------------------------------------*/
         _Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) \
                         id:("btn_frame_"+ i_str )	\
                         width:0	\
@@ -137,7 +141,7 @@ function trackbarToolsDialog =
 		
 		
 		/* BUTTON EVENTS */ 
-		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1)  )else sliderTime = EventFired.control.text as integer" ) tooltip:"Go to frame"
+		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1) ) else ToolsCallback.goToFrameOfButton(EventFired.control.text)" ) tooltip:"Go to frame"
 		
 		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:"Show Menu"
 	)
