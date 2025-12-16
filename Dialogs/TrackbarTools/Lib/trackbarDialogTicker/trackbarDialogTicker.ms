@@ -57,15 +57,18 @@ struct TrackbarDialogTicker_v
 	function updateDialog =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
-		/* GET BUTTON CONTROLS ON INIT */
-		this._setFrameButtons()
 		
-		visible_buttons = this.getVisibleButtons()
+		--visible_buttons = this.getVisibleButtons()
 		
 		anim_range_changed = this._animRangeChanged()
-		
+		--format "anim_range_changed: %\n" anim_range_changed
+		max_widow_size_changed = this._maxWidowSizeChanged()
+		--format "max_widow_size_changed: %\n" max_widow_size_changed
 		/* IF MAX WIDOW SIZE CHANGED */ 
 		update_button_position = anim_range_changed or this._maxWidowSizeChanged()
+		--format "update_button_position: %\n" update_button_position
+		/* GET BUTTON CONTROLS ON INIT */
+		this._setFrameButtons()
 		
 		this._getPositionsAndSizeOfWindows()
 		
@@ -93,7 +96,8 @@ struct TrackbarDialogTicker_v
 				this._resizeAndRepositionWindows()
 					
 		)
-		
+		--format "update_button_position: %\n" update_button_position
+
 		/* UPDATE BUTTONS SIZE AND POSITION */
 		if update_button_position then
 			this.updateButtonsSizePosition()
@@ -150,7 +154,7 @@ struct TrackbarDialogTicker_v
 				/* SET BUTTON TEXT BY FRAME */ 
 				btn.text = frame as string
 				
-				/* ADD BRACKET TO FRAMES IN PHASE */ 
+				/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
 				 if i > currentTime.frame - PHASE_LENGTH  and i <= currentTime.frame then
 					btn.text = "[ "+ btn.text +" ]"
 					
@@ -271,23 +275,26 @@ struct TrackbarDialogTicker_v
 	 */
 	function _isWindowPositionChanged =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v._isWindowPositionChanged()"
+		--format "\n\n"; print "TrackbarDialogTicker_v._isWindowPositionChanged()"
 		--format "last_pos: %\n" last_pos
 		buttons_win_need_update = false
-		
+		--format "last_pos: %\n" last_pos
 		/* INIT */ 	
 		if last_pos == undefined then
 		(
 			last_pos = copy slider_pos_size
 			
-			buttons_win_need_update = true 
+		--if last_pos == undefined then
+		
+			buttons_win_need_update = last_pos != undefined
+			
 		)
 		/* TEST CHANGE OF POSITION */ 
 		else
 		(
 			/* TEST CHANGE OF DOCKED STATE  */ 
 			dock_state_changed = slider_docked != buttons_docked
-			
+			--format "dock_state_changed: %\n" dock_state_changed
 			
 			/* IF DOCK STATE CHANGED */ 
 			buttons_win_need_update = dock_state_changed
@@ -314,7 +321,7 @@ struct TrackbarDialogTicker_v
 			last_pos = copy slider_pos_size
 		)
 				
-			
+		--format "buttons_win_need_update: %\n" buttons_win_need_update
 		buttons_win_need_update --return
 	),
 	
@@ -536,14 +543,15 @@ struct TrackbarDialogTicker_v
 				pos_x += btn_width
 			)
 			
-			/* SET POSITION OF "PLAY" BUTTON */
+			/* UPDATE POSITION OF "PLAY" BUTTON */
 			pos_after_last_button = buttons[frames_count + 1].pos
 
 		)
 		
-		/* WRA TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
-		--for key in sort buttons.keys do
-			--buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
+		
+		/* SET POSITION OF "PLAY" BUTTON */
+		_rollout.BTN_play.pos = pos_after_last_button
+
 	),
 	
 	/** Get frame buttons

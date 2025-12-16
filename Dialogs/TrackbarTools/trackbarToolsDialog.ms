@@ -135,9 +135,9 @@ function trackbarToolsDialog =
                         pos:pos	\
                         highlightColor:COLOR_NAMES[#GREEN_DARK]	\
                         visible:true	\
-                        border:false	\
                         tooltip:"CTRL + LMB | RMB: Jump to phase"
-		
+                        --border:false	\
+
 		
 		
 		/* BUTTON EVENTS */ 
