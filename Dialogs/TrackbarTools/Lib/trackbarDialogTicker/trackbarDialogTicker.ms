@@ -21,7 +21,6 @@ struct TrackbarDialogTicker_v
 	/* private */
 	green_color = COLOR_NAMES[#GREEN_DARK], -- coor active frame button 
 	
-	anim_button_state,
 	
 	buttons_hwnd,
 	buttons_size_pos,
@@ -51,6 +50,7 @@ struct TrackbarDialogTicker_v
 	init = false,
 	
 	animation_range,
+	anim_button_state,
 	
 	/** On timer tick update Dialog
 	 */
@@ -62,7 +62,7 @@ struct TrackbarDialogTicker_v
 		
 		anim_range_changed = this._animRangeChanged()
 		--format "anim_range_changed: %\n" anim_range_changed
-		max_widow_size_changed = this._maxWidowSizeChanged()
+		--max_widow_size_changed = this._maxWidowSizeChanged()
 		--format "max_widow_size_changed: %\n" max_widow_size_changed
 		/* IF MAX WIDOW SIZE CHANGED */ 
 		update_button_position = anim_range_changed or this._maxWidowSizeChanged()
@@ -71,6 +71,7 @@ struct TrackbarDialogTicker_v
 		this._setFrameButtons()
 		
 		this._getPositionsAndSizeOfWindows()
+		
 		
 		/* SET WIDTH OF SLIDER */ 
 		this.setSliderWidth()
@@ -121,13 +122,11 @@ struct TrackbarDialogTicker_v
 		----if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
 		----	_rollout.DL_phase.selection = PHASE_LENGTH
 		----
-		--
 		--/* IF STATE OF ANIMATION MODE IS CHANGED */ 
-		--if anim_button_state != animButtonState then
-		--(
-		--	anim_button_state = animButtonState
-		--	
-		--)
+		if this._animStateChanged() then
+			this.udpateHighlightColor()
+		
+		animation_range = animationRange
 	),
 	
 	/** Update button text and state
@@ -141,21 +140,24 @@ struct TrackbarDialogTicker_v
 		
 		if force == true or this._currentTimeChanged() then
 		(
+			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
+
 			this._setFrameButtons()
 			
 			frames_count = this.getFramesCount()
-			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
-			
+			--format "currentTime.frame: %\n" currentTime.frame
 			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
 			for i = 1 to frames_count where ( btn = buttons[i]) != undefined do
 			(
 				frame = ( animationRange.start.frame + i - 1 ) as integer
+				--format "frame: %\n" frame
+				--current_time_frame = currentTime.frame as integer + 1
 				
 				/* SET BUTTON TEXT BY FRAME */ 
 				btn.text = frame as string
 				
 				/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
-				 if i > currentTime.frame - PHASE_LENGTH  and i <= currentTime.frame then
+				 if frame > currentTime.frame - PHASE_LENGTH  and frame <= currentTime.frame then
 					btn.text = "[ "+ btn.text +" ]"
 					
 			
@@ -167,9 +169,32 @@ struct TrackbarDialogTicker_v
 						/* SET COLOR */ 
 						btn.highlightColor = this.getFrameButtonColor frame
 						
-						/* SET STATE TRUE -- force to update highlight color */ 
+						/* FORCE TO UPDATE HIGHLIGHT COLOR */ 
 						btn.state = true
 					)
+			)
+		)
+	),
+	
+	/** Udpate highlight color
+	 */
+	function udpateHighlightColor =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v.udpateHighlightColor()"
+		frames_count = this.getFramesCount()
+		
+		for i = 1 to frames_count where ( btn = buttons[i]) != undefined do
+		(
+			frame = ( animationRange.start.frame + i - 1 ) as integer
+			
+			btn.highlightColor = this.getFrameButtonColor frame
+
+			/* FORCE TO UPDATE HIGHLIGHT COLOR */ 
+			if btn.state then
+			(
+				btn.state = not btn.state
+					
+				btn.state = not btn.state
 			)
 		)
 	),
@@ -182,9 +207,15 @@ struct TrackbarDialogTicker_v
 	 */
 	function _maxWidowSizeChanged = this.testAndResetProperty #maxwin_pos_size_current (this._getMaxWindowSize()),
 	
+	/** Anim state changed
+	 */
+	function _animStateChanged =  this.testAndResetProperty #anim_button_state animButtonState,
+
 	/** Is anim range changed
 	 */
-	function _animRangeChanged = this.testAndResetProperty #animation_range animationRange,
+	function _animRangeChanged = animation_range != undefined and ( animation_range.start != animationRange.start or animation_range.end != animationRange.end ),
+	
+
 	--function _animRangeChanged =
 	--(
 	--	wtf = this.testAndResetProperty #animation_range animationRange
@@ -210,16 +241,8 @@ struct TrackbarDialogTicker_v
 		(
 			--format "val: %\n" ( getProperty this key )
 			--format "TEST: %\n" ( prop_val != undefined and classOf prop_val == Interval )
-			prop_val = getProperty this key
-			
-			is_changed = case of
-			(
-				( prop_val != undefined and classOf prop_val == Interval ): val.start != prop_val.start or val.end != prop_val.end
-				
-				default:  prop_val != val
-			)
-			
-			--is_changed = getProperty this key != val
+
+			is_changed = getProperty this key != val
 			
 			--format "is_changed: %\n" is_changed
 			if is_changed then
