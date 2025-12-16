@@ -27,11 +27,11 @@ struct TrackbarToolsCallback_v
 	 */
 	function goToFrameOfButton button_text =
 	(
-		format "\n--------------------------------------------\n"
-		format "\n"; print "TrackbarToolsCallback_v.goToFrameOfButton()"
+		--format "\n--------------------------------------------\n"
+		--format "\n"; print "TrackbarToolsCallback_v.goToFrameOfButton()"
 		
 		frame	= trimRight ( trimLeft button_text "[" )  "]"
-		format "frame: %\n" frame
+		--format "frame: %\n" frame
 		sliderTime = frame as integer
 	),
 	
@@ -135,7 +135,7 @@ struct TrackbarToolsCallback_v
 	*/
 	function jumpToPhase direction =
 	(
-		format "\n"; print "TrackbarToolsCallback_v.jumpToPhase()"
+		--format "\n"; print "TrackbarToolsCallback_v.jumpToPhase()"
 		--format "EventFired: %\n" EventFired
 		--direction = if EventFired.type == #rightClick  then -1 else 1
 		

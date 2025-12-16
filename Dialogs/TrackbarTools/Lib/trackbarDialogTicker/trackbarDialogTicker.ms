@@ -62,16 +62,11 @@ struct TrackbarDialogTicker_v
 		
 		visible_buttons = this.getVisibleButtons()
 		
-		--current_time_changed = this._currentTimeChanged() 
-		
 		anim_range_changed = this._animRangeChanged()
 		
 		/* IF MAX WIDOW SIZE CHANGED */ 
 		update_button_position = anim_range_changed or this._maxWidowSizeChanged()
-		--format "update_button_position: %\n" update_button_position
 		
-		update_button_text = anim_range_changed or this._currentTimeChanged() 
-
 		this._getPositionsAndSizeOfWindows()
 		
 		/* SET WIDTH OF SLIDER */ 
@@ -98,16 +93,16 @@ struct TrackbarDialogTicker_v
 				this._resizeAndRepositionWindows()
 					
 		)
-
 		
-		/* UPDATE BUTTONS */
+		/* UPDATE BUTTONS SIZE AND POSITION */
 		if update_button_position then
-			this.updateButtonsSizeAndPosition()
+			this.updateButtonsSizePosition()
 		
 		
-		if update_button_text then
-			this.updateActiveButton()
-
+		/* UPDATE ACTIVE FRAME BUTTON */
+		if anim_range_changed then
+			this.updateActiveButton force:true
+		
 		
 		/* SHOW \ HIDE KEYS by type */ 
 		this._filterTrackbarKeysByCurrentTool()
@@ -117,17 +112,61 @@ struct TrackbarDialogTicker_v
 		_rollout.SPN_range_start.value	= animationRange.start
 		_rollout.SPN_range_end.value	= animationRange.end
 		
-
+		
 		--/* SYNC WITH GLOBAL VAROABLE */
 		----if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
 		----	_rollout.DL_phase.selection = PHASE_LENGTH
 		----
 		--
 		--/* IF STATE OF ANIMATION MODE IS CHANGED */ 
-		if anim_button_state != animButtonState then
+		--if anim_button_state != animButtonState then
+		--(
+		--	anim_button_state = animButtonState
+		--	
+		--)
+	),
+	
+	/** Update button text and state
+	 */
+	function updateActiveButton force:false =
+	(
+
+		/*------------------------------------------------------------------------------
+			EDIT EACH BUTTON IN ANIM RANGE
+		--------------------------------------------------------------------------------*/
+		
+		if force == true or this._currentTimeChanged() then
 		(
-			anim_button_state = animButtonState
+			this._setFrameButtons()
 			
+			frames_count = this.getFramesCount()
+			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
+			
+			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
+			for i = 1 to frames_count where ( btn = buttons[i]) != undefined do
+			(
+				frame = ( animationRange.start.frame + i - 1 ) as integer
+				
+				/* SET BUTTON TEXT BY FRAME */ 
+				btn.text = frame as string
+				
+				/* ADD BRACKET TO FRAMES IN PHASE */ 
+				 if i > currentTime.frame - PHASE_LENGTH  and i <= currentTime.frame then
+					btn.text = "[ "+ btn.text +" ]"
+					
+			
+					/* TURN ALL FRAME BUTTONS OFF */ 				
+					btn.state = frame == currentTime.frame
+					
+					if btn.state then
+					(
+						/* SET COLOR */ 
+						btn.highlightColor = this.getFrameButtonColor frame
+						
+						/* SET STATE TRUE -- force to update highlight color */ 
+						btn.state = true
+					)
+			)
 		)
 	),
 	
@@ -137,13 +176,21 @@ struct TrackbarDialogTicker_v
 	
 	/** Max widow size changed
 	 */
-	function _maxWidowSizeChanged this.testAndResetProperty #maxwin_pos_size_current (this._getMaxWindowSize()),
+	function _maxWidowSizeChanged = this.testAndResetProperty #maxwin_pos_size_current (this._getMaxWindowSize()),
 	
 	/** Is anim range changed
 	 */
 	function _animRangeChanged = this.testAndResetProperty #animation_range animationRange,
-	
-	
+	--function _animRangeChanged =
+	--(
+	--	wtf = this.testAndResetProperty #animation_range animationRange
+	----format "wtf: %\n" wtf
+	--wtf --return
+	--)
+	--
+	--,
+	--
+	--
 	/*  testAndResetProperty
 
 	   Tests whether a property on a given object differs from a tested value.
@@ -151,12 +198,26 @@ struct TrackbarDialogTicker_v
 	*/
 	function testAndResetProperty key val =
 	(
+		--format "\n\n"; print "TrackbarDialogTicker_v.testAndResetProperty()"
+		--format "%: %\n" key val
 		--local current_value = undefined
 	
 		if isProperty this key then
 		(
-			is_changed = getProperty this key != val
+			--format "val: %\n" ( getProperty this key )
+			--format "TEST: %\n" ( prop_val != undefined and classOf prop_val == Interval )
+			prop_val = getProperty this key
 			
+			is_changed = case of
+			(
+				( prop_val != undefined and classOf prop_val == Interval ): val.start != prop_val.start or val.end != prop_val.end
+				
+				default:  prop_val != val
+			)
+			
+			--is_changed = getProperty this key != val
+			
+			--format "is_changed: %\n" is_changed
 			if is_changed then
 				setProperty this key val
 				
@@ -441,9 +502,9 @@ struct TrackbarDialogTicker_v
 	
 	/** Update buttons
 	 */
-	function updateButtonsSizeAndPosition =
+	function updateButtonsSizePosition =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsSizeAndPosition()"
+		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsSizePosition()"
 		
 		/* GET BUTTONS */ 
 		frames_count = this.getFramesCount()
@@ -483,45 +544,6 @@ struct TrackbarDialogTicker_v
 		/* WRA TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
 		--for key in sort buttons.keys do
 			--buttons[key].text = if key > phase_start and key <= frame then  "[ "+ key as string +" ]" else key as string
-	),
-	
-	/** Update button text and state
-	 */
-	function updateActiveButton =
-	(
-		--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
-		this._setFrameButtons()
-		
-		frames_count = this.getFramesCount()
-
-		/*------------------------------------------------------------------------------
-			EDIT EACH BUTTON IN ANIM RANGE
-		--------------------------------------------------------------------------------*/
-		for i = 1 to frames_count where ( btn = buttons[i]) != undefined do
-		(
-			frame = ( animationRange.start.frame + i - 1 ) as integer
-			
-			/* SET BUTTON TEXT BY FRAME */ 
-			btn.text = frame as string
-			
-			/* ADD BRACKET TO FRAMES IN PHASE */ 
-			 if i > currentTime.frame - PHASE_LENGTH  and i <= currentTime.frame then
-				btn.text = "[ "+ btn.text +" ]"
-			
-				
-		
-				/* TURN ALL FRAME BUTTONS OFF */ 				
-				btn.state = frame == currentTime.frame
-				
-				if btn.state then
-				(
-					/* SET COLOR */ 
-					btn.highlightColor = this.getFrameButtonColor frame
-					
-					/* SET STATE TRUE -- force to update highlight color */ 
-					btn.state = true
-				)
-		)
 	),
 	
 	/** Get frame buttons
