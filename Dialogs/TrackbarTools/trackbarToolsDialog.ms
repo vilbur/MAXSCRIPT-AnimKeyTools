@@ -90,7 +90,7 @@ function trackbarToolsDialog =
 	
 	/* BUTTONS */
 	btn_start	= _Controls.control #BUTTON	"<>"	id:#BTN_btn_sstart	width:20 height:16 pos:[ 34 , 0 ]	tooltip:"Shift FIRST frame"
-	btn_end	= _Controls.control #BUTTON	"<>"	id:#BTN_btn_send	width:20 height:16 pos:[ 34 , 20 ]	tooltip:"Shift LAST frame"
+	btn_end	= _Controls.control #BUTTON	"<>"	id:#BTN_btn_send	width:20 height:16 pos:[ 34 , 20 ]	tooltip:"Shift LAST frame\n\nALT: Trim END by CURRENT frame"
 
 	
 	/* EVENTS SPINNERS */ 	
@@ -130,12 +130,12 @@ function trackbarToolsDialog =
 		--------------------------------------------------------------------------------*/
         _Frame_btn = _Controls.control #CHECKBUTTON ( i_str ) \
                         id:("btn_frame_"+ i_str )	\
+                        pos:pos	\
                         width:0	\
                         height:width_button	\
-                        pos:pos	\
-                        highlightColor:COLOR_NAMES[#GREEN_DARK]	\
                         visible:true	\
                         border:false	\
+                        highlightColor:COLOR_NAMES[#GREEN_DARK]	\
                         tooltip:"CTRL + LMB | RMB: Jump to phase"
 
 		
@@ -153,9 +153,10 @@ function trackbarToolsDialog =
 	--------------------------------------------------------------------------------*/
 	
 	--PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
-	PlayBtn	= _Controls.control #CHECKBUTTON	"▶"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
+	PlayBtn	= _Controls.control #CHECKBUTTON	"►"	id:#BTN_play width:52 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN] ini:false
 	
-    PlayBtn.Event #CHANGED   	"is_playing_now = not is_playing_now" tooltip:"START \ STOP playback"
+    --PlayBtn.Event #CHANGED   	"is_playing_now = not is_playing_now" tooltip:"START \ STOP playback"
+    PlayBtn.Event #CHANGED   	"is_playing_now = not is_playing_now; EventFired.control.text = if val then \"■\" else \"►\" " tooltip:"START \ STOP playback"
     PlayBtn.Event #RIGHTCLICK	"ToolsCallback.showFpsRcMenu()"       tooltip:"Set FPS"
 
 	

@@ -500,7 +500,7 @@ struct TrackbarDialogTicker_v
 			translate slider_pos_size [ 0, -slider_pos_size.y ]
 			
 			/* MOVE TO BOTTOM */ 
-			translate slider_pos_size [ 0, maxwin_pos_size.bottom - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h ]
+			translate slider_pos_size [ 0, maxwin_pos_size.bottom - viewport_bottom_padding - slider_pos_size.h - buttons_size_pos.h - 4 ]
 		)
 		
 	),
@@ -542,7 +542,7 @@ struct TrackbarDialogTicker_v
 		--visible_buttons = for btn in buttons where btn.visible collect btn 
 
 		/* UPDATE BUTTONS */ 
-		--if update_button_position or visible_buttons.count != frames_count then
+		----if update_button_position or visible_buttons.count != frames_count then
 		(
 			pos_x = 54 -- left margin on trackbar
 			
@@ -610,7 +610,7 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.getFrameButtonColor()"
 		--format "animButtonState: %\n" animButtonState
-		if animButtonState then color 125 13 13 else ( if frame as integer != 0 then green_color else orange )
+		if animButtonState then color 125 13 13 else ( if frame as integer != 0 then green_color else color 220 120 20 )
 	),
 	
 	/** Filter trackbar keys by current tool

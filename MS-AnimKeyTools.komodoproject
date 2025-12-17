@@ -7,16 +7,16 @@
 </folder>
 <livefolder id="d5c06223-ea47-4d8a-8387-fc0b8b05c2b5" idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" name="Lib" url="Lib/">
 </livefolder>
+<livefolder id="18ae0f29-3d12-4be4-a6a1-260ae1c09fa7" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="PhaseMaker" url="Dialogs/PhaseMaker/">
+</livefolder>
 <file id="1b9a4099-fd6d-4c40-a0d7-ba4ec8f49ce0" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools.ms" url="AnimTools.ms">
 </file>
+<livefolder id="29391172-f11b-48ae-8b59-629267eefbd9" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools" url="Dialogs/AnimTools/">
+</livefolder>
+<livefolder id="7d29e177-e6c8-4d5d-ae8e-8721c83f6665" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools" url="Dialogs/TrackbarTools/">
+</livefolder>
 <file id="a38bbe5d-265a-4250-8aa6-69a02eaafc87" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="PhaseMaker.ms" url="PhaseMaker.ms">
 </file>
-<livefolder id="c12576a3-b432-4d9f-a42e-5d468d68cbf6" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools" url="TrackbarTools/">
-</livefolder>
-<livefolder id="e7e3a4c2-4c50-4a58-a357-2ca4949ea70a" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools" url="AnimTools/">
-</livefolder>
-<livefolder id="eedd9dbb-4ea9-4bd7-a3a1-c19dda41d34f" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="PhaseMaker" url="PhaseMaker/">
-</livefolder>
 <file id="f0246cc1-38c3-4e17-bfc8-9f7fcc246b69" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools.ms" url="TrackbarTools.ms">
 </file>
 <preference-set idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" id="project" preftype="project">

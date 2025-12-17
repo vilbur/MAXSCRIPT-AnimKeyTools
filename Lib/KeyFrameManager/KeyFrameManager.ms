@@ -54,7 +54,7 @@ struct KeyFrameManager_v
 	 */
 	function insertKeys objs: transforms: properties: time: =
 	(
-		format "\n"; print "KeyFrameManager_v.insertKeys()"
+		--format "\n"; print "KeyFrameManager_v.insertKeys()"
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
 
 		ObjectsControllerKeys = this.getObjectsWithKeys(this.objs)
@@ -62,14 +62,14 @@ struct KeyFrameManager_v
 		for ObjectControllerKeys in ObjectsControllerKeys do
 			for transform_track in ObjectControllerKeys.keys_transforms.keys do
 			(
-				format "\n"
-				format "transform_track: %\n" transform_track
-				format "ObjectControllerKeys.keys_transforms[transform_track]: %\n" ObjectControllerKeys.keys_transforms[transform_track]
+				--format "\n"
+				--format "transform_track: %\n" transform_track
+				--format "ObjectControllerKeys.keys_transforms[transform_track]: %\n" ObjectControllerKeys.keys_transforms[transform_track]
 				keys_of_track = ObjectControllerKeys.getKeys transform_track
-				format "keys_of_track: %: %\n" transform_track keys_of_track
-				format "amax(keys_of_track): %\n" (amax(keys_of_track))
-				format "current_time: %\n" current_time
-				format "TEST: %\n" ( current_time < amax(keys_of_track) )
+				--format "keys_of_track: %: %\n" transform_track keys_of_track
+				--format "amax(keys_of_track): %\n" (amax(keys_of_track))
+				--format "current_time: %\n" current_time
+				--format "TEST: %\n" ( current_time < amax(keys_of_track) )
 				
 				/* INSERT KEY ONLY BETWEEN OTHER KEYS - do not create key if it is last  */ 
 				if current_time < amax(keys_of_track) then
@@ -167,18 +167,16 @@ struct KeyFrameManager_v
 			)
 	),
 
-	private
-	
 	/** 
 	  
 	 */
 	function getObjectsWithKeys objs which:#( #POSITION, #ROTATION, #SCALE ) =
 	(
-		format "\n"; print ".getObjectsWithKeys()"
+		--format "\n"; print ".getObjectsWithKeys()"
 			
 		
 		if classOf which != Array then which = #( which )
-		format "which: %\n" which
+		--format "which: %\n" which
 		/* OBJECTS to process */ 
 		
 		ObjectsControllerKeys = #()
@@ -193,13 +191,15 @@ struct KeyFrameManager_v
 			
 			--format "tracks_of_keys: %\n" tracks_of_keys
 			
-			format "ObjectControllerKeys.keys_transforms: %\n" ObjectControllerKeys.keys_transforms.keys
+			--format "ObjectControllerKeys.keys_transforms: %\n" ObjectControllerKeys.keys_transforms.keys
 		)
 			
 		ObjectsControllerKeys --return
 		
 	),
 
+	private
+	
 	/** Process transforms
 	 */
 	function executeCallback callback =

@@ -159,7 +159,7 @@ struct TrackbarToolsCallback_v
 		frame = (if start != unsupplied then start else end) as integer
 		
 		
-		if not keyboard.controlPressed then
+		if not keyboard.altPressed then
 		(
 			_Interval = if start != unsupplied then Interval frame (animationRange.end.frame) else Interval (animationRange.start.frame) frame
 	
@@ -171,28 +171,9 @@ struct TrackbarToolsCallback_v
 				 _Interval.end += 1
 			
 		)
-		--else
-		--(
-		--	local last_frame_button
-		--	
-		--	buttons = this._getFrameButtons()
-		--	--format "buttons: %\n" buttons
-		--	for i = buttons.keys.count - 1 to 0 by -1  do
-		--	--format "buttons[i]: %\n" buttons[i].visible
-		--	
-		--	for i = buttons.keys.count - 1 to 0 by -1 while last_frame_button == undefined where buttons[i].visible do last_frame_button = buttons[i]
-		--	--format "last_frame_button: %\n" last_frame_button
-		--	frame_start = animationRange.start.frame
-		--	frame_end = animationRange.end.frame
-		--	
-		--	 if start != unsupplied then
-		--		frame_start = _rollout.btn_range_start.text as integer
-		--	else
-		--		frame_end = last_frame_button.text as integer
-		--	
-		--	
-		--	_Interval = Interval frame_start frame_end
-		--)
+		else
+			_Interval.end = if currentTime > animationRange.start then currentTime.frame as integer else currentTime.frame + 1
+			
 		
 		--format "_INTERVAL: %\n" _Interval
 		/* Set new animation range */
