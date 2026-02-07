@@ -10,20 +10,20 @@ function createTestObject =
 	
 	delete objects
 	
-	obj = Teapot isSelected:true radius:20
+	obj = Teapot isSelected:true radius:20 wirecolor:red
 	
 	
     animate on
     (
         --at time 1 obj.position  = [ 10, 0, 0 ]
-        at time 10 obj.position = [ 100, 0, 0 ]
-        at time 20 obj.position = [ 200, 0, 0 ]
-        at time 30 obj.position = [ 300, 0, 0 ]
+        at time 5 obj.position = [ 100, 0, 0 ]
+        at time 10 obj.position = [ 200, 0, 0 ]
+        at time 15 obj.position = [ 300, 0, 0 ]
 		
 		
-		at time 40 Rotate obj ( AngleAxis -180 [0,0,1])
+		at time 20 Rotate obj ( AngleAxis -180 [0,0,1])
 
-		at time 50  obj.radius = 100
+		at time 25  obj.radius = 100
     )
 	
 
@@ -33,8 +33,8 @@ function createTestObject =
 	animate on
 	(
 		at time 0  obj.modifiers[#bend].angle = 0
-		at time 20 obj.modifiers[#bend].angle = 45
-		at time 40 obj.modifiers[#bend].angle = -30 
+		at time 10 obj.modifiers[#bend].angle = 45
+		at time 20 obj.modifiers[#bend].angle = -30 
 	)
 	
 	
@@ -47,13 +47,18 @@ function createTestObject =
 	SETUP SCENE
 --------------------------------------------------------------------------------*/
 
+delete objects
+
 obj	= selection[1]
 
-obj = createTestObject()
+
+if obj == undefined then 
+	obj = createTestObject()
+
+animationRange = Interval 0 20
 
 sliderTime = 10
 sliderTime = 5
-
 
 
 /*------------------------------------------------------------------------------
@@ -86,35 +91,43 @@ KeyFrameManager.insertKeys()
 	DELETE KEYS
 --------------------------------------------------------------------------------*/
 
+/* CREAATE COPY OF OBJECT */ 
+maxOps.CloneNodes #(obj) offset:[0,100,0]  newNodes:&nnl
+
+nnl[1].wirecolor = green
+
+select nnl[1]
+
+
 /* ALL KEYS OF SELECTION */ 
---KeyFrameManager.removeKeys()
+KeyFrameManager.removeKeys()
 
 /* TRIM RIGHT */ 
--- KeyFrameManager.removeKeys time:#RIGHT
+ KeyFrameManager.removeKeys time:#RIGHT
 
 
 /* ALL KEYS FROM OBJECTS IN TIME RANGE */ 
---KeyFrameManager.removeKeys objs: selection[1] time:[ 10, 50 ]
+KeyFrameManager.removeKeys objs: selection[1] time:[ 10, 50 ]
 
 		
 /* TRANSFORMS all */
---KeyFrameManager.removeKeys transforms:true time:undefined
+KeyFrameManager.removeKeys transforms:true time:undefined
 
 /* TRANSFORMS each */
---KeyFrameManager.removeKeys transforms:#POSITION
---KeyFrameManager.removeKeys transforms:#ROTATION
---KeyFrameManager.removeKeys transforms:#SCALE
+KeyFrameManager.removeKeys transforms:#POSITION
+KeyFrameManager.removeKeys transforms:#ROTATION
+KeyFrameManager.removeKeys transforms:#SCALE
 
 
 
 /* PROPERTIES all modifiers and baseobject */
---KeyFrameManager.removeKeys properties:true
+KeyFrameManager.removeKeys properties:true
 
 
 /* MODIFIERS */
 --KeyFrameManager.removeKeys properties:#MODIFIERS
  
-/* BASEOBJECT */
+--/* BASEOBJECT */
 --KeyFrameManager.removeKeys properties:#BASEOBJECT
 
 

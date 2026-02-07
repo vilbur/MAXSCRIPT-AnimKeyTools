@@ -60,9 +60,13 @@ function frameButtonRcMenu =
 		--------------------------------------------------------------------------------*/
 		Menu.item	"TRIM keys RIGHT • Ctrl: LEFT"	(KeyFrameManager_side+".removeKeys()")
 		
+		Menu.separator()
+		
 		menu_trim = Menu.menu ("TRIM KEYS") --flat:false
 		
-		menu_trim.item "TRIM ALL TRANSFORMS" ( KeyFrameManager_side + "transforms:true" )
+		menu_trim.item "TRIM ALL TRANSFORMS" ( KeyFrameManager_side + " transforms:true" )
+		
+		menu_trim.separator()
 		
 		for transform_track in transform_tracks do
 			menu_trim.item ("Trim " + transform_track ) ( KeyFrameManager_side+".removeKeys TRANSFORMS:#" + transform_track)
@@ -83,8 +87,9 @@ function frameButtonRcMenu =
 		del_menu = Menu.menu "Delete TRANSFORMS"
 	
 		/* TRANSFORMS all */
-		del_menu.item "Delete ALL TRANSFORMS" ( removeKeys_cmd + "transforms:true" )
+		del_menu.item "Delete ALL TRANSFORMS" ( removeKeys_cmd + " transforms:true" )
 		
+		del_menu.separator() 
 		
 		/* TRANSFORMS each */
 		for transform_track in transform_tracks do 

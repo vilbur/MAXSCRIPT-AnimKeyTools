@@ -1,19 +1,11 @@
 clearListener(); print("Cleared in:\n"+getSourceFileName())
 
 
---frameRate
---playbackSpeed
---
---timeConfiguration.playbackSpeed
 
+obj	= selection[1]
 
-playback_speed = case timeConfiguration.playbackSpeed of
-(
-	1: 1/4 
-	2: 1/2 
-	3: 1
-	4: 2
-	5: 4
-)
+Turn_to_Poly_mod = Turn_to_Poly limitPolySize:on maxPolySize:4
 
-format "playback_speed: %\n" playback_speed
+addModifier obj Turn_to_Poly_mod
+--deleteModifier obj Turn_to_Poly_mod
+

@@ -152,7 +152,7 @@ struct TrackbarToolsCallback_v
 	function setAnimRange start: end: =
 	(
 		--format "\n"; print "TrackbarToolsCallback_v.setAnimRange()"
-		
+		animation_range = animationRange
 		--local _Interval
 		_Interval = animationRange
 		
@@ -176,8 +176,13 @@ struct TrackbarToolsCallback_v
 			
 		
 		--format "_INTERVAL: %\n" _Interval
-		/* Set new animation range */
+		/* SET NEW ANIMATION RANGE */
 		animationRange = _Interval
+		
+		/* KEEP ACTIVE LAST FRAME OF RANGE */ 
+		if animation_range.end == currentTime then
+			sliderTime = animationRange.end
+		
 		
 		/* Show / Hide buttons */
 		--this.showHideButtonsInRange sliderTime.frame

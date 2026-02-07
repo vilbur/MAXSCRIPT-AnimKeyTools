@@ -1,8 +1,4 @@
-
---win32 = win32_v()
-
-
-/** Trackbar tools dialog updater
+/** UPDATE TRACKBAR DIALOG ON EACH TIMER TICK
  */
 struct TrackbarDialogTicker_v
 (
@@ -543,7 +539,7 @@ struct TrackbarDialogTicker_v
 
 		/* UPDATE BUTTONS */ 
 		----if update_button_position or visible_buttons.count != frames_count then
-		(
+		--(
 			pos_x = 54 -- left margin on trackbar
 			
 			buttons_area = slider_width - 108
@@ -567,9 +563,11 @@ struct TrackbarDialogTicker_v
 			)
 			
 			/* UPDATE POSITION OF "PLAY" BUTTON */
-			pos_after_last_button = buttons[frames_count + 1].pos
+			last_button = if buttons[frames_count + 1] == undefined then frames_count else frames_count + 1
+			
+			pos_after_last_button = buttons[last_button].pos
 
-		)
+		--)
 		
 		
 		/* SET POSITION OF "PLAY" BUTTON */
@@ -619,10 +617,19 @@ struct TrackbarDialogTicker_v
 	 */
 	function _filterTrackbarKeysByCurrentTool =
 	(
+		transform_tools = #(
+			#USCALE,
+			#NUSCALE,
+			#SQUASH,
+			#ROTATE,
+			#MOVE
+		)
+		
+		
 		--format "\n"; print "TrackbarDialogTicker_v._filterTrackbarKeysByCurrentTool()"
-		trackbar.filter = if toolmode.commandmode == #ROTATE or toolmode.commandmode == #MOVE then
-			----#currentTM
-			#TMOnly 
+		trackbar.filter = if findItem transform_tools toolmode.commandmode > 0 then
+			#currentTM
+			--#TMOnly 
 		else
 			#all		
 	),

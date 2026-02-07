@@ -13,8 +13,8 @@ function showTimeSlider =
 		/* GET CURRENT WORKSPACE */ 
 		current_workspace = WorkspaceManager.GetCurrentWorkspaceIdentifier()
 	
-		workspace_file = (getDir #TEMP) + "\\..\\en-US\\UI\\Workspaces\\" + current_workspace + ".maxsettings"
-	
+		--workspace_file = (getDir #TEMP) + "\\..\\en-US\\UI\\Workspaces\\" + current_workspace + ".maxsettings"
+		workspace_file = WorkspaceManager.GetWriteDirectory() + "\\" + current_workspace + ".maxsettings"
 		/* GET TEMPORARY WORKSPACE */ 
 		temp_workspace = current_workspace + "_temp"
 	

@@ -57,7 +57,7 @@ struct KeyFrameManager_v
 		--format "\n"; print "KeyFrameManager_v.insertKeys()"
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
 
-		ObjectsControllerKeys = this.getObjectsWithKeys(this.objs)
+		ObjectsControllerKeys = this.getObjectsControllerKeys(this.objs)
 		
 		for ObjectControllerKeys in ObjectsControllerKeys do
 			for transform_track in ObjectControllerKeys.keys_transforms.keys do
@@ -170,9 +170,9 @@ struct KeyFrameManager_v
 	/** 
 	  
 	 */
-	function getObjectsWithKeys objs which:#( #POSITION, #ROTATION, #SCALE ) =
+	function getObjectsControllerKeys objs which:#( #POSITION, #ROTATION, #SCALE ) =
 	(
-		--format "\n"; print ".getObjectsWithKeys()"
+		--format "\n"; print ".getObjectsControllerKeys()"
 			
 		
 		if classOf which != Array then which = #( which )
