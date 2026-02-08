@@ -147,6 +147,7 @@ struct KeyFrameManager_v
 					for key_time in ControllerKeys.keys while not key_found where this.isKeyMatchTime key_time do 
 						key_found = true
 			
+			/* IF KEY(S) ON SPECIFIC TIME(S) HAS BEEN FOUND */ 
 			if key_found then
 				append objects_with_keys obj	
 		)

@@ -79,7 +79,7 @@ KeyFrameManager 	= KeyFrameManager_v() --time:#RIGHT -- DELETE CURRENT TIME IF t
 
 
 /*------------------------------------------------------------------------------
-	OPTIONS
+	CONFIGURATION OF TESTS
 --------------------------------------------------------------------------------*/
 
 /* DELETE ONLY SELECTED KEYS */ 
@@ -123,15 +123,6 @@ KeyFrameManager.time = #CURRENT
 
 
 /*------------------------------------------------------------------------------
-	SELECT OBJECTS BY KEYS
-------------------------------------------------------------------------------*/
-clearSelection()
-
-select (KeyFrameManager.getObjectsWithKeys())
-
-
-
-/*------------------------------------------------------------------------------
 	DELETE KEYS
 --------------------------------------------------------------------------------*/
 
@@ -152,27 +143,36 @@ select (KeyFrameManager.getObjectsWithKeys())
 
 /*------------------------------------------------------------------------------
 	DELETE KEYS - TRANSFORMS
---------------------------------------------------------------------------------*/
+------------------------------------------------------------------------------*/
 
---/* TRANSFORMS each */
---KeyFrameManager.removeKeys transforms:#POSITION
---KeyFrameManager.removeKeys transforms:#ROTATION
---KeyFrameManager.removeKeys transforms:#SCALE
---		
---/* TRANSFORMS all */
---KeyFrameManager.removeKeys transforms:true time:undefined
---
+/* TRANSFORMS each */
+KeyFrameManager.removeKeys transforms:#POSITION
+KeyFrameManager.removeKeys transforms:#ROTATION
+KeyFrameManager.removeKeys transforms:#SCALE
+		
+/* TRANSFORMS all */
+KeyFrameManager.removeKeys transforms:true time:undefined
+
 
 /*------------------------------------------------------------------------------
 	DELETE KEYS - PROPERTIES
 --------------------------------------------------------------------------------*/
 
---/* BASEOBJECT */
---KeyFrameManager.removeKeys properties:#BASEOBJECT
+/* BASEOBJECT */
+KeyFrameManager.removeKeys properties:#BASEOBJECT
  
 /* MODIFIERS */
---KeyFrameManager.removeKeys properties:#MODIFIERS
+KeyFrameManager.removeKeys properties:#MODIFIERS
 
---/* PROPERTIES all modifiers and baseobject */
---KeyFrameManager.removeKeys properties:true
+/* PROPERTIES all modifiers and baseobject */
+KeyFrameManager.removeKeys properties:true
+
+
+/*------------------------------------------------------------------------------
+	SELECT OBJECTS BY KEYS
+------------------------------------------------------------------------------*/
+clearSelection()
+
+select (KeyFrameManager.getObjectsWithKeys())
+
 
