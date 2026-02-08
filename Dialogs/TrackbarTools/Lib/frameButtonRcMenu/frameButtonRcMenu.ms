@@ -8,7 +8,7 @@ function frameButtonRcMenu =
 (
 	/** Get int string
 	 */
-	function getString num = (num as integer )  as string
+	function getString num = ( num as integer ) as string
 	
 	--which = case toolmode.commandmode of
 	--(

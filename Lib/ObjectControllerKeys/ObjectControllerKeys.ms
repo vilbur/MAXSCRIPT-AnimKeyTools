@@ -179,6 +179,24 @@ struct ObjectControllerKeys_v
 		
 	),
 	
+	/** print keys to script listener - DEVELOPENT 
+	 */
+	function list =
+	(
+		format "\n"; print "ObjectControllerKeys_v.list()"
+		
+		format "\n\nKEYS OF %\n" obj.name
+		
+		format "\n\n--- KEYS OF TRANSFORMS ---\n"
+		for track in keys_transforms.keys do
+			format "TRACK: %	KEYS: %\n" track keys_transforms[track]
+		
+		format "\n\n--- KEYS OF PROPERTIES ---\n"
+		for prop_name in keys_mods.keys do
+			format "PROP: %	KEYS: %\n\n\n" prop_name keys_mods[prop_name]
+		
+	),
+	
 	/** Has any keys
 	 */
 	function hasAnyKeys =

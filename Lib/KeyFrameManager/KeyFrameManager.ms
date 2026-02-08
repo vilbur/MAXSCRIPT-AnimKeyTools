@@ -13,20 +13,22 @@ struct KeyFrameManager_v
 	/* required */
 	/* properties */
 	objs,
-	transforms, -- #( #POSITION, #ROTATION, #SCALE )| @()
-	properties,
+	transforms, -- #( #POSITION, #ROTATION, #SCALE )| #()	-- delete keys of transforms
+	properties, --  #BASEOBJECT | #MODIFIERS | true | false	-- delete keys of mods -- only baseobject | modifiers | both | none of mods if false
 
 	current_time,
 	
 	only_selected = false,
 	
-	transform_tracks_all = #( #POSITION, #ROTATION, #SCALE ),
 	
 	--controller_tracks = Dictionary 
-	ControllersKeys	= #(),
+	ControllersKeys	= #(), --"./../ObjectControllerKeys/ObjectControllerKeys.ms"
 
 
 	/* private */
+	transform_tracks_all = #( #POSITION, #ROTATION, #SCALE ),
+	
+	
 	/* dependency */
 	RigWrapper,
 	
@@ -78,25 +80,7 @@ struct KeyFrameManager_v
 			)
 	),
 
-	/** Remove anim keys from selection
-	  * 
-	  * @param Array objs if undefined then use current selection
-	  * 
-	  * @param boolean|name|Array transforms	true|false|#POSITION|#ROTATION|#SCALE|#( #POSITION, #ROTATION, #SCALE )
-	  * @param boolean|name|Array properties	true|false|#MODIFIERS|#BASEOBJECT|#( #MODIFIERS, #BASEOBJECT )
-	 */
-	function removeKeys objs: transforms: properties: time: =
-	(
-		--format "\n"; print "KeyFrameManager_v.removeKeys()"
-		--format "TRANSFORMS: %\n" transforms
-		--format "properties: %\n" properties
 
-		this.setParameters objs:objs transforms:transforms properties:properties time:time
-		--format "this.properties: %\n" this.properties
-		--format "this.time: %\n" this.time
-		this.executeCallback #DELETE
-	),
-	
 	/** Copy keys
 	 */
 	function copyKeys objs: transforms: properties: time: =
@@ -137,6 +121,56 @@ struct KeyFrameManager_v
 		--RigWrapper.mirrorControllerTransfroms()
 		
 		sliderTime = current_time
+	),
+	
+	
+	/** get objects with keys of specific type and time
+	 */
+	function getObjectsWithKeys objs: transforms: properties: time: =
+	(
+		--format "\n"; print "KeyFrameManager_v.getObjectsWithKeys()"
+		this.setParameters objs:objs transforms:transforms properties:properties time:time
+
+		objects_with_keys = #()
+		
+		for obj in this.objs do
+		(
+			key_found = false
+
+			ObjectControllerKeys = ObjectControllerKeys_v(obj)
+
+			--ObjectControllerKeys.list()
+			
+			/* LOOP EACH TRANSFORM TRACK #( #POSITION, #ROTATION, #SCALE ) */ 
+			for transform_type in ObjectControllerKeys.keys_transforms.keys while not key_found where findItem this.transforms transform_type > 0 do
+				for ControllerKeys in ObjectControllerKeys.keys_transforms[transform_type] while not key_found do
+					for key_time in ControllerKeys.keys while not key_found where this.isKeyMatchTime key_time do 
+						key_found = true
+			
+			if key_found then
+				append objects_with_keys obj	
+		)
+
+		objects_with_keys --return
+	),
+	
+	/** Remove anim keys from selection
+	  * 
+	  * @param Array objs if undefined then use current selection
+	  * 
+	  * @param boolean|name|Array transforms	true|false|#POSITION|#ROTATION|#SCALE|#( #POSITION, #ROTATION, #SCALE )
+	  * @param boolean|name|Array properties	true|false|#MODIFIERS|#BASEOBJECT|#( #MODIFIERS, #BASEOBJECT )
+	 */
+	function removeKeys objs: transforms: properties: time: =
+	(
+		--format "\n"; print "KeyFrameManager_v.removeKeys()"
+		--format "TRANSFORMS: %\n" transforms
+		--format "properties: %\n" properties
+
+		this.setParameters objs:objs transforms:transforms properties:properties time:time
+		--format "this.properties: %\n" this.properties
+		--format "this.time: %\n" this.time
+		this.executeCallback #DELETE
 	),
 	
 	/** Remove all keys from scene
@@ -200,55 +234,58 @@ struct KeyFrameManager_v
 
 	private
 	
-	/** Process transforms
+	/** Process 
 	 */
 	function executeCallback callback =
 	(
 		--format "\n"; print "KeyFrameManager_v.executeCallback()"
 		--format "callback: %\n" callback
-		--format "this.transforms: %\n" this.transforms
-		--format "this.properties: %\n" this.properties
 		
 		for obj in this.objs do
 		(
-			--format "OBJ: %\n" obj.name
-			
 			ObjectControllerKeys = ObjectControllerKeys_v(obj)
-			--format "ObjectControllerKeys: %\n" ObjectControllerKeys.keys_transforms.keys
 			
 			/*------------------------------------------------------------------------------
-				TRANSFORMS KEYS
+				KEYS OF TRANSFORMS
 			--------------------------------------------------------------------------------*/
-			--format "this.transforms: %\n" this.transforms
-			--format "ObjectControllerKeys.keys_transforms.keys: %\n" ObjectControllerKeys.keys_transforms.keys
 			
+			/* LOOP EACH TRANSFORM TRACK #( #POSITION, #ROTATION, #SCALE ) */ 
 			for transform_type in ObjectControllerKeys.keys_transforms.keys where findItem this.transforms transform_type > 0 do
-			(
-				--format "TRANSFORM_TYPE: %\n" transform_type
-			
 				for ControllerKeys in ObjectControllerKeys.keys_transforms[transform_type] do
 					this._processControllerKeys ControllerKeys callback
-			)
-			/*------------------------------------------------------------------------------
-				MODS KEYS
-			------------------------------------------------------------------------------*/
-			if this.properties then
-				for mod_index = 1 to ObjectControllerKeys.keys_mods.count
-					where ( ControllersKeys = ObjectControllerKeys.keys_mods[mod_index]) != undefined  do
-						for prop_name in ControllersKeys.keys do
-							this._processControllerKeys ControllersKeys[prop_name] callback
 
+			
+			/*------------------------------------------------------------------------------
+				KEYS OF MODS 
+			------------------------------------------------------------------------------*/
+
+			if this.properties != false then
+			(
+				mods_count = ObjectControllerKeys.keys_mods.count
+
+				/* LOOP EACH MOD IN STACK FROM TOP TO BASEOBJECT */ 
+				for mod_index = 1 to ObjectControllerKeys.keys_mods.count
+					where ( ControllersKeys = ObjectControllerKeys.keys_mods[mod_index] ) != undefined do
+					(
+						is_baseobject = mod_index == mods_count -- baseobject is last mod inarray
+
+						/* TEST IF RDELTE KEYS OF BOTH or  KEYS OF BASEOBJECT  or KEYS OF MODIFIERS */ 
+						if properties == true or ( is_baseobject and properties == #BASEOBJECT ) or ( not is_baseobject and properties == #MODIFIERS ) then -- faster would be test this before loop through mods
+							for prop_name in ControllersKeys.keys do
+								this._processControllerKeys ControllersKeys[prop_name] callback
+					)
+			)
 		)
-		
 	),
 	
 	/** Process controller keys
 	 */
 	function _processControllerKeys ControllerKeys callback =
 	(
-		--format "\n"; print "KeyFrameManager_v._processControllerKeys()"
+		format "\n"; print "KeyFrameManager_v._processControllerKeys()"
 		--format "% CALLBACK: %\n" ControllerKeys.ctrl callback
-		--format "ControllerKeys.keys: %\n" ControllerKeys.keys
+		format "ControllerKeys: %\n" ControllerKeys
+		format "ControllerKeys.keys: %\n" ControllerKeys.keys
 		/** Copy key
 		 */
 		function _copyKey ctrl key_time =
@@ -332,17 +369,44 @@ struct KeyFrameManager_v
 	function setParameters objs: transforms: properties: time: =
 	(
 		--format "\n"; print "KeyFrameManager_v.setParameters()"
+		--format "objs: %\n" objs
+		--format "transforms: %\n" transforms
 		--format "properties: %\n" properties
+		--format "\n"
+		--format "this.transforms: %\n" this.transforms
+		--format "this.properties: %\n" this.properties
+		
 		--format "time: %\n" time
 		
-		/* OBJECTS */ 
-		this.objs = if objs == unsupplied then selection as Array else objs
+		/*------------------------------------------------------------------------------
+			OBJECTS
+		--------------------------------------------------------------------------------*/
 		
-		/* TIME */ 
+		this.objs = case of
+		(
+			/* use given objects */ 
+			( objs != unsupplied ): objs
+			
+			/* use selection if objs are not defined and selection exists */ 
+			( selection.count > 0): selection
+			
+			/* use all obejcts */ 
+			default: objects
+		)
+		
+		this.objs = this.objs as Array
+		
+		/*------------------------------------------------------------------------------
+			TIME
+		--------------------------------------------------------------------------------*/
 		if time != unsupplied then 
 			this.time = time
+
 		
-		/* TRANSFORMS AND MODS */ 
+		/*------------------------------------------------------------------------------
+			 TRANSFORMS AND PROPERTIES
+		--------------------------------------------------------------------------------*/
+
 		if not ( transforms == unsupplied and properties == unsupplied ) then
 		(
 			/* TRANSFORMS */ 
@@ -353,29 +417,30 @@ struct KeyFrameManager_v
 			if properties != unsupplied then 
 				this.properties = properties
 		)
-		else /* SET TRANSFORMS AND MODS TO TRUE if both are undefined */ 
+		else /* SET TRANSFORMS AND MODS TO TRUE if both are unsupplied */ 
 			this.transforms = this.properties = true
 		
-		--format "this.transforms: %\n" this.transforms
-
-		/* get array #( #POSITION, #ROTATION, #SCALE ) */ 
-		if classOf this.transforms == BooleanClass then
-		(
-			/* GET ALL OR NO TRANSFORM TRACKS */ 
-			this.transforms = if this.transforms then transform_tracks_all else #()
-			--format "this.TRANSFORMS: %\n" this.transforms
-		)
-		else if classOf this.transforms != Array then
-			this.transforms = #( this.transforms )
 		
-		/* PROPERTY KEYS */ 
-		if this.properties == undefined then
+		/*------ TRANSFORMS ------*/
+		
+		if classOf this.transforms == BooleanClass then
+			/* GET ALL OR ANY OF TRANSFORM TRACKS */ 
+			this.transforms = if this.transforms then transform_tracks_all else #() -- TRUE: use all transforms | FALSE: do not use transforms
+
+			
+		else if classOf this.transforms != Array then
+			/* SET TRANSFROMS TO ARRAY */ 
+			this.transforms = #( this.transforms ) -- #( undefinded ) -- this is allowed -- undefined item is sanitized below
+
+			
+		/* CONVERT ITEMS TO #NAMES -- remove undefined items also */ 
+		this.transforms = for transform_type in this.transforms where transform_type != undefined collect transform_type as name
+
+		
+		/*------ PROPERTIES ------*/
+		if properties == unsupplied or properties == unsupplied then
 			this.properties = false
 			
-		
-		/* SANITIZE ITEMS IN ARRAY */ 		
-		this.transforms = for transform_type in this.transforms collect transform_type as name
-	
 	),
 	
 	/**
@@ -383,10 +448,9 @@ struct KeyFrameManager_v
 	on create do
 	(
 		--format "\n"; print "KeyFrameManager.onCreate()"
-		--for prop in #(  ) where getProperty this prop == undefined do -- CHECK CONSTRUCT PROPERTIES -- Array of this struct properties necessary to run
-		--	throw ("\n\n\nUNDEFINED CONSTRUCT PROPERTY\n\n\nSTRUCT:\n\n"+ ((filterString( classof this as string )"(:")[2]) +"\n\n\nPROPERTY:\n\n"+ prop )
+		--format "this.transforms: %\n" this.transforms
+		--format "this.properties: %\n" this.properties
+		
 		current_time = currentTime
-
 	)
-
 )

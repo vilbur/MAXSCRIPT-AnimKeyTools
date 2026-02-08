@@ -50,34 +50,8 @@ function createTestObject times =
 
 obj	= selection[1]
 
-/*  */ 
+/* NEW INSTANCE */ 
 ObjectControllerKeys = ObjectControllerKeys_v(obj)
 
-
-format "\nTRANSFORM KEYS:\n"
-
-for transform_name in ObjectControllerKeys.keys_transforms.keys do
-(
-	format "\ntransform_name: %\n" transform_name
-	for ControllerKeys in ObjectControllerKeys.keys_transforms[transform_name] do
-		format "%: %\n" ControllerKeys.ctrl ControllerKeys.keys
-)
-
-
-
-format "\nPROPERTY KEYS:\n"
-for mod_index = 1 to ObjectControllerKeys.keys_mods.count do
-(
-	format "\nmod_index: %\n" mod_index
-	keys_of_mod = ObjectControllerKeys.keys_mods[mod_index]
-	
-	for prop_name in keys_of_mod.keys do
-		format "%: 	%\n" prop_name keys_of_mod[prop_name]
-)
-		
-		
-
---format "ObjectControllerKeys.keys_transforms: %\n" ObjectControllerKeys.keys_transforms
---format "ObjectControllerKeys.properties: %\n" ObjectControllerKeys.properties
-
-
+/* PRINT KEYS */ 
+ObjectControllerKeys.list()

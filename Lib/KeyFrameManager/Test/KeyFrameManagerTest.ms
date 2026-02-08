@@ -37,24 +37,34 @@ function createTestObject =
 		at time 20 obj.modifiers[#bend].angle = -30 
 	)
 	
-	
 	obj --return
 )
 
-
+/** Clone test object
+ */
+function cloneTestObject =
+(
+	--format "\n"; print ".cloneTestObject()"
+	maxOps.CloneNodes #(obj) offset:[0,100,0] newNodes:&nnl
+	
+	obj_clone = nnl[1]
+	
+	obj_clone.wirecolor = green
+	
+	obj_clone --return
+)
 
 /*------------------------------------------------------------------------------
 	SETUP SCENE
 --------------------------------------------------------------------------------*/
-
+/* OBJECTS  */ 
 delete objects
 
-obj	= selection[1]
+obj = createTestObject()
 
+obj_clone = cloneTestObject()
 
-if obj == undefined then 
-	obj = createTestObject()
-
+/* ANIMATION */ 
 animationRange = Interval 0 20
 
 sliderTime = 10
@@ -76,59 +86,15 @@ KeyFrameManager 	= KeyFrameManager_v() --time:#RIGHT -- DELETE CURRENT TIME IF t
 --KeyFrameManager.only_selected = true
 
 --KeyFrameManager.time = #RIGHT
---KeyFrameManager.time = #CURRENT
+KeyFrameManager.time = #CURRENT
 
 /*------------------------------------------------------------------------------
 	CREATE KEYS
 --------------------------------------------------------------------------------*/
 --KeyFrameManager.createKeys()
 
-KeyFrameManager.insertKeys()
+--KeyFrameManager.insertKeys()
 
-
-
-/*------------------------------------------------------------------------------
-	DELETE KEYS
---------------------------------------------------------------------------------*/
-
-/* CREAATE COPY OF OBJECT */ 
-maxOps.CloneNodes #(obj) offset:[0,100,0]  newNodes:&nnl
-
-nnl[1].wirecolor = green
-
-select nnl[1]
-
-
-/* ALL KEYS OF SELECTION */ 
-KeyFrameManager.removeKeys()
-
-/* TRIM RIGHT */ 
- KeyFrameManager.removeKeys time:#RIGHT
-
-
-/* ALL KEYS FROM OBJECTS IN TIME RANGE */ 
-KeyFrameManager.removeKeys objs: selection[1] time:[ 10, 50 ]
-
-		
-/* TRANSFORMS all */
-KeyFrameManager.removeKeys transforms:true time:undefined
-
-/* TRANSFORMS each */
-KeyFrameManager.removeKeys transforms:#POSITION
-KeyFrameManager.removeKeys transforms:#ROTATION
-KeyFrameManager.removeKeys transforms:#SCALE
-
-
-
-/* PROPERTIES all modifiers and baseobject */
-KeyFrameManager.removeKeys properties:true
-
-
-/* MODIFIERS */
---KeyFrameManager.removeKeys properties:#MODIFIERS
- 
---/* BASEOBJECT */
---KeyFrameManager.removeKeys properties:#BASEOBJECT
 
 
 /*------------------------------------------------------------------------------
@@ -149,8 +115,64 @@ KeyFrameManager.removeKeys properties:true
 	MIRROR
 --------------------------------------------------------------------------------*/
 
-sliderTime = start_frame = 3
+--sliderTime = start_frame = 3
 
 
-KeyFrameManager.mirrorKeys time:[ start_frame, start_frame + 2 ]
+--KeyFrameManager.mirrorKeys time:[ start_frame, start_frame + 2 ]
 --KeyFrameManager.mirrorKeys time:[ start_frame, start_frame  ]
+
+
+/*------------------------------------------------------------------------------
+	SELECT OBJECTS BY KEYS
+------------------------------------------------------------------------------*/
+clearSelection()
+
+select (KeyFrameManager.getObjectsWithKeys())
+
+
+
+/*------------------------------------------------------------------------------
+	DELETE KEYS
+--------------------------------------------------------------------------------*/
+
+--select obj_clone
+
+
+/* ALL KEYS OF SELECTION */ 
+--KeyFrameManager.removeKeys()
+--
+--/* TRIM RIGHT */ 
+--KeyFrameManager.removeKeys time:#RIGHT
+--
+--
+--/* ALL KEYS FROM OBJECTS IN TIME RANGE */ 
+--KeyFrameManager.removeKeys objs: selection[1] time:[ 10, 50 ]
+--
+
+
+/*------------------------------------------------------------------------------
+	DELETE KEYS - TRANSFORMS
+--------------------------------------------------------------------------------*/
+
+--/* TRANSFORMS each */
+--KeyFrameManager.removeKeys transforms:#POSITION
+--KeyFrameManager.removeKeys transforms:#ROTATION
+--KeyFrameManager.removeKeys transforms:#SCALE
+--		
+--/* TRANSFORMS all */
+--KeyFrameManager.removeKeys transforms:true time:undefined
+--
+
+/*------------------------------------------------------------------------------
+	DELETE KEYS - PROPERTIES
+--------------------------------------------------------------------------------*/
+
+--/* BASEOBJECT */
+--KeyFrameManager.removeKeys properties:#BASEOBJECT
+ 
+/* MODIFIERS */
+--KeyFrameManager.removeKeys properties:#MODIFIERS
+
+--/* PROPERTIES all modifiers and baseobject */
+--KeyFrameManager.removeKeys properties:true
+
