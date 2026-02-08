@@ -122,6 +122,15 @@ function frameButtonRcMenu =
 		--Menu.item ( "MIRROR curretnt keys" ) ( "(KeyFrameManager_v( #CURRENT )).mirrorKeys transforms:true" )
 		--Menu.item ( "MIRROR" + copy_keys_label ) ( mirrorKeys_cmd + " transforms:true" )
 		
+		/*------------------------------------------------------------------------------
+			SELECT OBEJCTS
+		--------------------------------------------------------------------------------*/
+
+		menu_trim = Menu.menu ("SELECT by keys") --flat:false
+
+        menu_trim.item "Select obj with keys RIGHT • Ctrl: LEFT" (KeyFrameManager_side+".getObjectsWithKeys()")
+
+
 	)
 	else
 	(
