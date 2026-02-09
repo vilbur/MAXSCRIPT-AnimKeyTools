@@ -58,7 +58,7 @@ function frameButtonRcMenu =
 		/*------------------------------------------------------------------------------
 			TRIM
 		--------------------------------------------------------------------------------*/
-		Menu.item	"TRIM keys RIGHT • Ctrl: LEFT"	(KeyFrameManager_side+".removeKeys()")
+		Menu.item	"TRIM keys RIGHT | Ctrl: LEFT"	(KeyFrameManager_side+".removeKeys()")
 		
 		Menu.separator()
 		
@@ -126,17 +126,18 @@ function frameButtonRcMenu =
 			SELECT OBEJCTS
 		--------------------------------------------------------------------------------*/
 
-		menu_trim = Menu.menu ("SELECT by keys") --flat:false
+		menu_trim = Menu.menu ("SELECT objects by keys") --flat:false
 
-        menu_trim.item "Select obj with keys RIGHT • Ctrl: LEFT" (KeyFrameManager_side+".getObjectsWithKeys()")
+        menu_trim.item ("Select objects with keys on time: " + (currentTime.frame as integer ) as string ) (KeyFrameManager_side+".getObjectsWithKeys time:#CURRENT")
 
+        menu_trim.item "Select objects with keys RIGHT | Ctrl: LEFT" (KeyFrameManager_side+".getObjectsWithKeys()")
 
 	)
 	else
 	(
 		Menu.item "DELETE all keys from scene" "(KeyFrameManager_v( #CURRENT )).removeAllKeysFromScene()"
 		
-		Menu.item "TRIM all keys from scene RIGHT • Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+KeyFrameManager_side+".removeKeys objs:( objects as Array )")
+		Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+KeyFrameManager_side+".removeKeys objs:( objects as Array )")
 	)
 	
 	--submenu = Menu.menu "COPY KEYS"

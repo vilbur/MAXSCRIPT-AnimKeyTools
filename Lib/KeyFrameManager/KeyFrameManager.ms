@@ -152,7 +152,21 @@ struct KeyFrameManager_v
 				append objects_with_keys obj	
 		)
 
-		objects_with_keys --return
+		where_searched = if selection.count > 0 then "selection" else "objects"
+		
+		if objects_with_keys.count > 0 then
+		(
+			--messageBox ("Yupiii") title:"KeyFrameManager"
+			
+			if objects_with_keys.count == this.objs.count then
+				messageBox ("All objects has anim keys on time") title:"KeyFrameManager"
+			
+			
+			select objects_with_keys
+		)
+		else
+			messageBox ("There is not any object with anim keys on time") title:"KeyFrameManager"
+			
 	),
 	
 	/** Remove anim keys from selection

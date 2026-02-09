@@ -173,6 +173,6 @@ KeyFrameManager.removeKeys properties:true
 ------------------------------------------------------------------------------*/
 clearSelection()
 
-select (KeyFrameManager.getObjectsWithKeys())
+KeyFrameManager.getObjectsWithKeys()
 
 
