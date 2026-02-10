@@ -33,12 +33,14 @@ struct TrackbarDialogTicker_v
 	
 	dock_state,
 	
-	last_pos,
+	slider_pos_size_last,
 	
 	viewport_width,
 	slider_width,
 	
 	pos_is_changing = false,
+	
+	max_win_hwnd,
 	
 	/* STATIC */ 
 	viewport_bottom_padding = 56,
@@ -54,40 +56,39 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
 		
-		--visible_buttons = this.getVisibleButtons()
-		
 		anim_range_changed = this._animRangeChanged()
-		--format "anim_range_changed: %\n" anim_range_changed
-		--max_widow_size_changed = this._maxWidowSizeChanged()
-		--format "max_widow_size_changed: %\n" max_widow_size_changed
+		
+		max_win_pos_changed = this._maxWidowSizeChanged()
+		--format "max_win_pos_changed: %\n" max_win_pos_changed
 		/* IF MAX WIDOW SIZE CHANGED */ 
-		update_button_position = anim_range_changed or this._maxWidowSizeChanged()
+		update_button_position = anim_range_changed or max_win_pos_changed
 		--format "update_button_position: %\n" update_button_position
 		/* GET BUTTON CONTROLS ON INIT */
 		this._setFrameButtons()
 		
 		this._getPositionsAndSizeOfWindows()
 		
-		
+
 		/* SET WIDTH OF SLIDER */ 
-		this.setSliderWidth()
+		this.setThisSliderWidth()
 		
-		
-		/*------------------------------------------------------------------------------
-			IF POSITION OF TIME SLIDER
-		--------------------------------------------------------------------------------*/
+		/*==============================================================================
+			POSITION OF TIME SLIDER
+		================================================================================*/
 		if this._isWindowPositionChanged() then
 		(
 			update_button_position = true
 			
+			
 			/*------------------------------------------------------------------------------
-				DOCK BUTTONS IF TIMNE SLIDER IS DOCKED
+				DOCK BUTTONS IF TIME SLIDER IS DOCKED
 			--------------------------------------------------------------------------------*/
 			if slider_docked and not buttons_docked then
 				this._dockButtonsWin()
 			
+			
 			/*------------------------------------------------------------------------------
-				IF SLIDER UN-DOCKED
+				ALIGN WINDOWS IF SLIDER UN-DOCKED
 			--------------------------------------------------------------------------------*/
 			else if not slider_docked and not this._windowsAreAligned() then
 				this._resizeAndRepositionWindows()
@@ -95,14 +96,18 @@ struct TrackbarDialogTicker_v
 		)
 		--format "update_button_position: %\n" update_button_position
 
+		
+		
 		/* UPDATE BUTTONS SIZE AND POSITION */
 		if update_button_position then
 			this.updateButtonsSizePosition()
 		
 		
+		
 		/* UPDATE ACTIVE FRAME BUTTON */
 		if anim_range_changed then
 			this.updateActiveButton force:true
+		
 		
 		
 		/* SHOW \ HIDE KEYS by type */ 
@@ -201,7 +206,7 @@ struct TrackbarDialogTicker_v
 	
 	/** Max widow size changed
 	 */
-	function _maxWidowSizeChanged = this.testAndResetProperty #maxwin_pos_size_current (this._getMaxWindowSize()),
+	function _maxWidowSizeChanged = this.testAndResetProperty #maxwin_pos_size (this._getMaxWindowSize()),
 	
 	/** Anim state changed
 	 */
@@ -222,27 +227,24 @@ struct TrackbarDialogTicker_v
 	--,
 	--
 	--
-	/*  testAndResetProperty
-
-	   Tests whether a property on a given object differs from a tested value.
+	/*  ests whether a property on a given object differs from a tested value.
+	    
 	   If different, resets the property to the tested value and returns true.
+	   
+	   @return boolean 
 	*/
-	function testAndResetProperty key val =
+	function testAndResetProperty key val_new =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.testAndResetProperty()"
-		--format "%: %\n" key val
-		--local current_value = undefined
-	
+
+		/* IF PROP EXISTS */ 			
 		if isProperty this key then
 		(
-			--format "val: %\n" ( getProperty this key )
-			--format "TEST: %\n" ( prop_val != undefined and classOf prop_val == Interval )
-
-			is_changed = getProperty this key != val
+			is_changed = getProperty this key != val_new
 			
 			--format "is_changed: %\n" is_changed
 			if is_changed then
-				setProperty this key val
+				setProperty this key val_new
 				
 			is_changed --return
 		)
@@ -280,7 +282,7 @@ struct TrackbarDialogTicker_v
 		--format "slider_hwnd:  %\n" slider_hwnd
 		--format "slider_docked_hwnd: %\n" slider_docked_hwnd
 		--format "slider_pos_size: %\n" slider_pos_size
-		
+		--format "slider_pos_size: %\n" slider_pos_size
 		/* FORCE TO SHOW TRACKBAR IS IT IS HIDDEN */ 
 		if not trackbar.visible then
 		(
@@ -295,22 +297,31 @@ struct TrackbarDialogTicker_v
 	function _isWindowPositionChanged =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v._isWindowPositionChanged()"
-		--format "last_pos: %\n" last_pos
+		--format "slider_pos_size_last: %\n" slider_pos_size_last
 		buttons_win_need_update = false
-		--format "last_pos: %\n" last_pos
-		/* INIT */ 	
-		if last_pos == undefined then
-		(
-			last_pos = copy slider_pos_size
-			
-		--if last_pos == undefined then
+		--format "slider_pos_size_last: %\n" slider_pos_size_last
 		
-			buttons_win_need_update = last_pos != undefined
+		/*------------------------------------------------------------------------------
+			ON INIT
+		--------------------------------------------------------------------------------*/
+		if slider_pos_size_last == undefined then
+		(
+			slider_pos_size_last = copy slider_pos_size
+			
+		--if slider_pos_size_last == undefined then
+		
+			buttons_win_need_update = slider_pos_size_last != undefined
 			
 		)
-		/* TEST CHANGE OF POSITION */ 
+		/*------------------------------------------------------------------------------
+			TEST CHANGE OF POSITION
+		--------------------------------------------------------------------------------*/
 		else
 		(
+			--format "maxwin_pos_size: %\n" maxwin_pos_size
+			--format "maxwin_pos_size: %\n" ( intersects maxwin_pos_size slider_pos_size )
+			
+			
 			/* TEST CHANGE OF DOCKED STATE  */ 
 			dock_state_changed = slider_docked != buttons_docked
 			--format "dock_state_changed: %\n" dock_state_changed
@@ -324,20 +335,20 @@ struct TrackbarDialogTicker_v
 			(
 				
 				/* IF CHANGING POSITION ENDS */ 
-				if pos_is_changing and last_pos == slider_pos_size then
+				if pos_is_changing and slider_pos_size_last == slider_pos_size then
 				(
 					pos_is_changing = false
 				
 					buttons_win_need_update = true
 				)
 				/* IF CHANGING POSITION STARTS */ 
-				else if not pos_is_changing and last_pos != slider_pos_size then
+				else if not pos_is_changing and slider_pos_size_last != slider_pos_size then
 					pos_is_changing = true
 			)
 			
 			
 			/* STORE VALUE FOR NEXT TICK */ 
-			last_pos = copy slider_pos_size
+			slider_pos_size_last = copy slider_pos_size
 		)
 				
 		--format "buttons_win_need_update: %\n" buttons_win_need_update
@@ -367,15 +378,17 @@ struct TrackbarDialogTicker_v
 		--format "\n"; print "TrackbarDialogTicker_v._resizeAndRepositionWindows()"
 		--format "slider_pos_size: %\n" slider_pos_size
 		
-		/* SET WINDOW WIDTH */
-		if buttons_size_pos == undefined then
-		(
-			buttons_size_pos = copy slider_pos_size
-			
-			buttons_size_pos.h = 36
-		)
-			--format "slider_pos_size:  %\n" slider_pos_size
-			--format "buttons_size_pos: %\n" buttons_size_pos
+		--/* SET WINDOW WIDTH */
+		--if buttons_size_pos == undefined then
+		--(
+		--	format "\nWTF"
+		--	
+		--	buttons_size_pos = copy slider_pos_size
+		--	
+		--	--buttons_size_pos.h = 36
+		--)
+		--format "slider_pos_size:  %\n" slider_pos_size
+		--format "buttons_size_pos: %\n" buttons_size_pos
 			
 		buttons_size_pos.w = slider_width
 
@@ -393,11 +406,13 @@ struct TrackbarDialogTicker_v
 			buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		)
 
+		--format "buttons_size_pos: %\n" buttons_size_pos
+		
 		/* SET POSITION OF BUTTONS WINDOW */ 
 		windows.setWindowPos buttons_hwnd buttons_size_pos true
 
 		/* SET TIME SLIDER POSITION */ 
-		windows.setWindowPos slider_hwnd slider_pos_size true		
+		windows.setWindowPos slider_hwnd slider_pos_size true
 		
 	),
 	
@@ -436,13 +451,13 @@ struct TrackbarDialogTicker_v
 	
 	/** Set slider width
 	 */
-	function setSliderWidth =
+	function setThisSliderWidth =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.setSliderWidth()"
+		--format "\n"; print "TrackbarDialogTicker_v.setThisSliderWidth()"
 		--format "slider_hwnd:  %\n" slider_hwnd
 		--format "buttons_hwnd: %\n" buttons_hwnd
 		
-		slider_width = case of
+		this.slider_width = case of
 		(
 			(slider_hwnd	!= undefined): slider_pos_size.w
 			--(buttons_hwnd	!= undefined): buttons_size_pos.w
@@ -668,7 +683,10 @@ struct TrackbarDialogTicker_v
 	function _getMaxWindowSize =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v._getMaxWindowSize()"
-		windows.getWindowPos ( windows.getMAXHWND() )
+		if this.max_win_hwnd == undefined then 
+			this.max_win_hwnd = windows.getMAXHWND()
+		
+		windows.getWindowPos ( this.max_win_hwnd )
 	),
 	
 	on create do

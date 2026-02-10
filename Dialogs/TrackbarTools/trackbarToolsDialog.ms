@@ -167,9 +167,12 @@ function trackbarToolsDialog =
 		DIALOG CREATE
 	------------------------------------------------------------------------------*/
 
-	Dialog_rollout = Dialog.create height:dialog_height width:dialog_width lockWidth:true lockHeight:true style:#()
-	
-	--Dialog.create height:dialog_height width:0 lockWidth:true lockHeight:true --style:#()
+	/* PRODUCTION */ 
+	--Dialog_rollout = Dialog.create height:36 width:dialog_width lockWidth:true lockHeight:true style:#()
+	--format "dialog_height: %\n" dialog_height
+	/* DEVELOPENT */ 
+	Dialog_rollout = Dialog.create height:48 width:dialog_width lockWidth:true lockHeight:true --style:#()
+	--Dialog_rollout = Dialog.create height:128 width:0 lockWidth:true --lockHeight:true --style:#()
 	
 	--Dialog.register()
 	

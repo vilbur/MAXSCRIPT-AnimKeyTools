@@ -113,24 +113,12 @@ function frameButtonRcMenu =
 		
 		Menu.item ( "COPY" + copy_keys_label ) ( copyKeys_cmd + " transforms:true" )
 		
-		Menu.separator()
-		
-		--
 		--/*------------------------------------------------------------------------------
 		--	MIRROR
 		----------------------------------------------------------------------------------*/
 		--Menu.item ( "MIRROR curretnt keys" ) ( "(KeyFrameManager_v( #CURRENT )).mirrorKeys transforms:true" )
 		--Menu.item ( "MIRROR" + copy_keys_label ) ( mirrorKeys_cmd + " transforms:true" )
-		
-		/*------------------------------------------------------------------------------
-			SELECT OBEJCTS
-		--------------------------------------------------------------------------------*/
 
-		menu_trim = Menu.menu ("SELECT objects by keys") --flat:false
-
-        menu_trim.item ("Select objects with keys on time: " + (currentTime.frame as integer ) as string ) (KeyFrameManager_side+".getObjectsWithKeys time:#CURRENT")
-
-        menu_trim.item "Select objects with keys RIGHT | Ctrl: LEFT" (KeyFrameManager_side+".getObjectsWithKeys()")
 
 	)
 	else
@@ -139,6 +127,19 @@ function frameButtonRcMenu =
 		
 		Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+KeyFrameManager_side+".removeKeys objs:( objects as Array )")
 	)
+	
+	Menu.separator()
+
+	/*------------------------------------------------------------------------------
+		SELECT OBEJCTS
+	--------------------------------------------------------------------------------*/
+
+	menu_trim = Menu.menu ( ( if selection.count > 0 then "FILTER" else "SELECT") + " objects by keys") --flat:false
+
+	menu_trim.item ( "On frame " + (currentTime.frame as integer ) as string ) (KeyFrameManager_side+".getObjectsWithKeys time:#CURRENT")
+
+	menu_trim.item ( "With keys to RIGHT | Ctrl: LEFT") (KeyFrameManager_side+".getObjectsWithKeys()")
+	
 	
 	--submenu = Menu.menu "COPY KEYS"
 

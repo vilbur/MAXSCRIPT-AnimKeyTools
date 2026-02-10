@@ -1,3 +1,4 @@
+clearListener(); print("Cleared in:\n"+getSourceFileName())
 
 filein( getFilenamePath(getSourceFileName()) + "/main_script.ms" )	--"./main_script.ms"
 
