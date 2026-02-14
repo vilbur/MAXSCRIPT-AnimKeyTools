@@ -38,12 +38,12 @@ struct TrackbarDialogTicker_v
 	viewport_width,
 	slider_width,
 	
-	pos_is_changing = false,
+	pos_is_changing_now = false,
 	
 	max_win_hwnd,
 	
 	/* STATIC */ 
-	viewport_bottom_padding = 56,
+	viewport_bottom_padding = 60,
 	
 	init = false,
 	
@@ -75,7 +75,7 @@ struct TrackbarDialogTicker_v
 		/*==============================================================================
 			POSITION OF TIME SLIDER
 		================================================================================*/
-		if this._isWindowPositionChanged() then
+		if this._isPosSizeOfNativeSliderChanged() then
 		(
 			update_button_position = true
 			
@@ -94,6 +94,9 @@ struct TrackbarDialogTicker_v
 				this._resizeAndRepositionWindows()
 					
 		)
+		else if max_win_pos_changed then
+			this._resizeAndRepositionWindows()
+
 		--format "update_button_position: %\n" update_button_position
 
 		
@@ -294,11 +297,10 @@ struct TrackbarDialogTicker_v
 	
 	/** Is window position changed
 	 */
-	function _isWindowPositionChanged =
+	function _isPosSizeOfNativeSliderChanged =
 	(
-		--format "\n\n"; print "TrackbarDialogTicker_v._isWindowPositionChanged()"
+		--format "\n\n"; print "TrackbarDialogTicker_v._isPosSizeOfNativeSliderChanged()"
 		--format "slider_pos_size_last: %\n" slider_pos_size_last
-		buttons_win_need_update = false
 		--format "slider_pos_size_last: %\n" slider_pos_size_last
 		
 		/*------------------------------------------------------------------------------
@@ -308,26 +310,19 @@ struct TrackbarDialogTicker_v
 		(
 			slider_pos_size_last = copy slider_pos_size
 			
-		--if slider_pos_size_last == undefined then
-		
-			buttons_win_need_update = slider_pos_size_last != undefined
-			
+			true --return
 		)
 		/*------------------------------------------------------------------------------
-			TEST CHANGE OF POSITION
+			TEST CHANGE OF POSITION -- wait then user end with resizing or move ends
 		--------------------------------------------------------------------------------*/
 		else
 		(
-			--format "maxwin_pos_size: %\n" maxwin_pos_size
-			--format "maxwin_pos_size: %\n" ( intersects maxwin_pos_size slider_pos_size )
-			
-			
 			/* TEST CHANGE OF DOCKED STATE  */ 
 			dock_state_changed = slider_docked != buttons_docked
 			--format "dock_state_changed: %\n" dock_state_changed
 			
 			/* IF DOCK STATE CHANGED */ 
-			buttons_win_need_update = dock_state_changed
+			pos_size_of_native_slider_changed = dock_state_changed
 			
 			
 			/* IF SLIDER IS UNDOCKED */ 
@@ -335,24 +330,23 @@ struct TrackbarDialogTicker_v
 			(
 				
 				/* IF CHANGING POSITION ENDS */ 
-				if pos_is_changing and slider_pos_size_last == slider_pos_size then
+				if pos_is_changing_now and slider_pos_size_last == slider_pos_size then
 				(
-					pos_is_changing = false
+					pos_is_changing_now = false
 				
-					buttons_win_need_update = true
+					pos_size_of_native_slider_changed = true
 				)
 				/* IF CHANGING POSITION STARTS */ 
-				else if not pos_is_changing and slider_pos_size_last != slider_pos_size then
-					pos_is_changing = true
+				else if not pos_is_changing_now and slider_pos_size_last != slider_pos_size then
+					pos_is_changing_now = true
 			)
 			
 			
 			/* STORE VALUE FOR NEXT TICK */ 
 			slider_pos_size_last = copy slider_pos_size
+			
+			pos_size_of_native_slider_changed --return
 		)
-				
-		--format "buttons_win_need_update: %\n" buttons_win_need_update
-		buttons_win_need_update --return
 	),
 	
 	/** Dock buttons win
@@ -393,10 +387,7 @@ struct TrackbarDialogTicker_v
 		buttons_size_pos.w = slider_width
 
 		
-		this.snapSliderPosition()
-		
-		/* ALIG POSITION */ 
-		this.alignTimeSliders()
+
 		
 		/* UN DOCK BUTTONS */ 
 		if buttons_docked then
@@ -404,6 +395,15 @@ struct TrackbarDialogTicker_v
 			cui.UnRegisterDialogBar _rollout
 
 			buttons_hwnd = this.getChildWindow "Time Slider Tools"
+		)
+		else
+		(
+			/* SNAP TO LEFT | CENTER | BOTTOM */ 
+			this.snapSliderPosition()
+			
+			/* ALIG POSITION WINDOWS TOP \ BOTTOM */ 
+			this.alignTimeSliders()
+			
 		)
 
 		--format "buttons_size_pos: %\n" buttons_size_pos
@@ -478,21 +478,10 @@ struct TrackbarDialogTicker_v
 		snap_treshold = 128
 		
 		/*------------------------------------------------------------------------------
-			SNAP TO LEFT EDGE
-		--------------------------------------------------------------------------------*/
-		if abs( slider_pos_size.x - maxwin_pos_size.left	) < snap_treshold then
-		(
-			/* RESET POSITION */ 
-			translate slider_pos_size [ -slider_pos_size.x, 0 ]
-			
-			/* MOVE TO LEFT */ 
-			translate slider_pos_size [ maxwin_pos_size.left + 8, 0 ]
-		)
-		
-		/*------------------------------------------------------------------------------
 			SNAP TO CENTER
 		--------------------------------------------------------------------------------*/
-		else if abs( slider_pos_size.center.x - maxwin_pos_size.center.x	) < maxwin_pos_size.w / 4 then
+		/* IF DISABLED DISABLED - IT MAKES SLIDER PINNED TO CENTER */ 
+		----if abs( slider_pos_size.center.x - maxwin_pos_size.center.x	) < maxwin_pos_size.w / 4 then
 		(
 			/* RESET POSITION */ 
 			translate slider_pos_size [ -slider_pos_size.x, 0 ]
@@ -502,10 +491,25 @@ struct TrackbarDialogTicker_v
 			translate slider_pos_size [ maxwin_pos_size.center.x - ( slider_width / 2 ), 0]
 		)
 		
+		
+		/*------------------------------------------------------------------------------
+			SNAP TO LEFT EDGE
+		------------------------------------------------------------------------------*/
+		----else if abs( slider_pos_size.x - maxwin_pos_size.left	) < snap_treshold then
+		----(
+		----	/* RESET POSITION */ 
+		----	translate slider_pos_size [ -slider_pos_size.x, 0 ]
+		----	
+		----	/* MOVE TO LEFT */ 
+		----	translate slider_pos_size [ maxwin_pos_size.left + 8, 0 ]
+		----)
+		
+		
 		/*------------------------------------------------------------------------------
 			SNAP TO BOTTOM EDGE
 		--------------------------------------------------------------------------------*/
-		if abs( slider_pos_size.bottom - maxwin_pos_size.bottom	) < snap_treshold then
+		/* IF DISABLED DISABLED - IT MAKES SLIDER PINNED TO BOTTOM */ 
+		----if abs( slider_pos_size.bottom - maxwin_pos_size.bottom	) < snap_treshold then
 		(
 			/* RESET POSITION */ 
 			translate slider_pos_size [ 0, -slider_pos_size.y ]
