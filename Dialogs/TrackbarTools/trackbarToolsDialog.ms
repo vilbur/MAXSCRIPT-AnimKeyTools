@@ -143,7 +143,7 @@ function trackbarToolsDialog =
 		/* BUTTON EVENTS */ 
 		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1) ) else ToolsCallback.goToFrameOfButton(EventFired.control.text)" ) tooltip:"Go to frame"
 		
-		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:"Show Menu"
+		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:"Show menu\n    If CONTROL pressed then process keys to RIGHT\n    If ALT pressed then process keys to LEFT"
 	)
 	
 	

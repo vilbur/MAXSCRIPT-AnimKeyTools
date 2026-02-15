@@ -4,6 +4,12 @@ filein( getFilenamePath(getSourceFileName()) + "/../RigWrapper/RigWrapper.ms" )	
 
 filein( getFilenamePath(getSourceFileName()) + "/../ObjectControllerKeys/ObjectControllerKeys.ms" )	--"./../ObjectControllerKeys/ObjectControllerKeys.ms"
 /** Key frame manager
+  
+  
+  @property array objs if undefined use all objects or selection if something is selected 
+  
+  
+  
  */
 struct KeyFrameManager_v
 (
@@ -297,10 +303,10 @@ struct KeyFrameManager_v
 	 */
 	function _processControllerKeys ControllerKeys callback =
 	(
-		format "\n"; print "KeyFrameManager_v._processControllerKeys()"
+		--format "\n"; print "KeyFrameManager_v._processControllerKeys()"
 		--format "% CALLBACK: %\n" ControllerKeys.ctrl callback
-		format "ControllerKeys: %\n" ControllerKeys
-		format "ControllerKeys.keys: %\n" ControllerKeys.keys
+		--format "ControllerKeys: %\n" ControllerKeys
+		--format "ControllerKeys.keys: %\n" ControllerKeys.keys
 		/** Copy key
 		 */
 		function _copyKey ctrl key_time =

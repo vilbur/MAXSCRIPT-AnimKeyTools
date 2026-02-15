@@ -28,16 +28,18 @@ function frameButtonRcMenu =
 	--phase_length = phase_dll.items[phase_dll.selection] as integer
 	
 	phase = [ currentTime, currentTime + PHASE_LENGTH - 1 ] 
-	--format "PAHSE_RANGE: %\n" phase
-	time_delete = if keyboard.controlPressed then "#RIGHT" else "#CURRENT"
-	KeyFrameManager_side   = "(KeyFrameManager_v( if keyboard.controlPressed then #LEFT else #RIGHT ))"
+	time_option_key = "if keyboard.controlPressed then #RIGHT else if keyboard.altPressed then #LEFT else #CURRENT"
+	
+	time_current = "(KeyFrameManager_v( #CURRENT ))"
+	KeyFrameManager_side    = "(KeyFrameManager_v( if keyboard.controlPressed then #LEFT else #RIGHT ))"
 
 	/*------------------------------------------------------------------------------
 		COMMANDS
 	--------------------------------------------------------------------------------*/
-	removeKeys_cmd = "(KeyFrameManager_v( "+time_delete+" )).removeKeys "
-	copyKeys_cmd   = "(KeyFrameManager_v( "+phase as string +" )).copyKeys "
-	mirrorKeys_cmd = "(KeyFrameManager_v( "+phase as string +" )).mirrorKeys "
+	
+	removeKeys = "(KeyFrameManager_v( "+time_option_key+" )).removeKeys "
+	copyKeys   = "(KeyFrameManager_v( "+phase as string +" )).copyKeys "
+	mirrorKeys = "(KeyFrameManager_v( "+phase as string +" )).mirrorKeys "
 
 	/*------------------------------------------------------------------------------
 		HELPERS
@@ -48,93 +50,89 @@ function frameButtonRcMenu =
 		MENU
 	--------------------------------------------------------------------------------*/
 	Menu = RcMenu_v name:"frameButtonMenu"
-	
 
+	
+	/*==============================================================================
+		MENU IF SELECTION EXISTS
+	================================================================================*/
 	if selection.count > 0 then
 	(
-		Menu.item	"Delete CURRENT KEY"	"(KeyFrameManager_v( #CURRENT )).removeKeys()"
-		Menu.item	"INSRERT KEY"	"(KeyFrameManager_v( #CURRENT )).insertKeys()"
-		
-		/*------------------------------------------------------------------------------
-			TRIM
-		--------------------------------------------------------------------------------*/
-		Menu.item	"TRIM keys RIGHT | Ctrl: LEFT"	(KeyFrameManager_side+".removeKeys()")
-		
+		Menu.item	"CREATE  Keys"	(time_current + ".createKeys()" )
+
 		Menu.separator()
-		
-		menu_trim = Menu.menu ("TRIM KEYS") --flat:false
-		
-		menu_trim.item "TRIM ALL TRANSFORMS" ( KeyFrameManager_side + " transforms:true" )
-		
-		menu_trim.separator()
-		
-		for transform_track in transform_tracks do
-			menu_trim.item ("Trim " + transform_track ) ( KeyFrameManager_side+".removeKeys TRANSFORMS:#" + transform_track)
-	
-			menu_trim.separator()
-			
-			menu_trim.item ("Trim Properties" ) ( KeyFrameManager_side+".removeKeys()")
-		
+
+		Menu.item	"INSRERT Keys"	(time_current + ".insertKeys()" )
+
 		Menu.separator()
 		
 		
-		
 		/*------------------------------------------------------------------------------
-			DELETE TRANSFORMS
+			DELETE \ TRIM KEYS
 		--------------------------------------------------------------------------------*/
 		
 		
-		del_menu = Menu.menu "Delete TRANSFORMS"
-	
+		del_menu = Menu.menu "DELETE KEYS"
+		
+		del_menu.item	"All KEYS"	(removeKeys + "()" )
+		
 		/* TRANSFORMS all */
-		del_menu.item "Delete ALL TRANSFORMS" ( removeKeys_cmd + " transforms:true" )
+		del_menu.item "TRANSFORMS" ( removeKeys + " transforms:true" )
+		del_menu.item "PROPERTIES" ( removeKeys + " properties:true" )
 		
 		del_menu.separator() 
 		
 		/* TRANSFORMS each */
 		for transform_track in transform_tracks do 
-			del_menu.item ("Delete "+transform_track) ( removeKeys_cmd + "transforms:#" + transform_track )
+			del_menu.item ("Delete "+transform_track) ( removeKeys + "transforms:#" + transform_track )
 		
 		
+		del_menu.separator()
 		
+		del_menu.item	"• Ctrl: RIGHT | Alt: LEFT" "messageBox \"If CONTROL pressed then process keys to RIGHT\n    If ALT pressed then process keys to LEFT\" title:\"HELP\""
+
 		/*------------------------------------------------------------------------------
 			DELETE PROPERTIES
-		--------------------------------------------------------------------------------*/
-	
-		/* PROPERTIES all */
-		Menu.item "Delete ALL PROPERTIES" ( removeKeys_cmd + "properties:true" )
-		
-	
-		Menu.separator()
-	
-		/*------------------------------------------------------------------------------
-			COPY KEYS
-		--------------------------------------------------------------------------------*/
-		
-		Menu.item ( "COPY" + copy_keys_label ) ( copyKeys_cmd + " transforms:true" )
-		
+		----------------------------------------------------------------------------------*/
+		--
+		--/* PROPERTIES all */
+		--Menu.item "Delete ALL PROPERTIES" ( removeKeys + "properties:true" )
+		--
+		--
+		--Menu.separator()
+		--
+		--/*------------------------------------------------------------------------------
+		--	COPY KEYS
+		----------------------------------------------------------------------------------*/
+		--
+		--Menu.item ( "COPY" + copy_keys_label ) ( copyKeys + " transforms:true" )
+		--
 		--/*------------------------------------------------------------------------------
 		--	MIRROR
 		----------------------------------------------------------------------------------*/
 		--Menu.item ( "MIRROR curretnt keys" ) ( "(KeyFrameManager_v( #CURRENT )).mirrorKeys transforms:true" )
-		--Menu.item ( "MIRROR" + copy_keys_label ) ( mirrorKeys_cmd + " transforms:true" )
+		--Menu.item ( "MIRROR" + copy_keys_label ) ( mirrorKeys + " transforms:true" )
 
 
 	)
 	else
+	/*==============================================================================
+		MENU IF NOTHING SELECTED
+	================================================================================*/
 	(
 		Menu.item "DELETE all keys from scene" "(KeyFrameManager_v( #CURRENT )).removeAllKeysFromScene()"
 		
 		Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+KeyFrameManager_side+".removeKeys objs:( objects as Array )")
 	)
 	
+	
+	
 	Menu.separator()
 
 	/*------------------------------------------------------------------------------
-		SELECT OBEJCTS
+		SELECT OBJECTS
 	--------------------------------------------------------------------------------*/
 
-	menu_trim = Menu.menu ( ( if selection.count > 0 then "FILTER" else "SELECT") + " objects by keys") --flat:false
+	menu_trim = Menu.menu ( ( if selection.count > 0 then "FILTER" else "SELECT") + " by keys") --flat:false
 
 	menu_trim.item ( "On frame " + (currentTime.frame as integer ) as string ) (KeyFrameManager_side+".getObjectsWithKeys time:#CURRENT")
 
