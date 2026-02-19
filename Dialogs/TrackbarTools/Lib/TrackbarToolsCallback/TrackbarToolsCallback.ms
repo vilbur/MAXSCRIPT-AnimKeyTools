@@ -235,7 +235,7 @@ struct TrackbarToolsCallback_v
 	
 	on create do
 	(
-		--format "\n"; print "TrackbarToolsCallback_v.onCreate()"
+		format "\n"; print "TrackbarToolsCallback_v.onCreate()"
 		hwnd_slider_tools = this.getChildWindow "Time Slider Tools"
 		hwnd_slider_default = this.getChildWindow "Time Slider"
 	)

@@ -50,6 +50,7 @@ struct TrackbarDialogTicker_v
 	animation_range,
 	anim_button_state,
 	
+	
 	/** On timer tick update Dialog
 	 */
 	function updateDialog =
@@ -701,7 +702,7 @@ struct TrackbarDialogTicker_v
 	
 	on create do
 	(
-		--format "\n"; print "TrackbarDialogTicker_v.onCreate()"
+		format "\n"; print "TrackbarDialogTicker_v.onCreate()"
 		--buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		--slider_hwnd = this.getChildWindow "Time Slider"
 		

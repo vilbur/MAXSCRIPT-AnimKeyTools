@@ -6,7 +6,7 @@ filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/frame
 
 filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/trackbarDialogTicker/trackbarDialogTicker.ms" )	--"./Dialogs/TrackbarTools/trackbarDialogTicker/trackbarDialogTicker.ms"
 
-filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/TrackbarToolsCallback/TrackbarToolsCallback.ms" )	--"./Dialogs/TrackbarTools/TrackbarToolsCallback/TrackbarToolsCallback.ms"
+filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/TrackbarToolsCallback/TrackbarToolsCallback.ms" )	--"./Dialogs/TrackbarTools/Lib/TrackbarToolsCallback/TrackbarToolsCallback.ms"
 
 filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/trackbarToolsDialog.ms" )	--"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"
 

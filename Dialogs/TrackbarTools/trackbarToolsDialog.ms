@@ -1,20 +1,18 @@
  /** Create Trackbar Tools Dialog
   
-	ALIGN size and position witrh time slider
+	ALIGN size and position with time slider
 	
 	
 	SYNC count of frame buttons with anim range - update visible buttons count
 	
 	SYNC current frame -> update active button
 	
-	PLAY ANIMATION -> update active button
   
+	PLAY ANIMATION -> update active button
   
  */
 function trackbarToolsDialog =
 (
-	--format "\n"; print ".trackbarToolsDialog()"
-
 	
 	/* SETUP */
 	
@@ -50,23 +48,18 @@ function trackbarToolsDialog =
 	_Controls   = Dialog.Controls()
 
 	Dialog.addLocal "ToolsCallback" undefined
-	
-	Dialog.addLocal  "TrackbarDialogTicker" ("TrackbarDialogTicker_v("+Dialog.id as string +")")
+	Dialog.addLocal "DialogTicker" undefined
 
 	Dialog.addLocal "is_playing_now" false
 
 	Dialog.addLocal "display_frames" "TMOnly"
-	--Dialog.addLocal "display_frames" "ALL"
-	--Dialog.addLocal "frame_buttons" undefined
 	
 	
 	/*------------------------------------------------------------------------------
 		DIALOG EVENTS
 	--------------------------------------------------------------------------------*/
-	Dialog.Event #OPEN ("ToolsCallback = TrackbarToolsCallback_v("+Dialog.id as string +")")
-	
-	--Dialog.Event #OPEN ("frame_buttons = for ctrl in "+Dialog.id as string +".controls where matchPattern (ctrl as string ) pattern:(\"*btn_frame_*\") collect ctrl")	tooltip:"PRESSED Tooltip"
-	
+	Dialog.Event #OPEN ("ToolsCallback	= TrackbarToolsCallback_v("+Dialog.id as string +")")
+	Dialog.Event #OPEN ("DialogTicker	= TrackbarDialogTicker_v("+Dialog.id as string +")")
 	
 	
 	/*------------------------------------------------------------------------------
@@ -76,9 +69,9 @@ function trackbarToolsDialog =
 	TIMER_updateButton	= _Controls.control #TIMER "TIMER_updateActiveButton"	interval:100 active:true
 	TIMER_playBack	= _Controls.control #TIMER "TIMER_playBack"	interval:500 active:true
 	
-	TIMER_updateDialog.Event	#TICK ("TrackbarDialogTicker.updateDialog()")
-	TIMER_updateButton.Event	#TICK ("TrackbarDialogTicker.updateActiveButton()")
-	TIMER_playBack.Event	#TICK ("TrackbarDialogTicker.playback(is_playing_now)")
+	TIMER_updateDialog.Event	#TICK ("DialogTicker.updateDialog()")
+	TIMER_updateButton.Event	#TICK ("DialogTicker.updateActiveButton()")
+	TIMER_playBack.Event	#TICK ("DialogTicker.playback(is_playing_now)")
 
 
 
@@ -145,7 +138,7 @@ function trackbarToolsDialog =
 		/* BUTTON EVENTS */ 
 		_Frame_btn.Event #CHANGED    ( if_control_pressed_jump_to_phase + "(-1) ) else ToolsCallback.goToFrameOfButton(EventFired.control.text)" ) tooltip:"Go to frame"
 		
-		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) )else frameButtonRcMenu()" ) tooltip:"Show menu\n    If CONTROL pressed then process keys to RIGHT\n    If ALT pressed then process keys to LEFT"
+		_Frame_btn.Event #RIGHTCLICK ( if_control_pressed_jump_to_phase + "(1) ) else frameButtonRcMenu()" ) tooltip:"Show menu\n    If CONTROL pressed then process keys to RIGHT\n    If ALT pressed then process keys to LEFT"
 	)
 	
 	
@@ -154,10 +147,8 @@ function trackbarToolsDialog =
 		PLAY BUTTON
 	--------------------------------------------------------------------------------*/
 	
-	--PlayBtn	= _Controls.control #CHECKBUTTON	"P L A Y"	id:#BTN_play width:42 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN]
 	PlayBtn	= _Controls.control #CHECKBUTTON	"►"	id:#BTN_play width:52 height:(dialog_height) color:COLOR_NAMES[#DARKGREEN] ini:false
 	
-    --PlayBtn.Event #CHANGED   	"is_playing_now = not is_playing_now" tooltip:"START \ STOP playback"
     PlayBtn.Event #CHANGED   	"is_playing_now = not is_playing_now; EventFired.control.text = if val then \"■\" else \"►\" " tooltip:"START \ STOP playback"
     PlayBtn.Event #RIGHTCLICK	"ToolsCallback.showFpsRcMenu()"       tooltip:"Set FPS"
 
