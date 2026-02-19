@@ -24,15 +24,26 @@ function frameButtonRcMenu =
 	--format "\n"; print ".frameButtonRcMenu()"
 	--format "DIALOG_time_slider_tools.DL_phase.selection: %\n" DIALOG_time_slider_tools.DL_phase.selection
 	--phase_dll = ROLLOUT_phasemaker_options.DL_phase_length 
+	tool_mode = case toolMode.commandmodeID of
+	(
+		1: "MOVE"
+		2: "ROTATE"
+		3: "SCALE"
+		default: "SELECT"
+	)
+	
 	
 	--phase_length = phase_dll.items[phase_dll.selection] as integer
+	current_time_string = (currentTime.frame as integer ) as string
 	
-	phase = [ currentTime, currentTime + PHASE_LENGTH - 1 ] 
+	phase = [ currentTime, currentTime + PHASE_LENGTH - 1 ]
+	
 	time_option_key = "if keyboard.controlPressed then #RIGHT else if keyboard.altPressed then #LEFT else #CURRENT"
 	
-	time_current = "(KeyFrameManager_v( #CURRENT ))"
-	KeyFrameManager_side    = "(KeyFrameManager_v( if keyboard.controlPressed then #LEFT else #RIGHT ))"
+	FrameManagerCurrent = "(KeyFrameManager_v( #CURRENT ))"
+	FrameManagerSide    = "(KeyFrameManager_v( if keyboard.controlPressed then #LEFT else #RIGHT ))"
 
+	
 	/*------------------------------------------------------------------------------
 		COMMANDS
 	--------------------------------------------------------------------------------*/
@@ -57,15 +68,15 @@ function frameButtonRcMenu =
 	================================================================================*/
 	if selection.count > 0 then
 	(
-		Menu.item	"CREATE  Keys"	(time_current + ".createKeys()" )
+		Menu.item	"CREATE Keys"	(FrameManagerCurrent + ".createKeys()" )
 
 		Menu.separator()
 
-		Menu.item	"INSRERT Keys"	(time_current + ".insertKeys()" )
+		Menu.item	"INSRERT Keys"	(FrameManagerCurrent + ".insertKeys()" )
 
 		Menu.separator()
-		
-		
+
+		 
 		/*------------------------------------------------------------------------------
 			DELETE \ TRIM KEYS
 		--------------------------------------------------------------------------------*/
@@ -73,7 +84,13 @@ function frameButtonRcMenu =
 		
 		del_menu = Menu.menu "DELETE KEYS"
 		
-		del_menu.item	"All KEYS"	(removeKeys + "()" )
+		del_menu.item ( "ALL TYPES frame: " + current_time_string )	(removeKeys + "()" )
+		
+		--del_menu.separator()
+		----del_menu.item	("KEYS")	(removeKeys + "()" )
+		--del_menu.item ( "ALL TYPES frame: " + current_time_string ) ( "for i in selection do deleteKeys i" )
+
+		del_menu.separator()
 		
 		/* TRANSFORMS all */
 		del_menu.item "TRANSFORMS" ( removeKeys + " transforms:true" )
@@ -88,7 +105,10 @@ function frameButtonRcMenu =
 		
 		del_menu.separator()
 		
-		del_menu.item	"• Ctrl: RIGHT | Alt: LEFT" "messageBox \"If CONTROL pressed then process keys to RIGHT\n    If ALT pressed then process keys to LEFT\" title:\"HELP\""
+		--Menu.item "DELETE ALL KEYS from scene" "(KeyFrameManager_v()).removeAllKeysFromSceneOrSelection()"
+		--del_menu.separator()
+		
+		del_menu.item	"HELP: Ctrl: RIGHT | Alt: LEFT" "messageBox \"If CONTROL pressed then process keys to RIGHT\n    If ALT pressed then process keys to LEFT\" title:\"HELP\""
 
 		/*------------------------------------------------------------------------------
 			DELETE PROPERTIES
@@ -119,9 +139,11 @@ function frameButtonRcMenu =
 		MENU IF NOTHING SELECTED
 	================================================================================*/
 	(
-		Menu.item "DELETE all keys from scene" "(KeyFrameManager_v( #CURRENT )).removeAllKeysFromScene()"
+		Menu.item "DELETE ALL KEYS from scene" "(KeyFrameManager_v()).removeAllKeysFromSceneOrSelection()"
 		
-		Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+KeyFrameManager_side+".removeKeys objs:( objects as Array )")
+		--Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+FrameManagerSide+".removeKeys objs:( objects as Array )")
+
+
 	)
 	
 	
@@ -132,12 +154,16 @@ function frameButtonRcMenu =
 		SELECT OBJECTS
 	--------------------------------------------------------------------------------*/
 
-	menu_trim = Menu.menu ( ( if selection.count > 0 then "FILTER" else "SELECT") + " by keys") --flat:false
+	menu_select = Menu.menu ( ( if selection.count > 0 then "FILTER" else "SELECT") + " by keys") --flat:false
 
-	menu_trim.item ( "On frame " + (currentTime.frame as integer ) as string ) (KeyFrameManager_side+".getObjectsWithKeys time:#CURRENT")
+	menu_select.item ( "On frame " + current_time_string ) (FrameManagerSide+".getObjectsWithKeys time:#CURRENT")
 
-	menu_trim.item ( "With keys to RIGHT | Ctrl: LEFT") (KeyFrameManager_side+".getObjectsWithKeys()")
+	menu_select.item ( "With keys to RIGHT | Ctrl: LEFT") (FrameManagerSide+".getObjectsWithKeys()")
 	
+	Menu.separator()
+	
+	Menu.item ("SHOW " + ( if trackbar.filter == #ALL then "ALL" else "TMOnly" )) ( "DIALOG_time_slider_tools.display_frames = " +( if trackbar.filter == #ALL then "ALL" else "TMOnly") )
+
 	
 	--submenu = Menu.menu "COPY KEYS"
 

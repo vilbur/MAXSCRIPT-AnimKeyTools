@@ -1,5 +1,4 @@
-
-/** Create Trackbar Tools Dialog
+ /** Create Trackbar Tools Dialog
   
 	ALIGN size and position witrh time slider
 	
@@ -14,7 +13,7 @@
  */
 function trackbarToolsDialog =
 (
-	format "\n"; print ".trackbarToolsDialog()"
+	--format "\n"; print ".trackbarToolsDialog()"
 
 	
 	/* SETUP */
@@ -55,6 +54,9 @@ function trackbarToolsDialog =
 	Dialog.addLocal  "TrackbarDialogTicker" ("TrackbarDialogTicker_v("+Dialog.id as string +")")
 
 	Dialog.addLocal "is_playing_now" false
+
+	Dialog.addLocal "display_frames" "TMOnly"
+	--Dialog.addLocal "display_frames" "ALL"
 	--Dialog.addLocal "frame_buttons" undefined
 	
 	

@@ -196,9 +196,9 @@ struct KeyFrameManager_v
 	
 	/** Remove all keys from scene
 	 */
-	function removeAllKeysFromScene =
+	function removeAllKeysFromSceneOrSelection =
 	(
-		--format "\n"; print "KeyFrameManager_v.removeAllKeysFromScene()"
+		--format "\n"; print "KeyFrameManager_v.removeAllKeysFromSceneOrSelection()"
 		 
 		function filterCallbackFunction theAnimatable theParent theSubAnimIndex theGrandParent theNode = 
 		(       
@@ -206,20 +206,25 @@ struct KeyFrameManager_v
 			true
 		)
 		
-		if queryBox ("DELETE ALL KEYS FROM SCENE ?") title:"DELETE ALL KEYS" then
-			with redraw off
-			(   
-				trackbar.filter = #all
-				local filtind = maxops.trackbar.registerFilter filterCallbackFunction undefined "." 1 active:on
-				disableRefMsgs()
-				local sel = getCurrentSelection()
-				select objects
-				maxops.trackbar.redraw forceRedraw:on
-				maxops.trackbar.unregisterfilter filtind        
-				select sel
-				enableRefMsgs()
-				--ok
-			)
+		where_to_delete = if selection.count > 0 then "SELECTION" else "SCENE"
+		
+		if queryBox ("DELETE ALL KEYS FROM "+where_to_delete+" ?") title:"DELETE ALL KEYS" then
+			for i in this.objs do deleteKeys i
+
+
+			--with redraw off
+			--(   
+			--	trackbar.filter = #all
+			--	local filtind = maxops.trackbar.registerFilter filterCallbackFunction undefined "." 1 active:on
+			--	disableRefMsgs()
+			--	local sel = getCurrentSelection()
+			--	select objects
+			--	maxops.trackbar.redraw forceRedraw:on
+			--	maxops.trackbar.unregisterfilter filtind        
+			--	select sel
+			--	enableRefMsgs()
+			--	--ok
+			--)
 	),
 
 	/** 

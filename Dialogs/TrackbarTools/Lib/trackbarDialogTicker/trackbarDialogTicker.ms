@@ -3,7 +3,7 @@
 struct TrackbarDialogTicker_v
 (
 	/* construct */
-	_rollout,
+	_rollout, --"./../../trackbarToolsDialog.ms"
 	
 	/* required */
 	/* properties */
@@ -113,8 +113,9 @@ struct TrackbarDialogTicker_v
 		
 		
 		
-		/* SHOW \ HIDE KEYS by type */ 
+		/* SHOW \ HIDE KEYS by type: trnasforms|properties */ 
 		this._filterTrackbarKeysByCurrentTool()
+		
 		
 		
 		/* UPDATE ANIM RANGE START \ END */ 
@@ -554,6 +555,9 @@ struct TrackbarDialogTicker_v
 		/* GET BUTTONS */ 
 		frames_count = this.getFramesCount()
 
+		
+		
+		
 		--visible_buttons = for btn in buttons where btn.visible collect btn 
 
 		/* UPDATE BUTTONS */ 
@@ -644,13 +648,15 @@ struct TrackbarDialogTicker_v
 			#MOVE
 		)
 		
-		
-		--format "\n"; print "TrackbarDialogTicker_v._filterTrackbarKeysByCurrentTool()"
+		--format "_rollout.display_frames: %\n" _rollout.display_frames
+		--format "DIALOG_time_slider_tools: %\n" DIALOG_time_slider_tools
+		----format "\n"; print "TrackbarDialogTicker_v._filterTrackbarKeysByCurrentTool()"
 		trackbar.filter = if findItem transform_tools toolmode.commandmode > 0 then
 			#currentTM
 			--#TMOnly 
 		else
-			#all		
+			--DIALOG_time_slider_tools.display_frames as name
+			#all
 	),
 	
 	
