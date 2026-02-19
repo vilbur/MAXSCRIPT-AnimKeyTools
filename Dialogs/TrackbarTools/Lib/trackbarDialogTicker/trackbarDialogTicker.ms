@@ -641,6 +641,9 @@ struct TrackbarDialogTicker_v
 	 */
 	function _filterTrackbarKeysByCurrentTool =
 	(
+		--format "\n"; print "._filterTrackbarKeysByCurrentTool()"
+		--format "DIALOG_time_slider_tools.trackbar_filter: %\n" DIALOG_time_slider_tools.trackbar_filter
+		
 		transform_tools = #(
 			#USCALE,
 			#NUSCALE,
@@ -652,12 +655,20 @@ struct TrackbarDialogTicker_v
 		--format "_rollout.display_frames: %\n" _rollout.display_frames
 		--format "DIALOG_time_slider_tools: %\n" DIALOG_time_slider_tools
 		----format "\n"; print "TrackbarDialogTicker_v._filterTrackbarKeysByCurrentTool()"
-		trackbar.filter = if findItem transform_tools toolmode.commandmode > 0 then
-			#currentTM
-			--#TMOnly 
+		
+		trackbar.filter = if (filter_mode = DIALOG_time_slider_tools.trackbar_filter ) != #ALL then
+		(
+			if filter_mode == #currentTM and findItem transform_tools toolMode.commandMode > 0 then
+				#currentTM
+			else
+				#TMOnly 
+		)
 		else
-			--DIALOG_time_slider_tools.display_frames as name
-			#all
+			#All
+			
+			
+		--trackbar.filter = new_filter
+		
 	),
 	
 	

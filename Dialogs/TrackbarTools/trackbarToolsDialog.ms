@@ -52,7 +52,7 @@ function trackbarToolsDialog =
 
 	Dialog.addLocal "is_playing_now" false
 
-	Dialog.addLocal "display_frames" "TMOnly"
+	Dialog.addLocal "trackbar_filter" #AUTO -- #TRANSFORM|#ALL|#AUTO -- filter keys by type
 	
 	
 	/*------------------------------------------------------------------------------
@@ -161,10 +161,10 @@ function trackbarToolsDialog =
 	------------------------------------------------------------------------------*/
 
 	/* DEVELOPENT */ 
-	--Dialog_rollout = Dialog.create height:48 width:dialog_width lockWidth:true lockHeight:true --style:#()
+	Dialog_rollout = Dialog.create height:48 width:dialog_width lockWidth:true lockHeight:true --style:#()
 
 	/* PRODUCTION */ 
-	Dialog_rollout = Dialog.create height:36 width:dialog_width lockWidth:true lockHeight:true style:#()
+	--Dialog_rollout = Dialog.create height:36 width:dialog_width lockWidth:true lockHeight:true style:#()
 	
 	----Dialog.register()
 )

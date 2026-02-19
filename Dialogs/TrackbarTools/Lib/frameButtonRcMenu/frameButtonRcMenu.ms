@@ -162,8 +162,17 @@ function frameButtonRcMenu =
 	
 	Menu.separator()
 	
-	Menu.item ("SHOW " + ( if trackbar.filter == #ALL then "ALL" else "TMOnly" )) ( "DIALOG_time_slider_tools.display_frames = " +( if trackbar.filter == #ALL then "ALL" else "TMOnly") )
+	if trackbar.filter != #ALL then
+		Menu.item ("SHOW all keys") ( "DIALOG_time_slider_tools.trackbar_filter = #ALL" )
+		
+	if trackbar.filter != #currentTM then
+		Menu.item ("SHOW transform current") ( "DIALOG_time_slider_tools.trackbar_filter = #currentTM" )
 
+	if trackbar.filter != #TMOnly then
+		Menu.item ("SHOW transform all") ( "DIALOG_time_slider_tools.trackbar_filter = #TMOnly" )
+	
+
+	--Menu.item ("SHOW " + ( if trackbar.filter == #ALL then "TMOnly" else "ALL" )) ( "DIALOG_time_slider_tools.trackbar_filter = " +( if trackbar.filter == #ALL then "TMOnly" else "ALL") )
 	
 	--submenu = Menu.menu "COPY KEYS"
 
