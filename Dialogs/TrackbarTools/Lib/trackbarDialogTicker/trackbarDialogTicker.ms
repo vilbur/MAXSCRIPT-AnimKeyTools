@@ -589,6 +589,9 @@ struct TrackbarDialogTicker_v
 			/* UPDATE POSITION OF "PLAY" BUTTON */
 			last_button = if buttons[frames_count + 1] == undefined then frames_count else frames_count + 1
 			
+			if last_button > buttons.count then
+				last_button = buttons.count
+			
 			pos_after_last_button = buttons[last_button].pos
 
 		--)
