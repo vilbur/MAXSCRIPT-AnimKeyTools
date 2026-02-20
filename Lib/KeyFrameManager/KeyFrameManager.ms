@@ -48,12 +48,19 @@ struct KeyFrameManager_v
 		--if classOf which != Array then which = #( which )
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
 
+		lock_bits = Dictionary #( #POSITION, #{1..3} ) #( #ROTATION, #{4..6} ) #( #SCALE, #{7..3} )
+		
 		for obj in this.objs do
 		(
+			locked_transforms = getTransformLockFlags obj --{POS_X,POS_Y,POS_Z,ROT_X,ROT_Y,ROT_Z,SCALE_X,SCALE_Y,SCALE_Z}
+
 			ObjectControllerKeys = ObjectControllerKeys_v(obj)
-			
+
+			/* CEATE KEY FOR EACH TRACK */ 
 			for transform_track in this.transforms do
-				ObjectControllerKeys.createKeys transform_track current_time
+				/* IF TRACK IS NOT LOCKED */ 
+				if ( locked_transforms * lock_bits[transform_track] ).isEmpty then
+					ObjectControllerKeys.createKeys transform_track current_time
 		)
 					
 	),
