@@ -1,2 +1,6 @@
 *.bak
 *.ini
+test.ms
+*-cache.ms
+
+!macroscripts.ini

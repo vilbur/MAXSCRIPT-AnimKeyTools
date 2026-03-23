@@ -32,6 +32,7 @@ function frameButtonRcMenu =
 		default: "SELECT"
 	)
 	
+	filter_or_select = if selection.count > 0 then "FILTER" else "SELECT"
 	
 	--phase_length = phase_dll.items[phase_dll.selection] as integer
 	current_time_string = (currentTime.frame as integer ) as string
@@ -68,7 +69,13 @@ function frameButtonRcMenu =
 	================================================================================*/
 	if selection.count > 0 then
 	(
-		Menu.item	"CREATE Keys"	(FrameManagerCurrent + ".createKeys()" )
+		/*------------------------------------------------------------------------------
+			CREATE KEYS
+		--------------------------------------------------------------------------------*/
+		if tool_mode != "SELECT" then
+			Menu.item	("CREATE "+tool_mode+" Key")	(FrameManagerCurrent + ".createKeys transforms:"+tool_mode )
+		
+		Menu.item	"CREATE All Keys"	(FrameManagerCurrent + ".createKeys()" )
 
 		Menu.separator()
 
@@ -80,11 +87,9 @@ function frameButtonRcMenu =
 		/*------------------------------------------------------------------------------
 			DELETE \ TRIM KEYS
 		--------------------------------------------------------------------------------*/
-		
-		
 		del_menu = Menu.menu "DELETE KEYS"
 		
-		del_menu.item ( "ALL TYPES frame: " + current_time_string )	(removeKeys + "()" )
+		del_menu.item ( "DELETE ALL Keys on frame: " + current_time_string )	(removeKeys + "()" )
 		
 		--del_menu.separator()
 		----del_menu.item	("KEYS")	(removeKeys + "()" )
@@ -143,7 +148,6 @@ function frameButtonRcMenu =
 		
 		--Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+FrameManagerSide+".removeKeys objs:( objects as Array )")
 
-
 	)
 	
 	
@@ -154,9 +158,9 @@ function frameButtonRcMenu =
 		SELECT OBJECTS
 	--------------------------------------------------------------------------------*/
 
-	menu_select = Menu.menu ( ( if selection.count > 0 then "FILTER" else "SELECT") + " by keys") --flat:false
+	menu_select = Menu.menu ( filter_or_select + " by keys") --flat:false
 
-	menu_select.item ( "On frame " + current_time_string ) (FrameManagerSide+".getObjectsWithKeys time:#CURRENT")
+	menu_select.item (  filter_or_select + " on frame: " + current_time_string ) (FrameManagerSide+".getObjectsWithKeys time:#CURRENT")
 
 	menu_select.item ( "With keys to RIGHT | Ctrl: LEFT") (FrameManagerSide+".getObjectsWithKeys()")
 	
