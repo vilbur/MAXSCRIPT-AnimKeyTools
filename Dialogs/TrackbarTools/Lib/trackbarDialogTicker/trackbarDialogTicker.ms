@@ -94,11 +94,11 @@ struct TrackbarDialogTicker_v
 		if slider_pos_size_last == undefined then
 		(
 			--format "\nINIT\n"
+			update_button_position = true
+			
 			this._resizeAndRepositionWindows()
 
 			slider_pos_size_last = copy slider_pos_size
-			
-			update_button_position = true
 		)
 		/*==============================================================================
 			IF POSITION OF TIME SLIDER CHANGED
@@ -108,28 +108,31 @@ struct TrackbarDialogTicker_v
 			--format "\nUPDATE\n"
 			update_button_position = true
 			
+			
 			/*------------------------------------------------------------------------------
-				DOCK BUTTONS IF TIME SLIDER IS DOCKED
+				IF TIME SLIDER IS DOCKED -> DOCK BUTTONS
 			--------------------------------------------------------------------------------*/
 			if slider_docked and not buttons_docked then
 				this._dockButtonsWin()
 			
 			
 			/*------------------------------------------------------------------------------
-				ALIGN WINDOWS IF SLIDER UN-DOCKED
+				IF SLIDER UN-DOCKED -> ALIGN WINDOWS 
 			--------------------------------------------------------------------------------*/
 			else if not slider_docked and not this._windowsAreAligned() then
 				this._resizeAndRepositionWindows()
 					
 		)
+		
 		/*------------------------------------------------------------------------------
 			IF 3DS MAX WINDOW POSITION \ SIZE CHANGED
 		--------------------------------------------------------------------------------*/
-		else if max_win_pos_changed then
+		else if anim_range_changed or max_win_pos_changed then
 			this._resizeAndRepositionWindows()
 
-
 		--format "update_button_position: %\n" update_button_position
+		--format "update_button_position: %\n" update_button_position
+		
 		/* UPDATE BUTTONS SIZE AND POSITION */
 		if update_button_position then
 			this.updateButtonsSizePosition()
@@ -152,14 +155,9 @@ struct TrackbarDialogTicker_v
 		_rollout.SPN_range_end.value	= animationRange.end
 		
 		
-		--/* SYNC WITH GLOBAL VAROABLE */
-		----if PHASE_LENGTH != _rollout.DL_phase.selected as integer then
-		----	_rollout.DL_phase.selection = PHASE_LENGTH
-		----
 		--/* IF STATE OF ANIMATION MODE IS CHANGED */ 
 		if this._animStateChanged() then
 			this.udpateHighlightColor()
-		
 	),
 	
 	/** Update button text and state
@@ -182,28 +180,27 @@ struct TrackbarDialogTicker_v
 			for i = 1 to frames_count where ( btn = buttons[i]) != undefined do
 			(
 				frame = ( animationRange.start.frame + i - 1 ) as integer
-				--format "frame: %\n" frame
-				--current_time_frame = currentTime.frame as integer + 1
 				
 				/* SET BUTTON TEXT BY FRAME */ 
 				btn.text = frame as string
 				
 				/* WRAP TEXT OF BUTTONS IN PHASE TO "[ ]" */ 
-				 if frame > currentTime.frame - PHASE_LENGTH  and frame <= currentTime.frame then
-					btn.text = "[ "+ btn.text +" ]"
+				 if frame > currentTime.frame - PHASE_LENGTH  and frame < currentTime.frame then
+					btn.text = "["+ btn.text +"]"
 					
 			
-					/* TURN ALL FRAME BUTTONS OFF */ 				
-					btn.state = frame == currentTime.frame
+				/* TURN ALL FRAME BUTTONS OFF */ 				
+				btn.state = frame == currentTime.frame
+				
+				/* ACTIVE BUTTON */ 
+				if btn.state then
+				(
+					/* SET COLOR */ 
+					btn.highlightColor = this.getFrameButtonColor frame
 					
-					if btn.state then
-					(
-						/* SET COLOR */ 
-						btn.highlightColor = this.getFrameButtonColor frame
-						
-						/* FORCE TO UPDATE HIGHLIGHT COLOR */ 
-						btn.state = true
-					)
+					/* FORCE TO UPDATE HIGHLIGHT COLOR */ 
+					btn.state = true
+				)
 			)
 		)
 	),
@@ -351,7 +348,7 @@ struct TrackbarDialogTicker_v
 		if btn_width > button_width_max then
 			button_width_new = button_width_max
 		
-			
+		--format "button_width_new: %\n" button_width_new
 		/* NORMALIZE BUTTON SIZE IF NEEDED */ 
 		if button_width_new != undefined then
 			this.slider_width = buttons_size_pos.w = slider_pos_size.w  = ( frames_count * button_width_new ) + padding_left + padding_right
@@ -583,13 +580,7 @@ struct TrackbarDialogTicker_v
 	function updateButtonsSizePosition =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsSizePosition()"
-		
-		/* GET BUTTONS */ 
-		--frames_count = this.getFramesCount()
-
-		/* UPDATE BUTTONS */ 
-		----if update_button_position or visible_buttons.count != frames_count then
-		--(
+		frames_count = this.getFramesCount()
 	
 		pos_x = padding_left -- left margin on trackbar
 		
@@ -600,8 +591,6 @@ struct TrackbarDialogTicker_v
 			buttons_area -= 20
 		
 		btn_width = ( buttons_area / (frames_count ) )
-		--format "BTN_WIDTH: %\n" btn_width
-		
 		
 		for i = 1 to buttons.count do
 		(

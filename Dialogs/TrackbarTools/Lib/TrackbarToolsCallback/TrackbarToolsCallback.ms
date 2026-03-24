@@ -183,7 +183,7 @@ struct TrackbarToolsCallback_v
 		if animation_range.end == currentTime then
 			sliderTime = animationRange.end
 		
-		
+		clearListener(); print("Cleared in: "+getSourceFileName())
 		/* Show / Hide buttons */
 		--this.showHideButtonsInRange sliderTime.frame
 		--
