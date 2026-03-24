@@ -17,15 +17,17 @@ struct TrackbarDialogTicker_v
 	/* private */
 	green_color = COLOR_NAMES[#GREEN_DARK], -- coor active frame button 
 	
-	
+	/* trackbar buttons */ 
 	buttons_hwnd,
 	buttons_size_pos,
 	buttons_docked,
-		
+	
+	/* Native timeslider */ 
 	slider_hwnd,
 	slider_pos_size,
 	slider_docked,
 	
+	/* 3Ds Max window */ 
 	maxwin_pos_size,
 		
 	/* private */
@@ -42,9 +44,15 @@ struct TrackbarDialogTicker_v
 	
 	max_win_hwnd,
 	
+	anim_range_changed,
+	frames_count,
+	
 	/* STATIC */ 
 	viewport_bottom_padding = 60,
-	
+
+	padding_left	= 54,
+	padding_right	= 108,
+			
 	init = false,
 	
 	animation_range,
@@ -56,30 +64,49 @@ struct TrackbarDialogTicker_v
 	function updateDialog =
 	(
 		--format "\n\n"; print "TrackbarDialogTicker_v.updateDialog()"
+		--format "\n"
+		--format "slider_pos_size_last == undefined: %\n" (slider_pos_size_last == undefined)
+		/* GET BUTTON CONTROLS ON INIT */
+		this._getFrameButtonsFromUi()
 		
-		anim_range_changed = this._animRangeChanged()
-		
+		/* GET DATA */ 
+		anim_range_changed = this._animRangeChanged()		
+		--format "anim_range_changed: %\n" anim_range_changed
 		max_win_pos_changed = this._maxWidowSizeChanged()
 		--format "max_win_pos_changed: %\n" max_win_pos_changed
 		/* IF MAX WIDOW SIZE CHANGED */ 
 		update_button_position = anim_range_changed or max_win_pos_changed
-		--format "update_button_position: %\n" update_button_position
-		/* GET BUTTON CONTROLS ON INIT */
-		this._setFrameButtons()
-		
+
+		--/* GET FRAMES COUNT */ 
+		--if anim_range_changed then
+		--	frames_count = this.getFramesCount()
+		--
+	
+		/* UPDATE WINDOWS POSITIONS ON EACH TICK */
 		this._getPositionsAndSizeOfWindows()
 		
-
 		/* SET WIDTH OF SLIDER */ 
 		this.setThisSliderWidth()
 		
 		/*==============================================================================
-			POSITION OF TIME SLIDER
+			ON INIT
 		================================================================================*/
-		if this._isPosSizeOfNativeSliderChanged() then
+		if slider_pos_size_last == undefined then
 		(
-			update_button_position = true
+			--format "\nINIT\n"
+			this._resizeAndRepositionWindows()
+
+			slider_pos_size_last = copy slider_pos_size
 			
+			update_button_position = true
+		)
+		/*==============================================================================
+			IF POSITION OF TIME SLIDER CHANGED
+		================================================================================*/
+		else if this._isPosSizeOfNativeSliderChanged() then
+		(
+			--format "\nUPDATE\n"
+			update_button_position = true
 			
 			/*------------------------------------------------------------------------------
 				DOCK BUTTONS IF TIME SLIDER IS DOCKED
@@ -95,13 +122,14 @@ struct TrackbarDialogTicker_v
 				this._resizeAndRepositionWindows()
 					
 		)
+		/*------------------------------------------------------------------------------
+			IF 3DS MAX WINDOW POSITION \ SIZE CHANGED
+		--------------------------------------------------------------------------------*/
 		else if max_win_pos_changed then
 			this._resizeAndRepositionWindows()
 
-		--format "update_button_position: %\n" update_button_position
 
-		
-		
+		--format "update_button_position: %\n" update_button_position
 		/* UPDATE BUTTONS SIZE AND POSITION */
 		if update_button_position then
 			this.updateButtonsSizePosition()
@@ -132,14 +160,12 @@ struct TrackbarDialogTicker_v
 		if this._animStateChanged() then
 			this.udpateHighlightColor()
 		
-		animation_range = animationRange
 	),
 	
 	/** Update button text and state
 	 */
 	function updateActiveButton force:false =
 	(
-
 		/*------------------------------------------------------------------------------
 			EDIT EACH BUTTON IN ANIM RANGE
 		--------------------------------------------------------------------------------*/
@@ -148,7 +174,7 @@ struct TrackbarDialogTicker_v
 		(
 			--format "\n"; print "TrackbarDialogTicker_v.updateActiveButton()"
 
-			this._setFrameButtons()
+			this._getFrameButtonsFromUi()
 			
 			frames_count = this.getFramesCount()
 			--format "currentTime.frame: %\n" currentTime.frame
@@ -219,7 +245,15 @@ struct TrackbarDialogTicker_v
 
 	/** Is anim range changed
 	 */
-	function _animRangeChanged = animation_range != undefined and ( animation_range.start != animationRange.start or animation_range.end != animationRange.end ),
+	function _animRangeChanged =
+	(
+		anim_range_changed = animation_range != undefined and ( animation_range.start != animationRange.start or animation_range.end != animationRange.end )
+	 
+		/* STORE ANIM RANGE TO DETECT CHANGE */ 
+		animation_range = animationRange
+		
+		anim_range_changed --return
+	),
 	
 
 	--function _animRangeChanged =
@@ -263,38 +297,64 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n"; print "TrackbarDialogTicker_v._getPositionsAndSizeOfWindows()"
 		
-		buttons_hwnd	= this.getChildWindow "Time Slider Tools"
+		--if buttons_hwnd == undefined then 
+			buttons_hwnd	= this.getChildWindow "Time Slider Tools"
+		--format "buttons_hwnd: %\n" buttons_hwnd
+		--if slider_hwnd == undefined then 
+			slider_hwnd	= this.getChildWindow "Time Slider"
+		--format "slider_hwnd: %\n" slider_hwnd
 		
-		slider_hwnd	= this.getChildWindow "Time Slider"
-		
-		
-		/* IF BUTTONS ARE UN DOCKED */ 
-		if not ( buttons_docked  = buttons_hwnd == undefined ) then 
+		/* IF BUTTONS ARE UNDOCKED */ 
+		if not ( buttons_docked = buttons_hwnd == undefined ) then 
 			buttons_size_pos = windows.getWindowPos buttons_hwnd
 
 
-		/* IF TIMESLIDER IS UN DOCKED */ 
-		if not ( slider_docked  = slider_hwnd == undefined ) then 
+		/* IF TIMESLIDER IS UNDOCKED */ 
+		if not ( slider_docked  = slider_hwnd == undefined ) then
 			slider_pos_size = windows.getWindowPos slider_hwnd
 		
 		
 		/* IF TIMESLIDER IS DOCKED */ 
 		else if slider_hwnd == undefined then
 			slider_docked_hwnd = (for control in ( windows.getChildrenHWND #max ) where control[5] == "TimeSlider" collect control[1])[1]
-		
-		--format "\n"
-		--format "buttons_hwnd: %\n" buttons_hwnd
-		--format "slider_hwnd:  %\n" slider_hwnd
-		--format "slider_docked_hwnd: %\n" slider_docked_hwnd
-		--format "slider_pos_size: %\n" slider_pos_size
-		--format "slider_pos_size: %\n" slider_pos_size
+
 		/* FORCE TO SHOW TRACKBAR IS IT IS HIDDEN */ 
-		if not trackbar.visible then
-		(
-			showTimeSlider()
+		--if not trackbar.visible then
+		--(
+		--	--showTimeSlider()
+		--	
+		--	this._getPositionsAndSizeOfWindows()
+		--)
+	),
+	
+	/** Keep size of buttons 
+	 */
+	function _normalizeDialogWidth =
+	(
+		--format "\n"; print "TrackbarDialogTicker_v._normalizeDialogWidth()"
+		--format "slider_pos_size: %\n" slider_pos_size.w
+		--format "frames_count: %\n" frames_count
+		button_width_min = 14
+		button_width_max = 32
+		
+		btn_width = ( ( slider_pos_size.w - padding_left - padding_right ) / frames_count ) as integer
+		
+		button_width_new = undefined 
+		--format "btn_width: %\n" btn_width
+		
+		/* TEST MINIMAL SIZE OF BUTTONS  */ 
+		if btn_width < button_width_min then
+			button_width_new = button_width_min
 			
-			this._getPositionsAndSizeOfWindows()
-		)
+		
+		/* TEST MAXIMAL SIZE OF BUTTONS  */ 
+		if btn_width > button_width_max then
+			button_width_new = button_width_max
+		
+			
+		/* NORMALIZE BUTTON SIZE IF NEEDED */ 
+		if button_width_new != undefined then
+			this.slider_width = buttons_size_pos.w = slider_pos_size.w  = ( frames_count * button_width_new ) + padding_left + padding_right
 	),
 	
 	/** Is window position changed
@@ -304,61 +364,49 @@ struct TrackbarDialogTicker_v
 		--format "\n\n"; print "TrackbarDialogTicker_v._isPosSizeOfNativeSliderChanged()"
 		--format "slider_pos_size_last: %\n" slider_pos_size_last
 		--format "slider_pos_size_last: %\n" slider_pos_size_last
-		
-		/*------------------------------------------------------------------------------
-			ON INIT
-		--------------------------------------------------------------------------------*/
-		if slider_pos_size_last == undefined then
-		(
-			slider_pos_size_last = copy slider_pos_size
-			
-			true --return
-		)
+
 		/*------------------------------------------------------------------------------
 			TEST CHANGE OF POSITION -- wait then user end with resizing or move ends
 		--------------------------------------------------------------------------------*/
-		else
+		/* TEST CHANGE OF DOCKED STATE  */ 
+		dock_state_changed = slider_docked != buttons_docked
+		--format "dock_state_changed: %\n" dock_state_changed
+		
+		/* IF DOCK STATE CHANGED */ 
+		pos_size_of_native_slider_changed = dock_state_changed
+		
+		/* IF SLIDER IS UNDOCKED */ 
+		if not slider_docked and not dock_state_changed then
 		(
-			/* TEST CHANGE OF DOCKED STATE  */ 
-			dock_state_changed = slider_docked != buttons_docked
-			--format "dock_state_changed: %\n" dock_state_changed
 			
-			/* IF DOCK STATE CHANGED */ 
-			pos_size_of_native_slider_changed = dock_state_changed
-			
-			
-			/* IF SLIDER IS UNDOCKED */ 
-			if not slider_docked and not dock_state_changed then
+			/* IF CHANGING POSITION ENDS */ 
+			if pos_is_changing_now and slider_pos_size_last == slider_pos_size then
 			(
-				
-				/* IF CHANGING POSITION ENDS */ 
-				if pos_is_changing_now and slider_pos_size_last == slider_pos_size then
-				(
-					pos_is_changing_now = false
-				
-					pos_size_of_native_slider_changed = true
-				)
-				/* IF CHANGING POSITION STARTS */ 
-				else if not pos_is_changing_now and slider_pos_size_last != slider_pos_size then
-					pos_is_changing_now = true
+				--format "\nRESIZE END\n"
+				pos_is_changing_now = false
+			
+				pos_size_of_native_slider_changed = true
 			)
-			
-			
-			/* STORE VALUE FOR NEXT TICK */ 
-			slider_pos_size_last = copy slider_pos_size
-			
-			pos_size_of_native_slider_changed --return
+			/* IF CHANGING POSITION STARTS */ 
+			else if not pos_is_changing_now and slider_pos_size_last != slider_pos_size then
+				pos_is_changing_now = true
 		)
+		
+		
+		/* STORE VALUE FOR NEXT TICK */ 
+		slider_pos_size_last = copy slider_pos_size
+		
+		pos_size_of_native_slider_changed --return
 	),
 	
 	/** Dock buttons win
 	 */
-	function _dockButtonsWin =
+	function _dockButin =
 	(
 		--format "\n"; print "TrackbarDialogTicker_v._dockButtonsWin()"
 		
 		/* SET POSITION OF BUTTONS WINDOW */ 
-		windows.setWindowPos buttons_hwnd buttons_size_pos true
+		windows.setWindowPos buttons_hwnd buttons_area_size_pos true
 		
 		cui.RegisterDialogBar _rollout style:#(#cui_dock_bottom)
 		
@@ -373,49 +421,34 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n"; print "TrackbarDialogTicker_v._resizeAndRepositionWindows()"
 		--format "slider_pos_size: %\n" slider_pos_size
-		
-		--/* SET WINDOW WIDTH */
-		--if buttons_size_pos == undefined then
-		--(
-		--	format "\nWTF"
-		--	
-		--	buttons_size_pos = copy slider_pos_size
-		--	
-		--	--buttons_size_pos.h = 36
-		--)
-		--format "slider_pos_size:  %\n" slider_pos_size
-		--format "buttons_size_pos: %\n" buttons_size_pos
-			
+		this._normalizeDialogWidth()
+
 		buttons_size_pos.w = slider_width
-
-		
-
 		
 		/* UN DOCK BUTTONS */ 
 		if buttons_docked then
 		(
 			cui.UnRegisterDialogBar _rollout
-
+			
 			buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		)
 		else
 		(
-			/* SNAP TO LEFT | CENTER | BOTTOM */ 
+		/* SNAP TO LEFT | CENTER | BOTTOM */ 
 			this.snapSliderPosition()
 			
 			/* ALIG POSITION WINDOWS TOP \ BOTTOM */ 
 			this.alignTimeSliders()
-			
 		)
-
-		--format "buttons_size_pos: %\n" buttons_size_pos
+		
+		/* STORE POSITION TO DETECT CHANGE */ 
+		slider_pos_size_last = slider_pos_size
 		
 		/* SET POSITION OF BUTTONS WINDOW */ 
 		windows.setWindowPos buttons_hwnd buttons_size_pos true
 
 		/* SET TIME SLIDER POSITION */ 
 		windows.setWindowPos slider_hwnd slider_pos_size true
-		
 	),
 	
 	/** Windows aligned
@@ -434,9 +467,7 @@ struct TrackbarDialogTicker_v
 		)
 		else
 			false --return
-		
 	),
-
 
 	/** Playback
 	 */
@@ -554,45 +585,42 @@ struct TrackbarDialogTicker_v
 		--format "\n"; print "TrackbarDialogTicker_v.updateButtonsSizePosition()"
 		
 		/* GET BUTTONS */ 
-		frames_count = this.getFramesCount()
-
-		
-		
-		
-		--visible_buttons = for btn in buttons where btn.visible collect btn 
+		--frames_count = this.getFramesCount()
 
 		/* UPDATE BUTTONS */ 
 		----if update_button_position or visible_buttons.count != frames_count then
 		--(
-			pos_x = 54 -- left margin on trackbar
-			
-			buttons_area = slider_width - 108
+	
+		pos_x = padding_left -- left margin on trackbar
+		
+		buttons_area = slider_width - padding_right
 
-			/* FIX WIDTH OF DOCKED DIALOG */ 
-			if slider_hwnd == undefined then
-				buttons_area -= 20
+		/* FIX WIDTH OF DOCKED DIALOG */ 
+		if slider_hwnd == undefined then
+			buttons_area -= 20
+		
+		btn_width = ( buttons_area / (frames_count ) )
+		--format "BTN_WIDTH: %\n" btn_width
+		
+		
+		for i = 1 to buttons.count do
+		(
+			/* EDIT BUTTON */ 
+			buttons[i].visible = i <= frames_count
+			buttons[i].width   = btn_width
+			buttons[i].pos.x   = pos_x
 			
-			btn_width = ( buttons_area / (frames_count ) ) 
-			
-			
-			for i = 1 to buttons.count do
-			(
-				/* EDIT BUTTON */ 
-				buttons[i].visible = i <= frames_count
-				buttons[i].width   = btn_width
-				buttons[i].pos.x   = pos_x
-				
-				/* UPDADTE POS FOR NEXT BUTTON */ 
-				pos_x += btn_width
-			)
-			
-			/* UPDATE POSITION OF "PLAY" BUTTON */
-			last_button = if buttons[frames_count + 1] == undefined then frames_count else frames_count + 1
-			
-			if last_button > buttons.count then
-				last_button = buttons.count
-			
-			pos_after_last_button = buttons[last_button].pos
+			/* UPDADTE POS FOR NEXT BUTTON */ 
+			pos_x += btn_width
+		)
+		
+		/* UPDATE POSITION OF "PLAY" BUTTON */
+		last_button = if buttons[frames_count + 1] == undefined then frames_count else frames_count + 1
+		
+		if last_button > buttons.count then
+			last_button = buttons.count
+		
+		pos_after_last_button = buttons[last_button].pos
 
 		--)
 		
@@ -606,9 +634,9 @@ struct TrackbarDialogTicker_v
 	  
 	  @return Dictionary #INTEGER
 	 */
-	function _setFrameButtons =
+	function _getFrameButtonsFromUi =
 	(
-		--format "\n"; print "._setFrameButtons()"
+		--format "\n"; print "._getFrameButtonsFromUi()"
 		if this.buttons == undefined then
 			this.buttons = for ctrl in _rollout.controls where matchPattern (ctrl as string ) pattern:("*btn_frame_*") collect ctrl --return
 	),
@@ -716,7 +744,7 @@ struct TrackbarDialogTicker_v
 	
 	on create do
 	(
-		format "\n"; print "TrackbarDialogTicker_v.onCreate()"
+		--format "\n"; print "TrackbarDialogTicker_v.onCreate()"
 		--buttons_hwnd = this.getChildWindow "Time Slider Tools"
 		--slider_hwnd = this.getChildWindow "Time Slider"
 		

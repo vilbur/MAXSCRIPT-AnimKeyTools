@@ -88,7 +88,7 @@ function trackbarToolsDialog =
 	btn_end	= _Controls.control #BUTTON	"<>"	id:#BTN_btn_send	width:20 height:16 pos:[ 34 , 20 ]	tooltip:"Shift LAST frame\n\nALT: Trim END by CURRENT frame"
 
 	
-	/* EVENTS SPINNERS */ 	
+	/* EVENTS SPINNERS */
 	spinner_start.Event	#CHANGED "ToolsCallback.setAnimRange START: EventFired.val"	tooltip:"Set anim range START"
 	spinner_end.Event	#CHANGED "ToolsCallback.setAnimRange END: EventFired.val"	tooltip:"Set anim range END"
 	

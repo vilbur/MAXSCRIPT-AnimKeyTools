@@ -55,4 +55,21 @@ function showTimeSlider =
 	/* FORCE TO SHOW IN UI */ 
 	if not trackbar.visible then
 		forceShowTimeSliderWithWorkspaceReset()
+		
+		
+	/* CHECK IF SLIDER IS VISIBLE */ 
+	if not trackbar.visible then
+	(
+		msg = "Toggle does not work because of 3Ds Max Bug.\n\n"
+		msg += "WORKAROUND:\n\n"
+		msg += "1) Right-click on an empty area of the top Toolbar to bring up the drop-down menu"
+		msg += "2) Click on the \"Time Slider\"" 
+		msg += "3) Save current Workspace"
+
+		
+		messageBox msg title:"SHOW TIMESLIDDE"
+	)
+	
+	trackbar.visible --return
+		
 )

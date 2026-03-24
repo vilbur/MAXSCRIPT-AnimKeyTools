@@ -14,4 +14,6 @@ filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/trackbarT
 /*------------------------------------------------------------------------------
 	CREATE DIALOG
 --------------------------------------------------------------------------------*/
-trackbarToolsDialog() --"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"
+
+if showTimeSlider() then
+	trackbarToolsDialog() --"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"
