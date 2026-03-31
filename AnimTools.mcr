@@ -7,7 +7,7 @@ toolTip:	"Open AnimTools"
 	--filein @"$userscripts\vilTools3\main_script.ms"
 	filein @"$userscripts\MAXSCRIPT-AnimKeyTools\AnimTools.ms" --"./AnimTools.ms"
 	
-	loadContentAndCreateDialog()
+	--loadContentAndCreateDialog()
 )
 
 /*------------------------------------------------------------------------------

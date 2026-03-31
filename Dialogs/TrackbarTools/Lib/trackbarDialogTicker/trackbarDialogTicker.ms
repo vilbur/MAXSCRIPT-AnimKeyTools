@@ -326,9 +326,9 @@ struct TrackbarDialogTicker_v
 	
 	/** Keep size of buttons 
 	 */
-	function _normalizeDialogWidth =
+	function _keepButtonSizeInRange =
 	(
-		--format "\n"; print "TrackbarDialogTicker_v._normalizeDialogWidth()"
+		--format "\n"; print "TrackbarDialogTicker_v._keepButtonSizeInRange()"
 		--format "slider_pos_size: %\n" slider_pos_size.w
 		--format "frames_count: %\n" frames_count
 		button_width_min = 14
@@ -339,19 +339,24 @@ struct TrackbarDialogTicker_v
 		button_width_new = undefined 
 		--format "btn_width: %\n" btn_width
 		
-		/* TEST MINIMAL SIZE OF BUTTONS  */ 
-		if btn_width < button_width_min then
-			button_width_new = button_width_min
+		--/* TEST MINIMAL SIZE OF BUTTONS  */ 
+		--if btn_width < button_width_min then
+		--	button_width_new = button_width_min
+		--	
+		--
+		--/* TEST MAXIMAL SIZE OF BUTTONS  */ 
+		--if btn_width > button_width_max then
+		--	button_width_new = button_width_max
+		--
+		----format "button_width_new: %\n" button_width_new
+		--/* NORMALIZE BUTTON SIZE IF NEEDED */ 
+		--if button_width_new != undefined then
+		--	this.slider_width = buttons_size_pos.w = slider_pos_size.w  = ( frames_count * button_width_new ) + padding_left + padding_right
+		--	
+		if btn_width < button_width_min or btn_width > button_width_max then
+			this.slider_width = buttons_size_pos.w = slider_pos_size.w  = ( frames_count * ( (button_width_min + button_width_max) / 2 ) ) + padding_left + padding_right
+
 			
-		
-		/* TEST MAXIMAL SIZE OF BUTTONS  */ 
-		if btn_width > button_width_max then
-			button_width_new = button_width_max
-		
-		--format "button_width_new: %\n" button_width_new
-		/* NORMALIZE BUTTON SIZE IF NEEDED */ 
-		if button_width_new != undefined then
-			this.slider_width = buttons_size_pos.w = slider_pos_size.w  = ( frames_count * button_width_new ) + padding_left + padding_right
 	),
 	
 	/** Is window position changed
@@ -418,7 +423,7 @@ struct TrackbarDialogTicker_v
 	(
 		--format "\n"; print "TrackbarDialogTicker_v._resizeAndRepositionWindows()"
 		--format "slider_pos_size: %\n" slider_pos_size
-		this._normalizeDialogWidth()
+		this._keepButtonSizeInRange()
 
 		buttons_size_pos.w = slider_width
 		
