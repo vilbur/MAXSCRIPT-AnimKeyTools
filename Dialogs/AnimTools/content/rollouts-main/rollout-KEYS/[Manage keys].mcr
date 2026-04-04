@@ -7,7 +7,7 @@
 macroscript	AnimTools_select_obejcts_with_Keys
 category:	"_AnimTools"
 buttontext:	"Select by keys"
-toolTip:	"SELECT \ FILTER SELECTION object with keys.\n\nType of keys is driven by current tool.\n\n1) DEFAULT: ALL TYPES OF TRANSFORM KEYS\n\n2) MOVE: POSIITON\n\n3) ROTATE: ROTATION\n\n4) SCALE: SCALE"
+toolTip:	"SELECT \ FILTER SELECTION object with keys.\n\nType of keys is driven by current tool.\n\n1) DEFAULT: ALL TYPES OF TRANSFORM KEYS\n\n2) MOVE TOOL: Position  Keys\n\n3) ROTATE TOOL: Rotation Keys\n\n4) SCALE TOOL: Scale Keys"
 icon:	"across:2|width:96|height:32"
 (
 	on execute do
@@ -29,28 +29,7 @@ icon:	"across:2|width:96|height:32"
 		
 		objs = if selection.count > 0 then selection as Array else objects
 
-		ObjectsControllerKeys = (KeyFrameManager_v()).getObjectsWithKeys objs which:which
-		
-		if classOf which != Array then which = #( which )
-		
-		/* OBJECTS to process */ 
-
-		where_search = if selection.count > 0 then "SELECTION" else "ALL OBJECTS"
-		
-		objs_to_select = for ObjectControllerKeys in ObjectsControllerKeys collect ObjectControllerKeys.obj
-		--format "objs_to_select: %\n" objs_to_select
-		
-		if objs_to_select.count > 0 then
-		(
-			msg = objs_to_select.count as string + " OBJECTS SELECTED IN " + where_search + " WITH ANIM KEYS: " + arrayToString which
-			
-			format "%\n" msg
-			
-			select objs_to_select
-		)
-		else
-			messageBox ( "THERE IS NOT ANY OBJECT IN " + where_search + "\n\nWITH ANIM KEYS OF TYPE:\n\n" + arrayToString which ) title:( toUpper(mode as string ) + " KEYS")
-	
+		(KeyFrameManager_v()).getObjectsWithKeys objs:objs which:which
 	)
 )
 
@@ -65,20 +44,20 @@ icon:	"menu:Insert key"
 	on execute do
 	(
 		--filein @"C:\Users\vilbur\AppData\Local\Autodesk\3dsMax\2023 - 64bit\ENU\scripts\MAXSCRIPT-AnimKeyTools\AnimTools\content\rollouts-main\rollout-KEYS\[Manage keys].mcr"
-		--which = case toolmode.commandmode of
-		--(
-		--	#move:	#POSITION
-		--	#Rotate:	#ROTATION
-		--	#squash:	#SCALE
-		--	#nuscale:	#SCALE
-		--	#uscale:	#SCALE
-		--	default: #( #POSITION, #ROTATION, #SCALE )
-		--)
+		which = case toolmode.commandmode of
+		(
+			#move:	#POSITION
+			#Rotate:	#ROTATION
+			#squash:	#SCALE
+			#nuscale:	#SCALE
+			#uscale:	#SCALE
+			default: #( #POSITION, #ROTATION, #SCALE )
+		)
 		
 		format "\nInsert key"
 		--createKeys()
-		--createKeys tracks:#POSITION
-		createKeys tracks:#ROTATION
+		createKeys tracks:which
+		--createKeys tracks:#ROTATION
 	)
 )
 /**  

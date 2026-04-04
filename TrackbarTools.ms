@@ -11,9 +11,24 @@ filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/Lib/Track
 filein( getFilenamePath(getSourceFileName()) + "/Dialogs/TrackbarTools/trackbarToolsDialog.ms" )	--"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"
 
 
+/*
+	THIS WORKS AS TOGGLE
+		
+	CREATE \ DESTROY DIALOG
+
+*/ 
+
+/*------------------------------------------------------------------------------
+	KILL DIALOG
+--------------------------------------------------------------------------------*/
+if not (try( GetDialogPos DIALOG_time_slider_tools != [0,0] )catch( false ) )then
+(
+	try( cui.UnRegisterDialogBar DIALOG_time_slider_tools )catch()
+	
+	try( destroyDialog DIALOG_time_slider_tools )catch()
+)
 /*------------------------------------------------------------------------------
 	CREATE DIALOG
 --------------------------------------------------------------------------------*/
-
-if showTimeSlider() then
+else if showTimeSlider() then
 	trackbarToolsDialog() --"./Dialogs/TrackbarTools/trackbarToolsDialog.ms"

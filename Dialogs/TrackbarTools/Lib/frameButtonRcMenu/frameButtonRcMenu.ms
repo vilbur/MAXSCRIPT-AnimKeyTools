@@ -147,12 +147,11 @@ function frameButtonRcMenu =
 		Menu.item "DELETE ALL KEYS from scene" "(KeyFrameManager_v()).removeAllKeysFromSceneOrSelection()"
 		
 		--Menu.item "TRIM all keys from scene RIGHT | Ctrl: LEFT" ( "if queryBox ( \"TRIM keys from all objects in scene ?\") title:\"TRIM keys\" then "+FrameManagerSide+".removeKeys objs:( objects as Array )")
-
 	)
-	
-	
-	
+
 	Menu.separator()
+	
+	
 
 	/*------------------------------------------------------------------------------
 		SELECT OBJECTS
@@ -160,6 +159,7 @@ function frameButtonRcMenu =
 
 	menu_select = Menu.menu ( filter_or_select + " by keys") --flat:false
 
+	/* Select\Filter on frame:n */ 
 	menu_select.item (  filter_or_select + " on frame: " + current_time_string ) (FrameManagerSide+".getObjectsWithKeys time:#CURRENT")
 
 	menu_select.item ( "With keys to RIGHT | Ctrl: LEFT") (FrameManagerSide+".getObjectsWithKeys()")

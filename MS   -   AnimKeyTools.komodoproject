@@ -13,10 +13,10 @@
 </file>
 <livefolder id="7d29e177-e6c8-4d5d-ae8e-8721c83f6665" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools" url="Dialogs/TrackbarTools/">
 </livefolder>
+<livefolder id="87c58ced-88e1-4ec8-ba47-3b1725d0e730" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools" url="Dialogs/AnimTools/">
+</livefolder>
 <file id="a38bbe5d-265a-4250-8aa6-69a02eaafc87" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="PhaseMaker.ms" url="PhaseMaker.ms">
 </file>
-<folder id="c6ca22be-3ca8-46c3-8aef-d5dc69667659" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="AnimTools">
-</folder>
 <file id="f0246cc1-38c3-4e17-bfc8-9f7fcc246b69" idref="5af1249a-22f0-4572-a7b7-fca63ea84995" name="TrackbarTools.ms" url="TrackbarTools.ms">
 </file>
 <preference-set idref="1113d1d2-74de-42d8-913a-3406d6b9a29d" id="project" preftype="project">

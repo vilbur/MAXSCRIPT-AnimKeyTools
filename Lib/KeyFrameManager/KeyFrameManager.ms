@@ -139,9 +139,9 @@ struct KeyFrameManager_v
 	
 	/** get objects with keys of specific type and time
 	 */
-	function getObjectsWithKeys objs: transforms: properties: time: =
+	function getObjectsWithKeys objs: transforms: properties: time: select_result:true =
 	(
-		--format "\n"; print "KeyFrameManager_v.getObjectsWithKeys()"
+		format "\n"; print "KeyFrameManager_v.getObjectsWithKeys()"
 		this.setParameters objs:objs transforms:transforms properties:properties time:time
 
 		objects_with_keys = #()
@@ -164,22 +164,34 @@ struct KeyFrameManager_v
 			if key_found then
 				append objects_with_keys obj	
 		)
-
-		where_searched = if selection.count > 0 then "selection" else "objects"
 		
-		if objects_with_keys.count > 0 then
+		--format "objects_with_keys: %\n" objects_with_keys
+		
+		if select_result then
 		(
-			--messageBox ("Yupiii") title:"KeyFrameManager"
+			if classOf which != Array then which = #( which )
 			
-			if objects_with_keys.count == this.objs.count then
-				messageBox ("All objects has anim keys on time") title:"KeyFrameManager"
+			/* OBJECTS to process */ 
+	
+			where_search = if selection.count > 0 then "SELECTION" else "ALL OBJECTS"
 			
+			--objs_to_select = for ObjectControllerKeys in ObjectsControllerKeys collect ObjectControllerKeys.obj
+			--format "objs_to_select: %\n" objs_to_select
 			
-			select objects_with_keys
+			if objs_to_select.count > 0 then
+			(
+				msg = objs_to_select.count as string + " OBJECTS SELECTED IN " + where_search + " WITH ANIM KEYS: " + arrayToString which
+				
+				format "%\n" msg
+				
+				select objs_to_select
+			)
+			else
+				messageBox ( "THERE IS NOT ANY OBJECT IN " + where_search + "\n\nWITH ANIM KEYS OF TYPE:\n\n" + arrayToString which ) title:( toUpper(mode as string ) + " KEYS")
+			
 		)
 		else
-			messageBox ("There is not any object with anim keys on time") title:"KeyFrameManager"
-			
+			objects_with_keys --return
 	),
 	
 	/** Remove anim keys from selection
